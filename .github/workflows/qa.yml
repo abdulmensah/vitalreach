@@ -18,6 +18,9 @@ jobs:
   build:
     name: Build and verify
     runs-on: ubuntu-latest
+    environment:
+      name: qa
+      url: https://qa.vitalreachhub.com
     steps:
       - name: Check out source
         uses: actions/checkout@v5

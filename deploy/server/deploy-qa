@@ -8,7 +8,7 @@ fi
 
 release_id="$1"
 archive="$2"
-root="/opt/vitalreach"
+root="/opt/vitalreach/qa"
 release="$root/releases/$release_id"
 
 [[ "$release_id" =~ ^[0-9a-f]{40}$ ]] || { echo "Invalid release id" >&2; exit 65; }
