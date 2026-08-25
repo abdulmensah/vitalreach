@@ -6,7 +6,7 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>Product administration | VitalReach</PageTitle>
-<header class="admin-header"><a class="logo" href="/"><img src="images/vitalreach-logo.png" alt="VitalReach Wellness Hub" /></a><div><span>@AdminEmail</span><a href="/auth/logout">Sign out</a></div></header>
+<header class="admin-header"><a class="logo" href="/"><img src="images/vitalreach-logo.png" alt="VitalReach Wellness Hub" /></a><nav><a class="active" href="/admin/products">Products</a><a href="/admin/users">Access</a></nav><div><span>@AdminEmail</span><a href="/auth/logout">Sign out</a></div></header>
 <main class="admin-shell">
     <header class="admin-title"><div><p class="eyebrow">Secure administration</p><h1>Product catalog</h1><p>Manage the products shown on the VitalReach storefront.</p></div><button class="btn btn-gold" @onclick="NewProduct">Add product</button></header>
     @if (!string.IsNullOrEmpty(Message)) { <div class="admin-message">@Message</div> }

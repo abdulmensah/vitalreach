@@ -16,6 +16,8 @@ SyslogIdentifier=vitalreach-qa
 Environment=ASPNETCORE_ENVIRONMENT=Production
 Environment=ASPNETCORE_URLS=http://127.0.0.1:5088
 Environment="ConnectionStrings__Catalog=Data Source=/opt/vitalreach/qa/shared/vitalreach.db"
+Environment=DataProtection__Path=/opt/vitalreach/qa/shared/keys
+Environment=DataProtection__ApplicationName=VitalReach.QA
 EnvironmentFile=-/etc/vitalreach/qa.env
 Environment=DOTNET_NOLOGO=true
 NoNewPrivileges=true

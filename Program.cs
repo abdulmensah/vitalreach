@@ -2,13 +2,20 @@ using VitalReach.Web.Components;
 using VitalReach.Web.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+var dataProtectionPath = builder.Configuration["DataProtection:Path"] ?? Path.Combine(builder.Environment.ContentRootPath, "App_Data", "keys");
+Directory.CreateDirectory(dataProtectionPath);
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionPath))
+    .SetApplicationName(builder.Configuration["DataProtection:ApplicationName"] ?? "VitalReach.Local");
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddDbContextFactory<CatalogDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("Catalog") ?? "Data Source=data/vitalreach.db"));
+    options.UseSqlite(builder.Configuration.GetConnectionString("Catalog") ?? "Data Source=App_Data/vitalreach.db"));
 var googleClientId = builder.Configuration["Authentication:Google:ClientId"];
 var googleClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
 var googleConfigured = !string.IsNullOrWhiteSpace(googleClientId) && !string.IsNullOrWhiteSpace(googleClientSecret);
@@ -36,13 +43,9 @@ if (googleConfigured)
         options.ClientSecret = googleClientSecret!;
     });
 }
-var allowedAdmins = builder.Configuration.GetSection("Admin:AllowedEmails").Get<string[]>() ?? [];
+builder.Services.AddScoped<IAuthorizationHandler, DatabaseAdminAuthorizationHandler>();
 builder.Services.AddAuthorizationBuilder().AddPolicy("Admin", policy =>
-    policy.RequireAuthenticatedUser().RequireAssertion(context =>
-    {
-        var email = context.User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
-        return !string.IsNullOrWhiteSpace(email) && allowedAdmins.Contains(email, StringComparer.OrdinalIgnoreCase);
-    }));
+    policy.RequireAuthenticatedUser().AddRequirements(new DatabaseAdminRequirement()));
 
 var app = builder.Build();
 
@@ -54,7 +57,7 @@ app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseAntiforgery();
-Directory.CreateDirectory(Path.Combine(app.Environment.ContentRootPath, "data"));
+Directory.CreateDirectory(Path.Combine(app.Environment.ContentRootPath, "App_Data"));
 await CatalogSeeder.SeedAsync(app.Services);
 if (googleConfigured)
 {

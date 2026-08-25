@@ -4,7 +4,8 @@
 <PageTitle>Wellness with purpose | VitalReach Wellness Hub</PageTitle>
 
 <div class="announcement">Proudly Ghanaian-American <span>✦</span> Free US shipping over $75</div>
-<header class="site-header" id="top"><a class="logo" href="#top"><img src="images/vitalreach-logo.png" alt="VitalReach Wellness Hub" /></a><nav><a href="#shop">Shop</a><a href="#mission">Ghana Mission</a><a href="#guide">Health Guide</a><a href="#about">Our Story</a></nav><button class="cart-trigger" @onclick="OpenCart">Bag <span>@CartCount</span></button></header>
+<header class="site-header" id="top"><a class="logo" href="#top"><img src="images/vitalreach-logo.png" alt="VitalReach Wellness Hub" /></a><nav class="desktop-nav"><a href="#shop">Shop</a><a href="#mission">Ghana Mission</a><a href="#guide">Health Guide</a><a href="#about">Our Story</a></nav><div class="header-actions"><button class="menu-trigger @(MenuOpen ? "open" : "")" @onclick="ToggleMenu" aria-label="Toggle navigation" aria-expanded="@MenuOpen"><span></span><span></span><span></span></button><button class="cart-trigger" @onclick="OpenCart">Bag <span>@CartCount</span></button></div></header>
+@if (MenuOpen) { <nav class="mobile-menu" aria-label="Mobile navigation"><p>Explore VitalReach</p><a href="#shop" @onclick="CloseMenu"><span>01</span> Shop</a><a href="#mission" @onclick="CloseMenu"><span>02</span> Ghana Mission</a><a href="#guide" @onclick="CloseMenu"><span>03</span> Health Guide</a><a href="#about" @onclick="CloseMenu"><span>04</span> Our Story</a><div><small>Wellness with purpose</small><b>Educating Ghana. Reaching the world.</b></div></nav> }
 <main>
 <section class="hero"><div class="hero-copy"><p class="eyebrow">Wellness, rooted in purpose</p><h1>Reach further.<br><em>Live fully.</em></h1><p class="lead">Premium wellness essentials and trusted health education—created to support families everywhere, with a special commitment to kidney-health awareness in Ghana.</p><div class="actions"><a class="btn btn-gold" href="#shop">Shop the collection <span>→</span></a><a class="underlink" href="#about">Meet VitalReach ↗</a></div><div class="trust"><span>Plant-based options</span><span>Quality focused</span><span>Education led</span></div></div><div class="hero-visual" role="img" aria-label="VitalReach health education professional"><div class="promise"><small>The VitalReach promise</small><strong>Clear choices.<br>Purposeful wellness.</strong></div></div></section>
 <section class="mission" id="mission"><div class="mission-badge"><b>GH</b><span>Education that<br>reaches home</span></div><div><p class="eyebrow">Our commitment to Ghana</p><h2>Improving kidney-health awareness <em>in Ghana.</em></h2><p>Clear, practical education about prevention, early screening, blood pressure, diabetes, medication safety, hydration and the kidney numbers that matter.</p></div><a class="btn btn-outline" href="#guide">Explore the guide →</a></section>
@@ -26,7 +27,7 @@ else { <div class="cart-items">@foreach (var line in Cart.Values) { <article cla
 @if (CheckoutOpen) { <div class="modal-backdrop" @onclick="CloseCheckout"><section class="checkout-dialog" @onclick:stopPropagation><button class="dialog-close" @onclick="CloseCheckout">×</button><p class="eyebrow">Secure checkout</p><h2>You're almost there.</h2><p>Online payment is being connected. Send your prepared order to our team and we’ll confirm availability, shipping, and a secure payment link.</p><a class="btn btn-gold" href="@OrderEmail">Email my order →</a></section></div> }
 
 @code {
-    private bool CartOpen, CheckoutOpen;
+    private bool CartOpen, CheckoutOpen, MenuOpen;
     private readonly Dictionary<string, CartLine> Cart = [];
     private List<ProductEntity> Products = [];
     private int CartCount => Cart.Values.Sum(x => x.Quantity);
@@ -39,6 +40,8 @@ else { <div class="cart-items">@foreach (var line in Cart.Values) { <article cla
     private void Remove(string id) => Cart.Remove(id);
     private void OpenCart() => CartOpen = true;
     private void CloseCart() => CartOpen = false;
+    private void ToggleMenu() => MenuOpen = !MenuOpen;
+    private void CloseMenu() => MenuOpen = false;
     private void BeginCheckout() { CartOpen = false; CheckoutOpen = true; }
     private void CloseCheckout() => CheckoutOpen = false;
     private sealed class CartLine(ProductEntity product, int quantity) { public ProductEntity Product { get; } = product; public int Quantity { get; set; } = quantity; }

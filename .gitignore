@@ -2,8 +2,6 @@
 bin/
 obj/
 artifacts/
-data/
-*.db-shm
-*.db-wal
+/App_Data/
 *.user
 *.suo
