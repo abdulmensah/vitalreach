@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +13,8 @@ Directory.CreateDirectory(dataProtectionPath);
 builder.Services.AddDataProtection()
     .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionPath))
     .SetApplicationName(builder.Configuration["DataProtection:ApplicationName"] ?? "VitalReach.Local");
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto);
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddDbContextFactory<CatalogDbContext>(options =>
@@ -50,6 +53,7 @@ builder.Services.AddAuthorizationBuilder().AddPolicy("Admin", policy =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseForwardedHeaders();
 if (!app.Environment.IsDevelopment()) { app.UseExceptionHandler("/Error", createScopeForErrors: true); app.UseHsts(); }
 
 app.UseHttpsRedirection();
