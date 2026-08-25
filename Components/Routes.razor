@@ -1,4 +1,4 @@
 <Router AppAssembly="typeof(Program).Assembly">
-    <Found Context="routeData"><RouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)" /><FocusOnNavigate RouteData="routeData" Selector="h1" /></Found>
+    <Found Context="routeData"><AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)"><NotAuthorized><main class="section admin-denied"><p class="eyebrow">Restricted area</p><h1>Administrator access required.</h1><p>Sign in with an authorized Google account to continue.</p><a class="btn btn-gold" href="/auth/login?returnUrl=/admin/products">Sign in with Google</a></main></NotAuthorized></AuthorizeRouteView><FocusOnNavigate RouteData="routeData" Selector="h1" /></Found>
     <NotFound><PageTitle>Not found</PageTitle><LayoutView Layout="typeof(MainLayout)"><main class="section"><h1>Page not found</h1><a href="/">Return home</a></main></LayoutView></NotFound>
 </Router>

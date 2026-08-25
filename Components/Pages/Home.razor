@@ -1,5 +1,6 @@
 @page "/"
 @rendermode InteractiveServer
+@inject IDbContextFactory<CatalogDbContext> DbFactory
 <PageTitle>Wellness with purpose | VitalReach Wellness Hub</PageTitle>
 
 <div class="announcement">Proudly Ghanaian-American <span>✦</span> Free US shipping over $75</div>
@@ -20,28 +21,25 @@
 @if (CartOpen) { <div class="cart-backdrop" @onclick="CloseCart"></div> }
 <aside class="cart @(CartOpen ? "open" : "")" aria-hidden="@(!CartOpen)"><header><div><small>Your selection</small><h2>Shopping bag</h2></div><button class="cart-close" @onclick="CloseCart">×</button></header>
 @if (Cart.Count == 0) { <div class="cart-empty"><span>V</span><h3>Your bag is waiting.</h3><p>Add a few wellness essentials to begin.</p><button class="btn btn-outline" @onclick="CloseCart">Explore products</button></div> }
-else { <div class="cart-items">@foreach (var line in Cart.Values) { <article class="cart-item"><div><h3>@line.Product.Name</h3><p>@Money(line.Product.Price)</p><div class="quantity"><button @onclick="() => ChangeQuantity(line.Product.Id, -1)">−</button><span>@line.Quantity</span><button @onclick="() => ChangeQuantity(line.Product.Id, 1)">+</button></div></div><button class="remove" @onclick="() => Remove(line.Product.Id)">Remove</button></article> }</div><div class="cart-summary"><div><span>Subtotal</span><strong>@Money(Subtotal)</strong></div><p>Shipping and taxes calculated at checkout.</p><button class="checkout" @onclick="BeginCheckout">Continue to checkout →</button></div> }
+else { <div class="cart-items">@foreach (var line in Cart.Values) { <article class="cart-item"><div><h3>@line.Product.Name</h3><p>@Money(line.Product.Price)</p><div class="quantity"><button @onclick="() => ChangeQuantity(line.Product.Slug, -1)">−</button><span>@line.Quantity</span><button @onclick="() => ChangeQuantity(line.Product.Slug, 1)">+</button></div></div><button class="remove" @onclick="() => Remove(line.Product.Slug)">Remove</button></article> }</div><div class="cart-summary"><div><span>Subtotal</span><strong>@Money(Subtotal)</strong></div><p>Shipping and taxes calculated at checkout.</p><button class="checkout" @onclick="BeginCheckout">Continue to checkout →</button></div> }
 </aside>
 @if (CheckoutOpen) { <div class="modal-backdrop" @onclick="CloseCheckout"><section class="checkout-dialog" @onclick:stopPropagation><button class="dialog-close" @onclick="CloseCheckout">×</button><p class="eyebrow">Secure checkout</p><h2>You're almost there.</h2><p>Online payment is being connected. Send your prepared order to our team and we’ll confirm availability, shipping, and a secure payment link.</p><a class="btn btn-gold" href="@OrderEmail">Email my order →</a></section></div> }
 
 @code {
     private bool CartOpen, CheckoutOpen;
     private readonly Dictionary<string, CartLine> Cart = [];
-    private static readonly Product[] Products = [
-        new("energy", "Ultra Energy Shot™", 24m, "Founder's Collection", "Caffeine-free focus & vitality", "30 servings", "gold-product", "30 mL", "Ultra Energy", "Shot"),
-        new("magnesium", "Magnesium Glycinate Complex+", 29m, "Daily Wellness", "Everyday calm & muscle support", "60 capsules", "teal-product", "COMPLEX+", "Magnesium", "Complex+"),
-        new("collagen", "Marine Collagen Glow", 38m, "Women's Beauty", "Beauty, hydration & glow support", "30 servings", "pearl-product", "GLOW", "Marine Collagen", "Glow"),
-        new("beetroot", "Beetroot Plus", 27m, "Active Living", "Circulation, endurance & stamina", "60 capsules", "berry-product", "500 mg", "Beetroot", "Plus")];
+    private List<ProductEntity> Products = [];
     private int CartCount => Cart.Values.Sum(x => x.Quantity);
     private decimal Subtotal => Cart.Values.Sum(x => x.Product.Price * x.Quantity);
     private string OrderEmail { get { var lines = string.Join("\n", Cart.Values.Select(x => $"{x.Quantity} × {x.Product.Name} — {Money(x.Product.Price * x.Quantity)}")); var body = Uri.EscapeDataString($"Hello VitalReach,\n\nI would like to order:\n{lines}\n\nSubtotal: {Money(Subtotal)}\n\nPlease confirm availability, shipping, and secure payment instructions."); return $"mailto:hello@vitalreachwellness.com?subject=VitalReach%20order%20request&body={body}"; } }
     private static string Money(decimal value) => value.ToString("C", CultureInfo.GetCultureInfo("en-US"));
-    private void AddToCart(Product product) { if (Cart.TryGetValue(product.Id, out var line)) line.Quantity++; else Cart[product.Id] = new(product, 1); CartOpen = true; }
+    protected override async Task OnInitializedAsync() { await using var db = await DbFactory.CreateDbContextAsync(); Products = await db.Products.AsNoTracking().Where(x => x.IsPublished).OrderBy(x => x.SortOrder).ToListAsync(); }
+    private void AddToCart(ProductEntity product) { if (Cart.TryGetValue(product.Slug, out var line)) line.Quantity++; else Cart[product.Slug] = new(product, 1); CartOpen = true; }
     private void ChangeQuantity(string id, int amount) { Cart[id].Quantity += amount; if (Cart[id].Quantity < 1) Cart.Remove(id); }
     private void Remove(string id) => Cart.Remove(id);
     private void OpenCart() => CartOpen = true;
     private void CloseCart() => CartOpen = false;
     private void BeginCheckout() { CartOpen = false; CheckoutOpen = true; }
     private void CloseCheckout() => CheckoutOpen = false;
-    private sealed class CartLine(Product product, int quantity) { public Product Product { get; } = product; public int Quantity { get; set; } = quantity; }
+    private sealed class CartLine(ProductEntity product, int quantity) { public ProductEntity Product { get; } = product; public int Quantity { get; set; } = quantity; }
 }

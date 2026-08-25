@@ -15,6 +15,8 @@ KillSignal=SIGINT
 SyslogIdentifier=vitalreach-qa
 Environment=ASPNETCORE_ENVIRONMENT=Production
 Environment=ASPNETCORE_URLS=http://127.0.0.1:5088
+Environment="ConnectionStrings__Catalog=Data Source=/opt/vitalreach/qa/shared/vitalreach.db"
+EnvironmentFile=-/etc/vitalreach/qa.env
 Environment=DOTNET_NOLOGO=true
 NoNewPrivileges=true
 PrivateTmp=true
