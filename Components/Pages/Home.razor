@@ -1,0 +1,47 @@
+@page "/"
+@rendermode InteractiveServer
+<PageTitle>Wellness with purpose | VitalReach Wellness Hub</PageTitle>
+
+<div class="announcement">Proudly Ghanaian-American <span>✦</span> Free US shipping over $75</div>
+<header class="site-header" id="top"><a class="logo" href="#top"><img src="images/vitalreach-logo.png" alt="VitalReach Wellness Hub" /></a><nav><a href="#shop">Shop</a><a href="#mission">Ghana Mission</a><a href="#guide">Health Guide</a><a href="#about">Our Story</a></nav><button class="cart-trigger" @onclick="OpenCart">Bag <span>@CartCount</span></button></header>
+<main>
+<section class="hero"><div class="hero-copy"><p class="eyebrow">Wellness, rooted in purpose</p><h1>Reach further.<br><em>Live fully.</em></h1><p class="lead">Premium wellness essentials and trusted health education—created to support families everywhere, with a special commitment to kidney-health awareness in Ghana.</p><div class="actions"><a class="btn btn-gold" href="#shop">Shop the collection <span>→</span></a><a class="underlink" href="#about">Meet VitalReach ↗</a></div><div class="trust"><span>Plant-based options</span><span>Quality focused</span><span>Education led</span></div></div><div class="hero-visual" role="img" aria-label="VitalReach health education professional"><div class="promise"><small>The VitalReach promise</small><strong>Clear choices.<br>Purposeful wellness.</strong></div></div></section>
+<section class="mission" id="mission"><div class="mission-badge"><b>GH</b><span>Education that<br>reaches home</span></div><div><p class="eyebrow">Our commitment to Ghana</p><h2>Improving kidney-health awareness <em>in Ghana.</em></h2><p>Clear, practical education about prevention, early screening, blood pressure, diabetes, medication safety, hydration and the kidney numbers that matter.</p></div><a class="btn btn-outline" href="#guide">Explore the guide →</a></section>
+<div class="ticker"><span>Premium quality</span><i>✦</i><span>Responsible wellness</span><i>✦</i><span>Health education</span><i>✦</i><span>Global vision</span></div>
+<section class="section shop" id="shop"><header class="section-heading"><div><p class="eyebrow">Shop VitalReach</p><h2>Daily wellness,<br><em>elevated.</em></h2></div><p>Thoughtfully selected formulas designed to fit your everyday routine. Build your bundle and begin your wellness journey.</p></header><div class="products">
+@foreach (var product in Products) { <ProductCard Product="product" OnAdd="AddToCart" /> }
+</div><p class="disclaimer">Product descriptions are for general information. Final labels and claims remain subject to formulation, testing, and regulatory review.</p></section>
+<section class="story" id="about"><div class="story-art"><span>VR</span><div class="seal">FOUNDED WITH<br><b>CARE &amp; PURPOSE</b></div></div><div class="story-copy"><p class="eyebrow light">Our story</p><h2>Wellness that<br><em>reaches home.</em></h2><p>VitalReach Wellness Hub was founded by Masaouda N. Nartey, BSN, RN, with a vision to make health education clearer, wellness choices more thoughtful, and quality products more accessible.</p><p>Rooted in nursing experience and proudly Ghanaian-American, VitalReach brings together practical education, culturally connected care, and a global standard of excellence.</p><div class="founder"><span>MN</span><div><b>Masaouda N. Nartey, BSN, RN</b><small>Founder &amp; CEO</small></div></div></div></section>
+<section class="guide" id="guide"><div class="guide-intro"><p class="eyebrow light">Kidney Health Ghana</p><h2>Know your kidney numbers.</h2><p>Kidney disease can develop quietly. Prevention and early testing matter.</p><a class="btn btn-gold" href="https://www.kidney.org/kidney-topics/know-your-kidney-numbers-two-simple-tests" target="_blank">Read the full guide ↗</a></div><div class="guide-list"><article><b>01</b><div><small>SCREENING</small><h3>Ask about eGFR and uACR</h3><p>Two important tests help show how well your kidneys filter and whether protein is leaking into your urine.</p></div></article><article><b>02</b><div><small>PREVENTION</small><h3>Know your blood pressure</h3><p>High blood pressure and diabetes are major kidney-health concerns. Regular checkups help you act early.</p></div></article><article><b>03</b><div><small>DAILY CARE</small><h3>Build a routine that lasts</h3><p>Balanced meals, appropriate hydration, movement, sleep, and medication safety all support long-term health.</p></div></article></div></section>
+<section class="contact"><div><p class="eyebrow light">Begin your VitalReach journey</p><h2>Wellness feels better<br>when it feels <em>personal.</em></h2></div><div><p>Questions about our collection, partnerships, or availability? We would love to hear from you.</p><address><small>Office location</small>24 Kusia Street<br>Kokomlemle, Accra, Ghana</address><a class="phone" href="tel:+14105044449"><small>Call us</small>(410) 504-4449</a><a class="btn btn-gold" href="mailto:hello@vitalreachwellness.com">Email VitalReach ↗</a></div></section>
+</main>
+<footer><img src="images/vitalreach-logo.png" alt="VitalReach Wellness Hub" /><p>Educating Ghana. Reaching the world.</p><div><a href="#shop">Collection</a><a href="#mission">Ghana Mission</a><a href="#guide">Kidney Guide</a><a href="#about">Our Story</a></div><small>© 2026 VitalReach Wellness Hub. Educational content is not a substitute for professional medical advice.</small></footer>
+
+@if (CartOpen) { <div class="cart-backdrop" @onclick="CloseCart"></div> }
+<aside class="cart @(CartOpen ? "open" : "")" aria-hidden="@(!CartOpen)"><header><div><small>Your selection</small><h2>Shopping bag</h2></div><button class="cart-close" @onclick="CloseCart">×</button></header>
+@if (Cart.Count == 0) { <div class="cart-empty"><span>V</span><h3>Your bag is waiting.</h3><p>Add a few wellness essentials to begin.</p><button class="btn btn-outline" @onclick="CloseCart">Explore products</button></div> }
+else { <div class="cart-items">@foreach (var line in Cart.Values) { <article class="cart-item"><div><h3>@line.Product.Name</h3><p>@Money(line.Product.Price)</p><div class="quantity"><button @onclick="() => ChangeQuantity(line.Product.Id, -1)">−</button><span>@line.Quantity</span><button @onclick="() => ChangeQuantity(line.Product.Id, 1)">+</button></div></div><button class="remove" @onclick="() => Remove(line.Product.Id)">Remove</button></article> }</div><div class="cart-summary"><div><span>Subtotal</span><strong>@Money(Subtotal)</strong></div><p>Shipping and taxes calculated at checkout.</p><button class="checkout" @onclick="BeginCheckout">Continue to checkout →</button></div> }
+</aside>
+@if (CheckoutOpen) { <div class="modal-backdrop" @onclick="CloseCheckout"><section class="checkout-dialog" @onclick:stopPropagation><button class="dialog-close" @onclick="CloseCheckout">×</button><p class="eyebrow">Secure checkout</p><h2>You're almost there.</h2><p>Online payment is being connected. Send your prepared order to our team and we’ll confirm availability, shipping, and a secure payment link.</p><a class="btn btn-gold" href="@OrderEmail">Email my order →</a></section></div> }
+
+@code {
+    private bool CartOpen, CheckoutOpen;
+    private readonly Dictionary<string, CartLine> Cart = [];
+    private static readonly Product[] Products = [
+        new("energy", "Ultra Energy Shot™", 24m, "Founder's Collection", "Caffeine-free focus & vitality", "30 servings", "gold-product", "30 mL", "Ultra Energy", "Shot"),
+        new("magnesium", "Magnesium Glycinate Complex+", 29m, "Daily Wellness", "Everyday calm & muscle support", "60 capsules", "teal-product", "COMPLEX+", "Magnesium", "Complex+"),
+        new("collagen", "Marine Collagen Glow", 38m, "Women's Beauty", "Beauty, hydration & glow support", "30 servings", "pearl-product", "GLOW", "Marine Collagen", "Glow"),
+        new("beetroot", "Beetroot Plus", 27m, "Active Living", "Circulation, endurance & stamina", "60 capsules", "berry-product", "500 mg", "Beetroot", "Plus")];
+    private int CartCount => Cart.Values.Sum(x => x.Quantity);
+    private decimal Subtotal => Cart.Values.Sum(x => x.Product.Price * x.Quantity);
+    private string OrderEmail { get { var lines = string.Join("\n", Cart.Values.Select(x => $"{x.Quantity} × {x.Product.Name} — {Money(x.Product.Price * x.Quantity)}")); var body = Uri.EscapeDataString($"Hello VitalReach,\n\nI would like to order:\n{lines}\n\nSubtotal: {Money(Subtotal)}\n\nPlease confirm availability, shipping, and secure payment instructions."); return $"mailto:hello@vitalreachwellness.com?subject=VitalReach%20order%20request&body={body}"; } }
+    private static string Money(decimal value) => value.ToString("C", CultureInfo.GetCultureInfo("en-US"));
+    private void AddToCart(Product product) { if (Cart.TryGetValue(product.Id, out var line)) line.Quantity++; else Cart[product.Id] = new(product, 1); CartOpen = true; }
+    private void ChangeQuantity(string id, int amount) { Cart[id].Quantity += amount; if (Cart[id].Quantity < 1) Cart.Remove(id); }
+    private void Remove(string id) => Cart.Remove(id);
+    private void OpenCart() => CartOpen = true;
+    private void CloseCart() => CartOpen = false;
+    private void BeginCheckout() { CartOpen = false; CheckoutOpen = true; }
+    private void CloseCheckout() => CheckoutOpen = false;
+    private sealed class CartLine(Product product, int quantity) { public Product Product { get; } = product; public int Quantity { get; set; } = quantity; }
+}

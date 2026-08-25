@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+if [[ $# -ne 2 ]]; then
+  echo "Usage: deploy-qa <release-id> <archive>" >&2
+  exit 64
+fi
+
+release_id="$1"
+archive="$2"
+root="/opt/vitalreach"
+release="$root/releases/$release_id"
+
+[[ "$release_id" =~ ^[0-9a-f]{40}$ ]] || { echo "Invalid release id" >&2; exit 65; }
+[[ -f "$archive" ]] || { echo "Release archive not found" >&2; exit 66; }
+
+install -d -o deployer -g deployer "$root/releases" "$release"
+tar -xzf "$archive" -C "$release"
+chown -R deployer:deployer "$release"
+ln -sfn "$release" "$root/current.next"
+mv -Tf "$root/current.next" "$root/current"
+systemctl restart vitalreach-qa.service
+
+for attempt in {1..12}; do
+  if curl --fail --silent http://127.0.0.1:5088/health >/dev/null; then
+    rm -f "$archive"
+    find "$root/releases" -mindepth 1 -maxdepth 1 -type d -printf '%T@ %p\n' | sort -nr | tail -n +6 | cut -d' ' -f2- | xargs -r rm -rf
+    echo "Release $release_id is healthy"
+    exit 0
+  fi
+  sleep 2
+done
+
+echo "Release failed its health check" >&2
+journalctl -u vitalreach-qa.service -n 60 --no-pager >&2
+exit 1

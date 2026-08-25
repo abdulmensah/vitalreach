@@ -1,0 +1,23 @@
+[Unit]
+Description=VitalReach QA Blazor application
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=notify
+User=deployer
+Group=deployer
+WorkingDirectory=/opt/vitalreach/current
+ExecStart=/usr/bin/dotnet /opt/vitalreach/current/VitalReach.Web.dll
+Restart=always
+RestartSec=5
+KillSignal=SIGINT
+SyslogIdentifier=vitalreach-qa
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=ASPNETCORE_URLS=http://127.0.0.1:5088
+Environment=DOTNET_NOLOGO=true
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

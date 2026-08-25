@@ -1,0 +1,73 @@
+name: CI and QA deployment
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vitalreach-qa
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build and verify
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Install .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore
+        run: dotnet restore --configfile NuGet.Config
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Publish
+        run: dotnet publish --configuration Release --no-build --output publish
+
+      - name: Package deployment
+        if: github.event_name != 'pull_request'
+        run: tar -C publish -czf vitalreach-${{ github.sha }}.tar.gz .
+
+      - name: Upload deployment artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: vitalreach-${{ github.sha }}
+          path: vitalreach-${{ github.sha }}.tar.gz
+          retention-days: 14
+
+      - name: Prepare SSH
+        if: github.event_name != 'pull_request'
+        env:
+          QA_SSH_PRIVATE_KEY: ${{ secrets.QA_SSH_PRIVATE_KEY }}
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$QA_SSH_PRIVATE_KEY" > ~/.ssh/vitalreach_qa
+          chmod 600 ~/.ssh/vitalreach_qa
+          ssh-keyscan -H 162.35.104.81 >> ~/.ssh/known_hosts
+
+      - name: Upload release
+        if: github.event_name != 'pull_request'
+        run: scp -i ~/.ssh/vitalreach_qa vitalreach-${{ github.sha }}.tar.gz deployer@162.35.104.81:/tmp/
+
+      - name: Activate release
+        if: github.event_name != 'pull_request'
+        run: ssh -i ~/.ssh/vitalreach_qa deployer@162.35.104.81 "sudo /opt/vitalreach/bin/deploy-qa '${{ github.sha }}' '/tmp/vitalreach-${{ github.sha }}.tar.gz'"
+
+      - name: Verify QA
+        if: github.event_name != 'pull_request'
+        run: curl --fail --retry 8 --retry-delay 5 --retry-all-errors https://qa.vitalreachhub.com/health
+
+  
