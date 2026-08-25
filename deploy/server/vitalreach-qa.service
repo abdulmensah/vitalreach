@@ -4,7 +4,7 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
-Type=notify
+Type=simple
 User=deployer
 Group=deployer
 WorkingDirectory=/opt/vitalreach/current
