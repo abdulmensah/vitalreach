@@ -42,7 +42,7 @@ jobs:
 
       - name: Upload deployment artifact
         if: github.event_name != 'pull_request'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: vitalreach-${{ github.sha }}
           path: vitalreach-${{ github.sha }}.tar.gz
