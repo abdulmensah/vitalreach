@@ -1,8 +1,6 @@
 @page "/admin/users"
 @rendermode InteractiveServer
 @attribute [Authorize(Policy = "Admin")]
-@inject IDbContextFactory<CatalogDbContext> DbFactory
-@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>Administrator access | VitalReach</PageTitle>
 <header class="admin-header"><a class="logo" href="/"><img src="images/vitalreach-logo.png" alt="VitalReach Wellness Hub" /></a><nav><a href="/admin/products">Products</a><a class="active" href="/admin/users">Access</a></nav><div><span>@CurrentEmail</span><a href="/auth/logout">Sign out</a></div></header>
@@ -12,19 +10,4 @@
 <section class="access-table"><header><span>User</span><span>Status</span><span>Added</span><span>Actions</span></header>@foreach (var user in Users) { <article><span><b>@user.DisplayName</b><small>@user.Email</small></span><span><i class="@(user.IsActive ? "published" : "draft")">@(user.IsActive ? "Active" : "Disabled")</i></span><span><small>@user.CreatedUtc.ToLocalTime().ToString("MMM d, yyyy")<br>by @user.CreatedBy</small></span><span class="access-actions"><button @onclick="() => Toggle(user)">@(user.IsActive ? "Disable" : "Enable")</button><button class="delete" @onclick="() => Delete(user)">Remove</button></span></article> }</section>
 </main>
 
-@code {
-    private List<AdminUser> Users = [];
-    private AdminUser NewUser = new();
-    private bool Adding, IsError;
-    private string CurrentEmail = "";
-    private string? Message;
-    protected override async Task OnInitializedAsync() { var state=await AuthenticationStateProvider.GetAuthenticationStateAsync(); CurrentEmail=state.User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "Administrator"; await Load(); }
-    private async Task Load() { await using var db=await DbFactory.CreateDbContextAsync(); Users=await db.AdminUsers.AsNoTracking().OrderByDescending(x=>x.IsActive).ThenBy(x=>x.DisplayName).ToListAsync(); }
-    private void StartAdd() { NewUser=new AdminUser(); Adding=true; Message=null; }
-    private void CancelAdd() { Adding=false; Message=null; }
-    private async Task AddUser() { await using var db=await DbFactory.CreateDbContextAsync(); var email=NewUser.Email.Trim().ToLowerInvariant(); if(await db.AdminUsers.AnyAsync(x=>x.NormalizedEmail==email.ToUpper())) { Error("That email is already on the access list."); return; } var user=AdminUser.Create(email, NewUser.DisplayName, CurrentEmail); db.AdminUsers.Add(user); await db.SaveChangesAsync(); Adding=false; Success($"Granted access to {user.Email}."); await Load(); }
-    private async Task Toggle(AdminUser selected) { await using var db=await DbFactory.CreateDbContextAsync(); var user=await db.AdminUsers.FindAsync(selected.Id); if(user is null) return; if(user.IsActive && await db.AdminUsers.CountAsync(x=>x.IsActive)<=1) { Error("At least one active administrator is required."); return; } user.IsActive=!user.IsActive; user.UpdatedBy=CurrentEmail; user.UpdatedUtc=DateTimeOffset.UtcNow; await db.SaveChangesAsync(); Success($"{user.Email} is now {(user.IsActive ? "active" : "disabled")}."); await Load(); }
-    private async Task Delete(AdminUser selected) { await using var db=await DbFactory.CreateDbContextAsync(); var user=await db.AdminUsers.FindAsync(selected.Id); if(user is null) return; if(user.IsActive && await db.AdminUsers.CountAsync(x=>x.IsActive)<=1) { Error("The last active administrator cannot be removed."); return; } db.AdminUsers.Remove(user); await db.SaveChangesAsync(); Success($"Removed {user.Email}."); await Load(); }
-    private void Success(string message) { Message=message; IsError=false; }
-    private void Error(string message) { Message=message; IsError=true; }
-}
+@code {}

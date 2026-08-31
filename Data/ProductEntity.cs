@@ -15,6 +15,8 @@ public sealed class ProductEntity
     [MaxLength(30)] public string Orb { get; set; } = "";
     [MaxLength(50)] public string LabelOne { get; set; } = "";
     [MaxLength(50)] public string LabelTwo { get; set; } = "";
+    [MaxLength(500), RegularExpression(@"^(https?://|/)[^\s]+$", ErrorMessage = "Use an https:// URL or a site-relative path beginning with /.")]
+    public string? ImageUrl { get; set; }
     public bool IsPublished { get; set; } = true;
     public int SortOrder { get; set; }
     public DateTimeOffset UpdatedUtc { get; set; } = DateTimeOffset.UtcNow;

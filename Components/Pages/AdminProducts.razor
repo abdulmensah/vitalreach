@@ -2,35 +2,39 @@
 @page "/admin/products"
 @rendermode InteractiveServer
 @attribute [Authorize(Policy = "Admin")]
-@inject IDbContextFactory<CatalogDbContext> DbFactory
-@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>Product administration | VitalReach</PageTitle>
 <header class="admin-header"><a class="logo" href="/"><img src="images/vitalreach-logo.png" alt="VitalReach Wellness Hub" /></a><nav><a class="active" href="/admin/products">Products</a><a href="/admin/users">Access</a></nav><div><span>@AdminEmail</span><a href="/auth/logout">Sign out</a></div></header>
 <main class="admin-shell">
     <header class="admin-title"><div><p class="eyebrow">Secure administration</p><h1>Product catalog</h1><p>Manage the products shown on the VitalReach storefront.</p></div><button class="btn btn-gold" @onclick="NewProduct">Add product</button></header>
-    @if (!string.IsNullOrEmpty(Message)) { <div class="admin-message">@Message</div> }
+    @if (!string.IsNullOrEmpty(Message))
+    {
+        <div class="admin-message">@Message</div>
+    }
     <div class="admin-grid">
-        <section class="admin-list"><h2>Products</h2>@foreach (var product in Products) { <button class="admin-product @(Editing?.Id == product.Id ? "selected" : "")" @onclick="() => Edit(product)"><span><b>@product.Name</b><small>@product.Category · @product.Price.ToString("C")</small></span><i class="@(product.IsPublished ? "published" : "draft")">@(product.IsPublished ? "Published" : "Hidden")</i></button> }</section>
-        <section class="admin-editor">
-        @if (Editing is null) { <div class="admin-placeholder"><h2>Select a product</h2><p>Choose an item from the catalog or add a new product.</p></div> }
-        else { <EditForm Model="Editing" OnValidSubmit="Save"><DataAnnotationsValidator /><ValidationSummary />
-            <div class="form-grid"><label class="wide">Product name<InputText @bind-Value="Editing.Name" /></label><label>Slug<InputText @bind-Value="Editing.Slug" /></label><label>Price<InputNumber @bind-Value="Editing.Price" /></label><label>Category<InputText @bind-Value="Editing.Category" /></label><label>Package detail<InputText @bind-Value="Editing.Detail" /></label><label class="wide">Benefit statement<InputTextArea @bind-Value="Editing.Benefit" /></label><label>Badge text<InputText @bind-Value="Editing.Orb" /></label><label>Color theme<InputSelect @bind-Value="Editing.Theme"><option value="gold-product">Gold</option><option value="teal-product">Teal</option><option value="pearl-product">Pearl</option><option value="berry-product">Berry</option></InputSelect></label><label>Label line one<InputText @bind-Value="Editing.LabelOne" /></label><label>Label line two<InputText @bind-Value="Editing.LabelTwo" /></label><label>Sort order<InputNumber @bind-Value="Editing.SortOrder" /></label><label class="check"><InputCheckbox @bind-Value="Editing.IsPublished" /> Published</label></div>
-            <div class="form-actions"><button class="btn btn-gold" type="submit">Save product</button>@if (Editing.Id != 0) { <button class="danger-button" type="button" @onclick="Delete">Delete product</button> }</div>
-        </EditForm> }
-        </section>
-    </div>
+        <section class="admin-list"><h2>Products</h2>@foreach (var product in Products) {
+            <button class="admin-product @(Editing?.Id == product.Id ? "selected" : "")" @onclick="() => Edit(product)"><span><b>@product.Name</b><small>@product.Category · @product.Price.ToString("C")</small></span><i class="@(product.IsPublished ? "published" : "draft")">@(product.IsPublished ? "Published" : "Hidden")</i></button>
+        }
+    </section>
+    <section class="admin-editor">
+        @if (Editing is null)
+        {
+            <div class="admin-placeholder"><h2>Select a product</h2><p>Choose an item from the catalog or add a new product.</p></div>
+        }
+        else
+        {
+
+            <EditForm Model="Editing" OnValidSubmit="Save">
+                <DataAnnotationsValidator /><ValidationSummary />
+                <div class="form-grid"><label class="wide">Product name<InputText @bind-Value="Editing.Name" /></label><label>Slug<InputText @bind-Value="Editing.Slug" /></label><label>Price<InputNumber @bind-Value="Editing.Price" /></label><label>Category<InputText @bind-Value="Editing.Category" /></label><label>Package detail<InputText @bind-Value="Editing.Detail" /></label><label class="wide">Benefit statement<InputTextArea @bind-Value="Editing.Benefit" /></label><label class="wide">Product image URL<InputText @bind-Value="Editing.ImageUrl" placeholder="https://… or /images/products/…" /></label>@if (!string.IsNullOrWhiteSpace(Editing.ImageUrl)) { <div class="admin-image-preview wide"><img src="@Editing.ImageUrl" alt="Product image preview for @Editing.Name" /></div> }<label>Badge text<InputText @bind-Value="Editing.Orb" /></label><label>Color theme<InputSelect @bind-Value="Editing.Theme"><option value="gold-product">Gold</option><option value="teal-product">Teal</option><option value="pearl-product">Pearl</option><option value="berry-product">Berry</option></InputSelect></label><label>Label line one<InputText @bind-Value="Editing.LabelOne" /></label><label>Label line two<InputText @bind-Value="Editing.LabelTwo" /></label><label>Sort order<InputNumber @bind-Value="Editing.SortOrder" /></label><label class="check"><InputCheckbox @bind-Value="Editing.IsPublished" /> Published</label></div>
+                <div class="form-actions"><button class="btn btn-gold" type="submit">Save product</button>@if (Editing.Id != 0) {
+                    <button class="danger-button" type="button" @onclick="Delete">Delete product</button>
+                }
+            </div>
+        </EditForm>
+    }
+</section>
+</div>
 </main>
 
-@code {
-    private List<ProductEntity> Products = [];
-    private ProductEntity? Editing;
-    private string? Message;
-    private string AdminEmail = "";
-    protected override async Task OnInitializedAsync() { var state = await AuthenticationStateProvider.GetAuthenticationStateAsync(); AdminEmail = state.User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "Administrator"; await Load(); }
-    private async Task Load() { await using var db = await DbFactory.CreateDbContextAsync(); Products = await db.Products.AsNoTracking().OrderBy(x => x.SortOrder).ThenBy(x => x.Name).ToListAsync(); }
-    private void NewProduct() { Editing = new ProductEntity { Theme="teal-product", IsPublished=true, SortOrder=(Products.LastOrDefault()?.SortOrder ?? 0)+10 }; Message=null; }
-    private void Edit(ProductEntity product) { Editing = new ProductEntity { Id=product.Id, Slug=product.Slug, Name=product.Name, Price=product.Price, Category=product.Category, Benefit=product.Benefit, Detail=product.Detail, Theme=product.Theme, Orb=product.Orb, LabelOne=product.LabelOne, LabelTwo=product.LabelTwo, IsPublished=product.IsPublished, SortOrder=product.SortOrder, UpdatedUtc=product.UpdatedUtc }; Message=null; }
-    private async Task Save() { if (Editing is null) return; Editing.UpdatedUtc=DateTimeOffset.UtcNow; await using var db=await DbFactory.CreateDbContextAsync(); if (Editing.Id==0) db.Products.Add(Editing); else db.Products.Update(Editing); try { await db.SaveChangesAsync(); Message=$"Saved {Editing.Name}."; await Load(); var id=Editing.Id; Edit(Products.Single(x=>x.Id==id)); } catch (DbUpdateException) { Message="That slug is already in use. Choose a unique slug."; } }
-    private async Task Delete() { if (Editing is null || Editing.Id==0) return; await using var db=await DbFactory.CreateDbContextAsync(); var product=await db.Products.FindAsync(Editing.Id); if(product is null) return; db.Products.Remove(product); await db.SaveChangesAsync(); Message=$"Deleted {product.Name}."; Editing=null; await Load(); }
-}
+@code {}
