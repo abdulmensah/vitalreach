@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +20,7 @@ builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddDbContextFactory<CatalogDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("Catalog") ?? "Data Source=App_Data/vitalreach.db"));
+builder.Services.AddSingleton<ProductImageStorage>();
 var googleClientId = builder.Configuration["Authentication:Google:ClientId"];
 var googleClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
 var googleConfigured = !string.IsNullOrWhiteSpace(googleClientId) && !string.IsNullOrWhiteSpace(googleClientSecret);
@@ -58,6 +60,13 @@ if (!app.Environment.IsDevelopment()) { app.UseExceptionHandler("/Error", create
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+var productImagesPath = ProductImageStorage.ResolveStoragePath(builder.Configuration, builder.Environment);
+Directory.CreateDirectory(productImagesPath);
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(productImagesPath),
+    RequestPath = "/uploads/products"
+});
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseAntiforgery();

@@ -2,6 +2,7 @@
 #nullable enable
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.EntityFrameworkCore;
 using VitalReach.Web.Data;
 
@@ -12,10 +13,13 @@ namespace VitalReach.Web.Components.Pages
 
         [Inject] IDbContextFactory<CatalogDbContext> DbFactory { get; set; } = default!;
         [Inject] AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
+        [Inject] ProductImageStorage ImageStorage { get; set; } = default!;
 
         private List<ProductEntity> Products = [];
         private ProductEntity? Editing;
         private string? Message;
+        private IBrowserFile? SelectedImage;
+        private bool Saving;
         private string AdminEmail = "";
         protected override async Task OnInitializedAsync()
         {
@@ -38,6 +42,7 @@ namespace VitalReach.Web.Components.Pages
                 IsPublished = true,
                 SortOrder = (Products.LastOrDefault()?.SortOrder ?? 0) + 10
             }; Message = null;
+            SelectedImage = null;
         }
 
         private void Edit(ProductEntity product)
@@ -61,20 +66,65 @@ namespace VitalReach.Web.Components.Pages
                 UpdatedUtc = product.UpdatedUtc
             };
             Message = null;
+            SelectedImage = null;
+        }
+
+        private void SelectImage(InputFileChangeEventArgs args)
+        {
+            SelectedImage = args.File;
+            Message = null;
+        }
+
+        private void RemoveImage()
+        {
+            if (Editing is null) return;
+            Editing.ImageUrl = null;
+            SelectedImage = null;
         }
 
         private async Task Save()
         {
             if (Editing is null) return;
+            Saving = true;
             Editing.UpdatedUtc = DateTimeOffset.UtcNow;
             await using var db = await DbFactory.CreateDbContextAsync();
-            if (Editing.Id == 0) db.Products.Add(Editing); else db.Products.Update(Editing);
+            var previousImageUrl = Editing.Id == 0
+                ? null
+                : await db.Products.AsNoTracking().Where(x => x.Id == Editing.Id).Select(x => x.ImageUrl).SingleOrDefaultAsync();
+            string? uploadedImageUrl = null;
             try
             {
+                if (SelectedImage is not null)
+                {
+                    uploadedImageUrl = await ImageStorage.SaveAsync(SelectedImage);
+                    Editing.ImageUrl = uploadedImageUrl;
+                }
+                if (Editing.Id == 0) db.Products.Add(Editing); else db.Products.Update(Editing);
                 await db.SaveChangesAsync(); Message = $"Saved {Editing.Name}.";
+                if (!string.Equals(previousImageUrl, Editing.ImageUrl, StringComparison.Ordinal))
+                    await ImageStorage.DeleteAsync(previousImageUrl);
+                SelectedImage = null;
                 await Load(); var id = Editing.Id; Edit(Products.Single(x => x.Id == id));
             }
-            catch (DbUpdateException) { Message = "That slug is already in use. Choose a unique slug."; }
+            catch (DbUpdateException)
+            {
+                await ImageStorage.DeleteAsync(uploadedImageUrl);
+                Editing.ImageUrl = previousImageUrl;
+                Message = "That slug is already in use. Choose a unique slug.";
+            }
+            catch (InvalidOperationException exception)
+            {
+                await ImageStorage.DeleteAsync(uploadedImageUrl);
+                Editing.ImageUrl = previousImageUrl;
+                Message = exception.Message;
+            }
+            catch (IOException)
+            {
+                await ImageStorage.DeleteAsync(uploadedImageUrl);
+                Editing.ImageUrl = previousImageUrl;
+                Message = "The image could not be stored. Please try again.";
+            }
+            finally { Saving = false; }
         }
 
         private async Task Delete()
@@ -85,6 +135,7 @@ namespace VitalReach.Web.Components.Pages
             if (product is null) return;
             db.Products.Remove(product);
             await db.SaveChangesAsync(); Message = $"Deleted {product.Name}.";
+            await ImageStorage.DeleteAsync(product.ImageUrl);
             Editing = null;
             await Load();
         }

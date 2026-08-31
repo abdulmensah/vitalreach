@@ -18,6 +18,7 @@ Environment=ASPNETCORE_URLS=http://127.0.0.1:5088
 Environment="ConnectionStrings__Catalog=Data Source=/opt/vitalreach/qa/shared/vitalreach.db"
 Environment=DataProtection__Path=/opt/vitalreach/qa/shared/keys
 Environment=DataProtection__ApplicationName=VitalReach.QA
+Environment=ProductImages__Path=/opt/vitalreach/qa/shared/uploads/products
 EnvironmentFile=-/etc/vitalreach/qa.env
 Environment=DOTNET_NOLOGO=true
 NoNewPrivileges=true
