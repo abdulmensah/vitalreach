@@ -10,7 +10,7 @@ public static class CatalogSeeder
         var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<CatalogDbContext>>();
         await using var db = await factory.CreateDbContextAsync();
         await db.Database.EnsureCreatedAsync();
-        await EnsureProductImageColumnAsync(db);
+        await EnsureProductColumnsAsync(db);
         await db.Database.ExecuteSqlRawAsync("""
             CREATE TABLE IF NOT EXISTS "AdminUsers" (
                 "Id" INTEGER NOT NULL CONSTRAINT "PK_AdminUsers" PRIMARY KEY AUTOINCREMENT,
@@ -24,6 +24,20 @@ public static class CatalogSeeder
                 "UpdatedBy" TEXT NOT NULL
             );
             CREATE UNIQUE INDEX IF NOT EXISTS "IX_AdminUsers_NormalizedEmail" ON "AdminUsers" ("NormalizedEmail");
+            CREATE TABLE IF NOT EXISTS "Headquarters" (
+                "Id" INTEGER NOT NULL CONSTRAINT "PK_Headquarters" PRIMARY KEY,
+                "CenterName" TEXT NOT NULL,
+                "AddressLine1" TEXT NOT NULL,
+                "AddressLine2" TEXT NOT NULL,
+                "City" TEXT NOT NULL,
+                "Region" TEXT NOT NULL,
+                "PostalCode" TEXT NOT NULL,
+                "Country" TEXT NOT NULL,
+                "Phone" TEXT NOT NULL,
+                "Email" TEXT NOT NULL,
+                "Hours" TEXT NOT NULL,
+                "UpdatedUtc" TEXT NOT NULL
+            );
             """);
         if (!await db.Products.AnyAsync()) db.Products.AddRange(
             New("energy", "Ultra Energy Shot™", 24m, "Founder's Collection", "Caffeine-free focus & vitality", "30 servings", "gold-product", "30 mL", "Ultra Energy", "Shot", 10),
@@ -33,10 +47,11 @@ public static class CatalogSeeder
         if (!await db.AdminUsers.AnyAsync()) db.AdminUsers.AddRange(
             AdminUser.Create("abdulmensah@gmail.com", "Abdul Mensah", "system-seed"),
             AdminUser.Create("masaoudaa@gmail.com", "Masaouda", "system-seed"));
+        if (!await db.Headquarters.AnyAsync()) db.Headquarters.Add(new HeadquartersSettings());
         await db.SaveChangesAsync();
     }
 
-    private static async Task EnsureProductImageColumnAsync(CatalogDbContext db)
+    private static async Task EnsureProductColumnsAsync(CatalogDbContext db)
     {
         var connection = db.Database.GetDbConnection();
         await connection.OpenAsync();
@@ -45,27 +60,27 @@ public static class CatalogSeeder
             await using var columns = connection.CreateCommand();
             columns.CommandText = "PRAGMA table_info(\"Products\");";
             await using var reader = await columns.ExecuteReaderAsync();
-            var hasImageUrl = false;
+            var existingColumns = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             while (await reader.ReadAsync())
-            {
-                if (string.Equals(reader.GetString(1), nameof(ProductEntity.ImageUrl), StringComparison.OrdinalIgnoreCase))
-                {
-                    hasImageUrl = true;
-                    break;
-                }
-            }
+                existingColumns.Add(reader.GetString(1));
 
             await reader.DisposeAsync();
-            if (hasImageUrl) return;
-
-            await using var alter = connection.CreateCommand();
-            alter.CommandText = "ALTER TABLE \"Products\" ADD COLUMN \"ImageUrl\" TEXT NULL;";
-            await alter.ExecuteNonQueryAsync();
+            if (!existingColumns.Contains(nameof(ProductEntity.ImageUrl)))
+                await AddColumnAsync(connection, "ALTER TABLE \"Products\" ADD COLUMN \"ImageUrl\" TEXT NULL;");
+            if (!existingColumns.Contains(nameof(ProductEntity.Description)))
+                await AddColumnAsync(connection, "ALTER TABLE \"Products\" ADD COLUMN \"Description\" TEXT NOT NULL DEFAULT '';");
         }
         finally
         {
             await connection.CloseAsync();
         }
+    }
+
+    private static async Task AddColumnAsync(System.Data.Common.DbConnection connection, string sql)
+    {
+        await using var alter = connection.CreateCommand();
+        alter.CommandText = sql;
+        await alter.ExecuteNonQueryAsync();
     }
 
     private static ProductEntity New(string slug, string name, decimal price, string category, string benefit, string detail, string theme, string orb, string one, string two, int order) => new() { Slug=slug, Name=name, Price=price, Category=category, Benefit=benefit, Detail=detail, Theme=theme, Orb=orb, LabelOne=one, LabelTwo=two, SortOrder=order };

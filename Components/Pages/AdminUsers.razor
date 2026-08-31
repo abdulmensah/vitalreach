@@ -3,7 +3,7 @@
 @attribute [Authorize(Policy = "Admin")]
 
 <PageTitle>Administrator access | VitalReach</PageTitle>
-<header class="admin-header"><a class="logo" href="/"><img src="images/vitalreach-logo.png" alt="VitalReach Wellness Hub" /></a><nav><a href="/admin/products">Products</a><a class="active" href="/admin/users">Access</a></nav><div><span>@CurrentEmail</span><a href="/auth/logout">Sign out</a></div></header>
+<header class="admin-header"><a class="logo" href="/"><img src="images/vitalreach-logo.png" alt="VitalReach Wellness Hub" /></a><nav><a href="/admin/products">Products</a><a href="/admin/headquarters">Headquarters</a><a class="active" href="/admin/users">Access</a></nav><div><span>@CurrentEmail</span><a href="/auth/logout">Sign out</a></div></header>
 <main class="admin-shell"><header class="admin-title"><div><p class="eyebrow">Secure administration</p><h1>Administrator access</h1><p>Google verifies identity; this list controls who may enter the portal.</p></div><button class="btn btn-gold" @onclick="StartAdd">Add administrator</button></header>
 @if (!string.IsNullOrEmpty(Message)) { <div class="admin-message @(IsError ? "error" : "")">@Message</div> }
 @if (Adding) { <section class="access-add"><EditForm Model="NewUser" OnValidSubmit="AddUser"><DataAnnotationsValidator /><ValidationSummary /><div class="form-grid"><label>Google email<InputText @bind-Value="NewUser.Email" /></label><label>Display name<InputText @bind-Value="NewUser.DisplayName" /></label></div><div class="form-actions"><button class="btn btn-gold" type="submit">Grant access</button><button class="danger-button" type="button" @onclick="CancelAdd">Cancel</button></div></EditForm></section> }

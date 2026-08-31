@@ -1,0 +1,36 @@
+@page "/shop/{Slug}"
+@inject IDbContextFactory<CatalogDbContext> DbFactory
+
+<PageTitle>@(Product is null ? "Product not found" : $"{Product.Name} | VitalReach")</PageTitle>
+<StorefrontHeader />
+@if (Product is null)
+{
+    <main class="product-not-found"><h1>Product not found.</h1><p>This product may no longer be available.</p><a class="btn btn-gold" href="/shop">Return to the collection</a></main>
+}
+else
+{
+    <main class="pdp">
+        <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>/</span><a href="/shop">Shop</a><span>/</span><span>@Product.Name</span></nav>
+        <section class="pdp-main"><div class="pdp-art @Product.Theme">@if (!string.IsNullOrWhiteSpace(Product.ImageUrl)) { <img src="@Product.ImageUrl" alt="@Product.Name" /> } else { <span class="halo">@Product.Orb</span><div class="bottle"><b>V</b><small>VITALREACH</small><i>@Product.LabelOne<br />@Product.LabelTwo</i><span>PREMIUM WELLNESS</span></div> }</div><div class="pdp-copy"><p class="eyebrow">@Product.Category</p><h1>@Product.Name</h1><p class="pdp-benefit">@Product.Benefit</p><div class="pdp-price"><strong>@Product.Price.ToString("C", CultureInfo.GetCultureInfo("en-US"))</strong><span>@Product.Detail</span></div><p>@(string.IsNullOrWhiteSpace(Product.Description) ? Product.Benefit : Product.Description)</p><a class="btn btn-gold" href="@PurchaseEmail">Ask about availability →</a><p class="pdp-note">Product information is general education and is not intended to diagnose, treat, cure, or prevent disease.</p></div></section>
+        <nav class="pdp-pagination" aria-label="Browse products">@if (Previous is not null) { <a href="/shop/@Previous.Slug"><small>Previous product</small><b>← @Previous.Name</b></a> } else { <span></span> }@if (Next is not null) { <a class="next" href="/shop/@Next.Slug"><small>Next product</small><b>@Next.Name →</b></a> }</nav>
+    </main>
+}
+<StorefrontFooter Headquarters="Headquarters" />
+
+@code {
+    [Parameter] public string Slug { get; set; } = "";
+    private ProductEntity? Product, Previous, Next;
+    private HeadquartersSettings? Headquarters;
+    private string PurchaseEmail => Product is null ? "#" : $"mailto:{Headquarters?.Email ?? "hello@vitalreachwellness.com"}?subject={Uri.EscapeDataString($"Product inquiry: {Product.Name}")}";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+        var products = await db.Products.AsNoTracking().Where(x => x.IsPublished).OrderBy(x => x.SortOrder).ThenBy(x => x.Name).ToListAsync();
+        var index = products.FindIndex(x => string.Equals(x.Slug, Slug, StringComparison.OrdinalIgnoreCase));
+        Product = index >= 0 ? products[index] : null;
+        Previous = index > 0 ? products[index - 1] : null;
+        Next = index >= 0 && index < products.Count - 1 ? products[index + 1] : null;
+        Headquarters = await db.Headquarters.AsNoTracking().SingleAsync(x => x.Id == 1);
+    }
+}

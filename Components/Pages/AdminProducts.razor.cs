@@ -18,6 +18,7 @@ namespace VitalReach.Web.Components.Pages
         private List<ProductEntity> Products = [];
         private ProductEntity? Editing;
         private string? Message;
+        private bool IsError;
         private IBrowserFile? SelectedImage;
         private bool Saving;
         private string AdminEmail = "";
@@ -42,10 +43,11 @@ namespace VitalReach.Web.Components.Pages
                 IsPublished = true,
                 SortOrder = (Products.LastOrDefault()?.SortOrder ?? 0) + 10
             }; Message = null;
+            IsError = false;
             SelectedImage = null;
         }
 
-        private void Edit(ProductEntity product)
+        private void Edit(ProductEntity product, bool clearMessage = true)
         {
             Editing = new ProductEntity
             {
@@ -55,6 +57,7 @@ namespace VitalReach.Web.Components.Pages
                 Price = product.Price,
                 Category = product.Category,
                 Benefit = product.Benefit,
+                Description = product.Description,
                 Detail = product.Detail,
                 Theme = product.Theme,
                 Orb = product.Orb,
@@ -65,7 +68,11 @@ namespace VitalReach.Web.Components.Pages
                 SortOrder = product.SortOrder,
                 UpdatedUtc = product.UpdatedUtc
             };
-            Message = null;
+            if (clearMessage)
+            {
+                Message = null;
+                IsError = false;
+            }
             SelectedImage = null;
         }
 
@@ -100,28 +107,33 @@ namespace VitalReach.Web.Components.Pages
                     Editing.ImageUrl = uploadedImageUrl;
                 }
                 if (Editing.Id == 0) db.Products.Add(Editing); else db.Products.Update(Editing);
-                await db.SaveChangesAsync(); Message = $"Saved {Editing.Name}.";
+                await db.SaveChangesAsync();
+                IsError = false;
+                Message = $"Product “{Editing.Name}” has been saved successfully.";
                 if (!string.Equals(previousImageUrl, Editing.ImageUrl, StringComparison.Ordinal))
                     await ImageStorage.DeleteAsync(previousImageUrl);
                 SelectedImage = null;
-                await Load(); var id = Editing.Id; Edit(Products.Single(x => x.Id == id));
+                await Load(); var id = Editing.Id; Edit(Products.Single(x => x.Id == id), clearMessage: false);
             }
             catch (DbUpdateException)
             {
                 await ImageStorage.DeleteAsync(uploadedImageUrl);
                 Editing.ImageUrl = previousImageUrl;
+                IsError = true;
                 Message = "That slug is already in use. Choose a unique slug.";
             }
             catch (InvalidOperationException exception)
             {
                 await ImageStorage.DeleteAsync(uploadedImageUrl);
                 Editing.ImageUrl = previousImageUrl;
+                IsError = true;
                 Message = exception.Message;
             }
             catch (IOException)
             {
                 await ImageStorage.DeleteAsync(uploadedImageUrl);
                 Editing.ImageUrl = previousImageUrl;
+                IsError = true;
                 Message = "The image could not be stored. Please try again.";
             }
             finally { Saving = false; }
@@ -134,7 +146,9 @@ namespace VitalReach.Web.Components.Pages
             var product = await db.Products.FindAsync(Editing.Id);
             if (product is null) return;
             db.Products.Remove(product);
-            await db.SaveChangesAsync(); Message = $"Deleted {product.Name}.";
+            await db.SaveChangesAsync();
+            IsError = false;
+            Message = $"Product “{product.Name}” has been deleted successfully.";
             await ImageStorage.DeleteAsync(product.ImageUrl);
             Editing = null;
             await Load();

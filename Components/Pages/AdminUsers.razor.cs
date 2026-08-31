@@ -53,7 +53,7 @@ namespace VitalReach.Web.Components.Pages
             var user = AdminUser.Create(email, NewUser.DisplayName, CurrentEmail);
             db.AdminUsers.Add(user); 
             await db.SaveChangesAsync();
-            Adding = false; Success($"Granted access to {user.Email}."); 
+            Adding = false; Success($"Administrator “{user.Email}” has been added successfully.");
             await Load();
         }
 
@@ -70,7 +70,7 @@ namespace VitalReach.Web.Components.Pages
             user.IsActive = !user.IsActive;
             user.UpdatedBy = CurrentEmail;
             user.UpdatedUtc = DateTimeOffset.UtcNow;
-            await db.SaveChangesAsync(); Success($"{user.Email} is now {(user.IsActive ? "active" : "disabled")}.");
+            await db.SaveChangesAsync(); Success($"Administrator “{user.Email}” has been {(user.IsActive ? "enabled" : "disabled")} successfully.");
             await Load();
         }
 
@@ -86,7 +86,7 @@ namespace VitalReach.Web.Components.Pages
             }
             db.AdminUsers.Remove(user);
             await db.SaveChangesAsync();
-            Success($"Removed {user.Email}.");
+            Success($"Administrator “{user.Email}” has been removed successfully.");
             await Load();
         }
 

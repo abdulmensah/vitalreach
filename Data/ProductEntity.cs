@@ -10,6 +10,7 @@ public sealed class ProductEntity
     [Range(0, 100000)] public decimal Price { get; set; }
     [Required, MaxLength(80)] public string Category { get; set; } = "";
     [Required, MaxLength(180)] public string Benefit { get; set; } = "";
+    [MaxLength(2000)] public string Description { get; set; } = "";
     [MaxLength(80)] public string Detail { get; set; } = "";
     [MaxLength(40)] public string Theme { get; set; } = "teal-product";
     [MaxLength(30)] public string Orb { get; set; } = "";

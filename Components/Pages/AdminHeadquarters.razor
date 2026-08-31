@@ -1,0 +1,64 @@
+@page "/admin/headquarters"
+@rendermode InteractiveServer
+@attribute [Authorize(Policy = "Admin")]
+@inject IDbContextFactory<CatalogDbContext> DbFactory
+
+<PageTitle>Headquarters administration | VitalReach</PageTitle>
+<header class="admin-header"><a class="logo" href="/"><img src="images/vitalreach-logo.png" alt="VitalReach Wellness Hub" /></a><nav><a href="/admin/products">Products</a><a class="active" href="/admin/headquarters">Headquarters</a><a href="/admin/users">Access</a></nav><div><a href="/auth/logout">Sign out</a></div></header>
+<main class="admin-shell">
+    <header class="admin-title"><div><p class="eyebrow">Secure administration</p><h1>Headquarters</h1><p>This address appears in the storefront footer and on the Shopping &amp; Wellness Center page.</p></div></header>
+    @if (!string.IsNullOrWhiteSpace(Message)) { <div class="admin-message @(IsError ? "error" : "")" role="status">@Message</div> }
+    @if (Settings is not null)
+    {
+        <section class="admin-editor settings-editor">
+            <EditForm Model="Settings" OnValidSubmit="SaveAsync"><DataAnnotationsValidator /><ValidationSummary />
+                <div class="form-grid">
+                    <label class="wide">Center name<InputText @bind-Value="Settings.CenterName" /></label>
+                    <label class="wide">Address line 1<InputText @bind-Value="Settings.AddressLine1" /></label>
+                    <label class="wide">Address line 2<InputText @bind-Value="Settings.AddressLine2" /></label>
+                    <label>City / locality<InputText @bind-Value="Settings.City" /></label>
+                    <label>Region / state<InputText @bind-Value="Settings.Region" /></label>
+                    <label>Postal code<InputText @bind-Value="Settings.PostalCode" /></label>
+                    <label>Country<InputText @bind-Value="Settings.Country" /></label>
+                    <label>Phone<InputText @bind-Value="Settings.Phone" /></label>
+                    <label>Email<InputText @bind-Value="Settings.Email" /></label>
+                    <label class="wide">Opening information<InputTextArea @bind-Value="Settings.Hours" /></label>
+                </div>
+                <div class="form-actions"><button class="btn btn-gold" type="submit" disabled="@Saving">@(Saving ? "Saving…" : "Save headquarters")</button></div>
+            </EditForm>
+        </section>
+    }
+</main>
+
+@code {
+    private HeadquartersSettings? Settings;
+    private string? Message;
+    private bool IsError, Saving;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+        Settings = await db.Headquarters.AsNoTracking().SingleAsync(x => x.Id == 1);
+    }
+
+    private async Task SaveAsync()
+    {
+        if (Settings is null) return;
+        Saving = true;
+        try
+        {
+            Settings.UpdatedUtc = DateTimeOffset.UtcNow;
+            await using var db = await DbFactory.CreateDbContextAsync();
+            db.Headquarters.Update(Settings);
+            await db.SaveChangesAsync();
+            IsError = false;
+            Message = "Headquarters details have been saved successfully.";
+        }
+        catch (DbUpdateException)
+        {
+            IsError = true;
+            Message = "Headquarters details could not be saved. Please try again.";
+        }
+        finally { Saving = false; }
+    }
+}
