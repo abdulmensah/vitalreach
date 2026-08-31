@@ -38,6 +38,15 @@ public static class CatalogSeeder
                 "Hours" TEXT NOT NULL,
                 "UpdatedUtc" TEXT NOT NULL
             );
+            CREATE TABLE IF NOT EXISTS "ContactSubmissions" (
+                "Id" INTEGER NOT NULL CONSTRAINT "PK_ContactSubmissions" PRIMARY KEY AUTOINCREMENT,
+                "Name" TEXT NOT NULL,
+                "Email" TEXT NOT NULL,
+                "Phone" TEXT NOT NULL,
+                "Message" TEXT NOT NULL,
+                "IsRead" INTEGER NOT NULL,
+                "CreatedUtc" TEXT NOT NULL
+            );
             """);
         if (!await db.Products.AnyAsync()) db.Products.AddRange(
             New("energy", "Ultra Energy Shot™", 24m, "Founder's Collection", "Caffeine-free focus & vitality", "30 servings", "gold-product", "30 mL", "Ultra Energy", "Shot", 10),

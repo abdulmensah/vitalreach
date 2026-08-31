@@ -7,6 +7,7 @@ public sealed class CatalogDbContext(DbContextOptions<CatalogDbContext> options)
     public DbSet<ProductEntity> Products => Set<ProductEntity>();
     public DbSet<AdminUser> AdminUsers => Set<AdminUser>();
     public DbSet<HeadquartersSettings> Headquarters => Set<HeadquartersSettings>();
+    public DbSet<ContactSubmission> ContactSubmissions => Set<ContactSubmission>();
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ProductEntity>().HasIndex(x => x.Slug).IsUnique();

@@ -1,0 +1,29 @@
+@page "/contact"
+@rendermode InteractiveServer
+
+<PageTitle>Contact VitalReach Wellness Hub</PageTitle>
+<StorefrontHeader />
+<main class="contact-page">
+    <section class="contact-page-hero"><p class="eyebrow light">Start a conversation</p><h1>How can we<br /><em>help you?</em></h1><p>Ask about products, the Shopping &amp; Wellness Center, partnerships, or the VitalReach health-education mission.</p></section>
+    <section class="contact-page-content">
+        <div class="contact-form-panel">
+            <p class="eyebrow">Send a message</p><h2>We would love to hear from you.</h2>
+            @if (!string.IsNullOrWhiteSpace(StatusMessage)) { <div class="form-status @(IsError ? "error" : "")" role="status">@StatusMessage</div> }
+            <EditForm Model="Input" OnValidSubmit="SubmitAsync" FormName="contact"><DataAnnotationsValidator /><ValidationSummary />
+                <div class="contact-form-grid">
+                    <label>Name<InputText @bind-Value="Input.Name" autocomplete="name" /><ValidationMessage For="() => Input.Name" /></label>
+                    <label>Email<InputText @bind-Value="Input.Email" type="email" autocomplete="email" /><ValidationMessage For="() => Input.Email" /></label>
+                    <label class="wide">Phone<InputText @bind-Value="Input.Phone" type="tel" autocomplete="tel" /><ValidationMessage For="() => Input.Phone" /></label>
+                    <label class="wide">Message<InputTextArea @bind-Value="Input.Message" rows="7" /><ValidationMessage For="() => Input.Message" /></label>
+                    <label class="contact-honeypot" aria-hidden="true">Website<InputText @bind-Value="Input.Website" tabindex="-1" autocomplete="off" /></label>
+                </div>
+                <button class="btn btn-gold" type="submit" disabled="@Submitting">@(Submitting ? "Sending…" : "Send message →")</button>
+            </EditForm>
+        </div>
+        @if (Headquarters is not null)
+        {
+            <aside class="contact-details"><p class="eyebrow light">VitalReach headquarters</p><h2>@Headquarters.CenterName</h2><address>@Headquarters.AddressLine1<br />@if (!string.IsNullOrWhiteSpace(Headquarters.AddressLine2)) { @Headquarters.AddressLine2<br /> }@Headquarters.CityRegion<br />@Headquarters.Country</address><a href="@Headquarters.PhoneHref">@Headquarters.Phone</a><a href="mailto:@Headquarters.Email">@Headquarters.Email</a><p>@Headquarters.Hours</p><a class="underlink light-link" href="/wellness-center">Explore the wellness center →</a></aside>
+        }
+    </section>
+</main>
+<StorefrontFooter Headquarters="Headquarters" />

@@ -1,11 +1,9 @@
-@page "/admin"
 @page "/admin/products"
 @rendermode InteractiveServer
 @attribute [Authorize(Policy = "Admin")]
 
 <PageTitle>Product administration | VitalReach</PageTitle>
-<header class="admin-header"><a class="logo" href="/"><img src="images/vitalreach-logo.png" alt="VitalReach Wellness Hub" /></a><nav><a class="active" href="/admin/products">Products</a><a href="/admin/headquarters">Headquarters</a><a href="/admin/users">Access</a></nav><div><span>@AdminEmail</span><a href="/auth/logout">Sign out</a></div></header>
-<main class="admin-shell">
+<AdminPortalLayout ActiveSection="products">
     <header class="admin-title"><div><p class="eyebrow">Secure administration</p><h1>Product catalog</h1><p>Manage the products shown on the VitalReach storefront.</p></div><button class="btn btn-gold" @onclick="NewProduct">Add product</button></header>
     @if (!string.IsNullOrEmpty(Message))
     {
@@ -35,4 +33,4 @@
     }
 </section>
 </div>
-</main>
+</AdminPortalLayout>

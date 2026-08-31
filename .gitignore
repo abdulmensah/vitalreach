@@ -5,3 +5,4 @@ artifacts/
 /App_Data/
 *.user
 *.suo
+.env

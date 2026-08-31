@@ -3,8 +3,7 @@
 @attribute [Authorize(Policy = "Admin")]
 
 <PageTitle>Headquarters administration | VitalReach</PageTitle>
-<header class="admin-header"><a class="logo" href="/"><img src="images/vitalreach-logo.png" alt="VitalReach Wellness Hub" /></a><nav><a href="/admin/products">Products</a><a class="active" href="/admin/headquarters">Headquarters</a><a href="/admin/users">Access</a></nav><div><a href="/auth/logout">Sign out</a></div></header>
-<main class="admin-shell">
+<AdminPortalLayout ActiveSection="headquarters">
     <header class="admin-title"><div><p class="eyebrow">Secure administration</p><h1>Headquarters</h1><p>This address appears in the storefront footer and on the Shopping &amp; Wellness Center page.</p></div></header>
     @if (!string.IsNullOrWhiteSpace(Message)) { <div class="admin-message @(IsError ? "error" : "")" role="status">@Message</div> }
     @if (Settings is not null)
@@ -27,4 +26,4 @@
             </EditForm>
         </section>
     }
-</main>
+</AdminPortalLayout>
