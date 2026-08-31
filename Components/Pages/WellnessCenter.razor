@@ -1,5 +1,4 @@
 @page "/wellness-center"
-@inject IDbContextFactory<CatalogDbContext> DbFactory
 
 <PageTitle>Shopping &amp; Wellness Center | VitalReach</PageTitle>
 <StorefrontHeader />
@@ -12,13 +11,4 @@
         <section class="center-location"><div><p class="eyebrow light">Visit our headquarters</p><h2>@Headquarters.CenterName</h2><address>@Headquarters.AddressLine1<br />@if (!string.IsNullOrWhiteSpace(Headquarters.AddressLine2)) { @Headquarters.AddressLine2<br /> }@Headquarters.CityRegion<br />@Headquarters.Country</address><p>@Headquarters.Hours</p></div><div><a href="@Headquarters.MapUrl" target="_blank" rel="noopener noreferrer">Open in Google Maps ↗</a><a href="@Headquarters.PhoneHref">@Headquarters.Phone</a><a href="mailto:@Headquarters.Email">@Headquarters.Email</a></div></section>
     </main>
     <StorefrontFooter Headquarters="Headquarters" />
-}
-
-@code {
-    private HeadquartersSettings? Headquarters;
-    protected override async Task OnInitializedAsync()
-    {
-        await using var db = await DbFactory.CreateDbContextAsync();
-        Headquarters = await db.Headquarters.AsNoTracking().SingleAsync(x => x.Id == 1);
-    }
 }
