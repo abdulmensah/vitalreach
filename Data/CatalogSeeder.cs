@@ -56,6 +56,10 @@ public static class CatalogSeeder
                 CONSTRAINT "FK_ProductImages_Products_ProductId" FOREIGN KEY ("ProductId") REFERENCES "Products" ("Id") ON DELETE CASCADE
             );
             CREATE UNIQUE INDEX IF NOT EXISTS "IX_ProductImages_ProductId_ImageUrl" ON "ProductImages" ("ProductId", "ImageUrl");
+            CREATE TABLE IF NOT EXISTS "SeedHistory" (
+                "Key" TEXT NOT NULL CONSTRAINT "PK_SeedHistory" PRIMARY KEY,
+                "AppliedUtc" TEXT NOT NULL
+            );
             """);
         if (!await db.Products.AnyAsync()) db.Products.AddRange(
             New("energy", "Ultra Energy Shot™", 24m, "Founder's Collection", "Caffeine-free focus & vitality", "30 servings", "gold-product", "30 mL", "Ultra Energy", "Shot", 10),
@@ -72,8 +76,7 @@ public static class CatalogSeeder
             AdminUser.Create("masaoudaa@gmail.com", "Masaouda", "system-seed"));
         if (!await db.Headquarters.AnyAsync()) db.Headquarters.Add(new HeadquartersSettings());
         await db.SaveChangesAsync();
-        await AddMissingProductGalleryImagesAsync(db);
-        await db.SaveChangesAsync();
+        await SeedProductGalleryImagesOnceAsync(db);
     }
 
     private static async Task EnsureProductColumnsAsync(CatalogDbContext db)
@@ -466,6 +469,31 @@ public static class CatalogSeeder
         foreach (var image in gallery)
             if (products.TryGetValue(image.Slug, out var product) && !existingUrls.Contains(image.Url, StringComparer.OrdinalIgnoreCase))
                 db.ProductImages.Add(new ProductImage { ProductId = product.Id, ImageUrl = image.Url, AltText = image.Alt, SortOrder = image.SortOrder });
+    }
+
+    private static async Task SeedProductGalleryImagesOnceAsync(CatalogDbContext db)
+    {
+        const string seedKey = "product-gallery-v2";
+        var connection = db.Database.GetDbConnection();
+        await connection.OpenAsync();
+        try
+        {
+            await using var command = connection.CreateCommand();
+            command.CommandText = "SELECT COUNT(*) FROM \"SeedHistory\" WHERE \"Key\" = $key;";
+            var parameter = command.CreateParameter();
+            parameter.ParameterName = "$key";
+            parameter.Value = seedKey;
+            command.Parameters.Add(parameter);
+            if (Convert.ToInt32(await command.ExecuteScalarAsync()) > 0) return;
+        }
+        finally
+        {
+            await connection.CloseAsync();
+        }
+
+        await AddMissingProductGalleryImagesAsync(db);
+        await db.SaveChangesAsync();
+        await db.Database.ExecuteSqlInterpolatedAsync($"INSERT OR IGNORE INTO \"SeedHistory\" (\"Key\", \"AppliedUtc\") VALUES ({seedKey}, {DateTimeOffset.UtcNow});");
     }
 
     private static async Task AddMissingShelfCollectionProductsAsync(CatalogDbContext db)

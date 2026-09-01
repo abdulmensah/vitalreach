@@ -50,7 +50,11 @@ namespace VitalReach.Web.Components.Pages
         private void CloseMenu() => MenuOpen = false;
         private void BeginCheckout() { CartOpen = false; CheckoutOpen = true; }
         private void CloseCheckout() => CheckoutOpen = false;
-        private sealed class CartLine(ProductEntity product, int quantity) { public ProductEntity Product { get; } = product; public int Quantity { get; set; } = quantity; }
+        private sealed class CartLine(ProductEntity product, int quantity)
+        {
+            public ProductEntity Product { get; } = product;
+            public int Quantity { get; set; } = quantity;
+        }
 
 
     }

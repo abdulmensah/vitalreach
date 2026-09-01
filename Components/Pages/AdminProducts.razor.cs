@@ -20,7 +20,12 @@ namespace VitalReach.Web.Components.Pages
         private string? Message;
         private bool IsError;
         private IBrowserFile? SelectedImage;
+        private IBrowserFile? SelectedGalleryImage;
+        private List<ProductImage> GalleryImages = [];
+        private string GalleryAltText = "";
         private bool Saving;
+        private bool Ranking;
+        private bool SavingGalleryImage;
         private string AdminEmail = "";
         protected override async Task OnInitializedAsync()
         {
@@ -45,9 +50,12 @@ namespace VitalReach.Web.Components.Pages
             }; Message = null;
             IsError = false;
             SelectedImage = null;
+            SelectedGalleryImage = null;
+            GalleryImages = [];
+            GalleryAltText = "";
         }
 
-        private void Edit(ProductEntity product, bool clearMessage = true)
+        private async Task Edit(ProductEntity product, bool clearMessage = true)
         {
             Editing = new ProductEntity
             {
@@ -74,6 +82,9 @@ namespace VitalReach.Web.Components.Pages
                 IsError = false;
             }
             SelectedImage = null;
+            SelectedGalleryImage = null;
+            GalleryAltText = "";
+            await LoadGalleryImages(product.Id);
         }
 
         private void SelectImage(InputFileChangeEventArgs args)
@@ -113,7 +124,7 @@ namespace VitalReach.Web.Components.Pages
                 if (!string.Equals(previousImageUrl, Editing.ImageUrl, StringComparison.Ordinal))
                     await ImageStorage.DeleteAsync(previousImageUrl);
                 SelectedImage = null;
-                await Load(); var id = Editing.Id; Edit(Products.Single(x => x.Id == id), clearMessage: false);
+                await Load(); var id = Editing.Id; await Edit(Products.Single(x => x.Id == id), clearMessage: false);
             }
             catch (DbUpdateException)
             {
@@ -145,13 +156,185 @@ namespace VitalReach.Web.Components.Pages
             await using var db = await DbFactory.CreateDbContextAsync();
             var product = await db.Products.FindAsync(Editing.Id);
             if (product is null) return;
+            var galleryImageUrls = await db.ProductImages.Where(image => image.ProductId == product.Id).Select(image => image.ImageUrl).ToListAsync();
             db.Products.Remove(product);
             await db.SaveChangesAsync();
             IsError = false;
             Message = $"Product “{product.Name}” has been deleted successfully.";
             await ImageStorage.DeleteAsync(product.ImageUrl);
+            foreach (var imageUrl in galleryImageUrls)
+                await ImageStorage.DeleteAsync(imageUrl);
             Editing = null;
+            GalleryImages = [];
             await Load();
+        }
+
+        private async Task MoveProduct(ProductEntity product, int direction)
+        {
+            if (Ranking || direction is < -1 or > 1 || direction == 0) return;
+            var currentIndex = Products.FindIndex(candidate => candidate.Id == product.Id);
+            var targetIndex = currentIndex + direction;
+            if (currentIndex < 0 || targetIndex < 0 || targetIndex >= Products.Count) return;
+
+            Ranking = true;
+            try
+            {
+                (Products[currentIndex], Products[targetIndex]) = (Products[targetIndex], Products[currentIndex]);
+                await using var db = await DbFactory.CreateDbContextAsync();
+                var productIds = Products.Select(candidate => candidate.Id).ToArray();
+                var entities = await db.Products.Where(candidate => productIds.Contains(candidate.Id)).ToDictionaryAsync(candidate => candidate.Id);
+                for (var index = 0; index < Products.Count; index++)
+                {
+                    var rank = (index + 1) * 10;
+                    Products[index].SortOrder = rank;
+                    entities[Products[index].Id].SortOrder = rank;
+                    entities[Products[index].Id].UpdatedUtc = DateTimeOffset.UtcNow;
+                }
+
+                await db.SaveChangesAsync();
+                var editingId = Editing?.Id;
+                await Load();
+                if (editingId is not null)
+                    await Edit(Products.Single(candidate => candidate.Id == editingId), clearMessage: false);
+                IsError = false;
+                Message = $"Product ranking has been updated. “{product.Name}” is now ranked #{targetIndex + 1}.";
+            }
+            catch (DbUpdateException)
+            {
+                await Load();
+                IsError = true;
+                Message = "The product ranking could not be updated. Please try again.";
+            }
+            finally
+            {
+                Ranking = false;
+            }
+        }
+
+        private async Task LoadGalleryImages(int productId)
+        {
+            await using var db = await DbFactory.CreateDbContextAsync();
+            GalleryImages = await db.ProductImages.AsNoTracking()
+                .Where(image => image.ProductId == productId)
+                .OrderBy(image => image.SortOrder)
+                .ThenBy(image => image.Id)
+                .ToListAsync();
+        }
+
+        private void SelectGalleryImage(InputFileChangeEventArgs args)
+        {
+            SelectedGalleryImage = args.File;
+            if (string.IsNullOrWhiteSpace(GalleryAltText) && Editing is not null)
+                GalleryAltText = $"{Editing.Name} product image";
+            Message = null;
+            IsError = false;
+        }
+
+        private async Task AddGalleryImage()
+        {
+            if (Editing is null || Editing.Id == 0 || SelectedGalleryImage is null || SavingGalleryImage) return;
+            SavingGalleryImage = true;
+            string? uploadedImageUrl = null;
+            try
+            {
+                uploadedImageUrl = await ImageStorage.SaveAsync(SelectedGalleryImage);
+                await using var db = await DbFactory.CreateDbContextAsync();
+                db.ProductImages.Add(new ProductImage
+                {
+                    ProductId = Editing.Id,
+                    ImageUrl = uploadedImageUrl,
+                    AltText = string.IsNullOrWhiteSpace(GalleryAltText) ? $"{Editing.Name} product image" : GalleryAltText.Trim(),
+                    SortOrder = (GalleryImages.LastOrDefault()?.SortOrder ?? 0) + 10
+                });
+                await db.SaveChangesAsync();
+                SelectedGalleryImage = null;
+                GalleryAltText = "";
+                await LoadGalleryImages(Editing.Id);
+                IsError = false;
+                Message = $"A gallery image for “{Editing.Name}” has been added successfully.";
+            }
+            catch (InvalidOperationException exception)
+            {
+                await ImageStorage.DeleteAsync(uploadedImageUrl);
+                IsError = true;
+                Message = exception.Message;
+            }
+            catch (IOException)
+            {
+                await ImageStorage.DeleteAsync(uploadedImageUrl);
+                IsError = true;
+                Message = "The gallery image could not be stored. Please try again.";
+            }
+            catch (DbUpdateException)
+            {
+                await ImageStorage.DeleteAsync(uploadedImageUrl);
+                IsError = true;
+                Message = "The gallery image could not be added. Please try again.";
+            }
+            finally
+            {
+                SavingGalleryImage = false;
+            }
+        }
+
+        private async Task MoveGalleryImage(ProductImage image, int direction)
+        {
+            if (SavingGalleryImage || direction is < -1 or > 1 || direction == 0) return;
+            var currentIndex = GalleryImages.FindIndex(candidate => candidate.Id == image.Id);
+            var targetIndex = currentIndex + direction;
+            if (currentIndex < 0 || targetIndex < 0 || targetIndex >= GalleryImages.Count) return;
+
+            SavingGalleryImage = true;
+            try
+            {
+                (GalleryImages[currentIndex], GalleryImages[targetIndex]) = (GalleryImages[targetIndex], GalleryImages[currentIndex]);
+                await using var db = await DbFactory.CreateDbContextAsync();
+                var imageIds = GalleryImages.Select(candidate => candidate.Id).ToArray();
+                var entities = await db.ProductImages.Where(candidate => imageIds.Contains(candidate.Id)).ToDictionaryAsync(candidate => candidate.Id);
+                for (var index = 0; index < GalleryImages.Count; index++)
+                    entities[GalleryImages[index].Id].SortOrder = (index + 1) * 10;
+                await db.SaveChangesAsync();
+                await LoadGalleryImages(image.ProductId);
+                IsError = false;
+                Message = "The product gallery order has been updated successfully.";
+            }
+            catch (DbUpdateException)
+            {
+                await LoadGalleryImages(image.ProductId);
+                IsError = true;
+                Message = "The product gallery order could not be updated. Please try again.";
+            }
+            finally
+            {
+                SavingGalleryImage = false;
+            }
+        }
+
+        private async Task RemoveGalleryImage(ProductImage image)
+        {
+            if (SavingGalleryImage) return;
+            SavingGalleryImage = true;
+            try
+            {
+                await using var db = await DbFactory.CreateDbContextAsync();
+                var entity = await db.ProductImages.FindAsync(image.Id);
+                if (entity is null) return;
+                db.ProductImages.Remove(entity);
+                await db.SaveChangesAsync();
+                await ImageStorage.DeleteAsync(entity.ImageUrl);
+                await LoadGalleryImages(entity.ProductId);
+                IsError = false;
+                Message = "The gallery image has been removed successfully.";
+            }
+            catch (DbUpdateException)
+            {
+                IsError = true;
+                Message = "The gallery image could not be removed. Please try again.";
+            }
+            finally
+            {
+                SavingGalleryImage = false;
+            }
         }
 
 
