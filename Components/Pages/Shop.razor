@@ -11,23 +11,23 @@
         </h1>
         <p>Explore thoughtful wellness essentials, filter by category, and open any product for full details.</p>
     </header>
-    <section class="shop-browser">
+    <section id="catalog" class="shop-browser">
         <aside class="shop-facets">
             <h2>Categories</h2>
-            <a class="@(string.IsNullOrWhiteSpace(Category) ? "active" : "")" href="@BuildUrl(null, 1)">
+            <a class="@(string.IsNullOrWhiteSpace(Category) ? "active" : "")" aria-current="@(string.IsNullOrWhiteSpace(Category) ? "true" : null)" href="@BuildUrl(null, 1)">
                 <span>All products</span>
                 <b>@TotalAcrossCategories</b>
             </a>
             @foreach (var facet in Facets)
             {
-                <a class="@(string.Equals(Category, facet.Name, StringComparison.OrdinalIgnoreCase) ? "active" : "")" href="@BuildUrl(facet.Name, 1)">
+                <a class="@(string.Equals(Category, facet.Name, StringComparison.OrdinalIgnoreCase) ? "active" : "")" aria-current="@(string.Equals(Category, facet.Name, StringComparison.OrdinalIgnoreCase) ? "true" : null)" href="@BuildUrl(facet.Name, 1)">
                     <span>@facet.Name</span>
                     <b>@facet.Count</b>
                 </a>
             }
         </aside>
         <div class="shop-results">
-            <form class="shop-search" method="get" action="/shop">
+            <form class="shop-search" method="get" action="/shop#catalog">
                 <label for="product-search">Search products</label>
                 <div>
                     <input id="product-search" type="search" name="q" value="@Search" placeholder="Search by name, benefit, or category" />

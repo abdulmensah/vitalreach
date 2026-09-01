@@ -57,7 +57,7 @@ public partial class Shop
         if (!string.IsNullOrWhiteSpace(Search)) values.Add($"q={Uri.EscapeDataString(Search.Trim())}");
         if (!string.IsNullOrWhiteSpace(category)) values.Add($"category={Uri.EscapeDataString(category)}");
         if (page > 1) values.Add($"page={page}");
-        return values.Count == 0 ? "/shop" : $"/shop?{string.Join("&", values)}";
+        return values.Count == 0 ? "/shop#catalog" : $"/shop?{string.Join("&", values)}#catalog";
     }
 
     private sealed record CategoryFacet(string Name, int Count);
