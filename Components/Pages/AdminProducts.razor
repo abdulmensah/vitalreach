@@ -4,33 +4,181 @@
 
 <PageTitle>Product administration | VitalReach</PageTitle>
 <AdminPortalLayout ActiveSection="products">
-    <header class="admin-title"><div><p class="eyebrow">Secure administration</p><h1>Product catalog</h1><p>Manage the products shown on the VitalReach storefront.</p></div><button class="btn btn-gold" @onclick="NewProduct">Add product</button></header>
+    <header class="admin-title">
+        <div>
+            <p class="eyebrow">Secure administration</p>
+            <h1>Product catalog</h1>
+            <p>Manage the products shown on the VitalReach storefront.</p>
+        </div>
+        <button class="btn btn-gold" @onclick="NewProduct">Add product</button>
+    </header>
     @if (!string.IsNullOrEmpty(Message))
     {
         <div class="admin-message @(IsError ? "error" : "")" role="status">@Message</div>
     }
     <div class="admin-grid">
-        <section class="admin-list"><h2>Products</h2>@foreach (var product in Products) {
-            <button class="admin-product @(Editing?.Id == product.Id ? "selected" : "")" @onclick="() => Edit(product)"><span><b>@product.Name</b><small>@product.Category · @product.Price.ToString("C")</small></span><i class="@(product.IsPublished ? "published" : "draft")">@(product.IsPublished ? "Published" : "Hidden")</i></button>
+        <section class="admin-list">
+            <div class="admin-list-heading">
+                <h2>Product ranking</h2>
+                <small>Top-ranked products appear first.</small>
+            </div>
+            @foreach (var product in Products)
+            {
+                <div class="admin-product-row @(Editing?.Id == product.Id ? "selected" : "")">
+                    <span class="admin-product-rank" aria-label="Rank @(Products.IndexOf(product) + 1)">@(Products.IndexOf(product) + 1)</span>
+                    <button class="admin-product" type="button" @onclick="() => Edit(product)">
+                        <span>
+                            <b>@product.Name</b>
+                            <small>@product.Category · @product.Price.ToString("C")</small>
+                        </span>
+                        <i class="@(product.IsPublished ? "published" : "draft")">@(product.IsPublished ? "Published" : "Hidden")</i>
+                    </button>
+                    <div class="admin-rank-actions" aria-label="Change rank for @product.Name">
+                        <button type="button" title="Move up" aria-label="Move @product.Name up" disabled="@(Ranking || Products.IndexOf(product) == 0)" @onclick="() => MoveProduct(product, -1)">↑</button>
+                        <button type="button" title="Move down" aria-label="Move @product.Name down" disabled="@(Ranking || Products.IndexOf(product) == Products.Count - 1)" @onclick="() => MoveProduct(product, 1)">↓</button>
+                    </div>
+                </div>
+            }
+        </section>
+        <section class="admin-editor">
+            @if (Editing is null)
+            {
+                <div class="admin-placeholder">
+                    <h2>Select a product</h2>
+                    <p>Choose an item from the catalog or add a new product.</p>
+                </div>
+            }
+            else
+            {
+
+                <EditForm Model="Editing" OnValidSubmit="Save">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+                    <div class="form-grid">
+                        <label class="wide">
+                            Product name<InputText @bind-Value="Editing.Name" />
+                        </label>
+                        <label>
+                            Slug<InputText @bind-Value="Editing.Slug" />
+                        </label>
+                        <label>
+                            Price<InputNumber @bind-Value="Editing.Price" />
+                        </label>
+                        <label>
+                            Category<InputText @bind-Value="Editing.Category" />
+                        </label>
+                        <label>
+                            Package detail<InputText @bind-Value="Editing.Detail" />
+                        </label>
+                        <label class="wide">
+                            Benefit statement<InputTextArea @bind-Value="Editing.Benefit" />
+                        </label>
+                        <label class="wide">
+                            Full product description<InputTextArea @bind-Value="Editing.Description" />
+                        </label>
+                        <label class="wide">
+                            Product image<InputFile OnChange="SelectImage" accept="image/jpeg,image/png,image/webp" />
+                            <small>JPG, PNG, or WebP · maximum 5 MB. The image is uploaded when you save.</small>
+                        </label>
+                        @if (SelectedImage is not null)
+                        {
+                            <div class="admin-selected-image wide">
+                                <b>Selected:</b> @SelectedImage.Name
+                            </div>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(Editing.ImageUrl))
+                        {
+                            <div class="admin-image-preview wide">
+                                <img src="@Editing.ImageUrl" alt="Product image preview for @Editing.Name" />
+                                <button class="danger-button" type="button" @onclick="RemoveImage">Remove image</button>
+                            </div>
+                        }
+                        @if (Editing.Id != 0)
+                        {
+                            <section class="admin-gallery-manager wide">
+                                <header>
+                                    <div>
+                                        <b>PDP gallery images</b>
+                                        <small>Additional images appear as thumbnails on the product detail page.</small>
+                                    </div>
+                                </header>
+                                <div class="admin-gallery-upload">
+                                    <label>
+                                        Image description
+                                        <InputText @bind-Value="GalleryAltText" placeholder="Describe this product image" />
+                                    </label>
+                                    <label>
+                                        Gallery image
+                                        <InputFile OnChange="SelectGalleryImage" accept="image/jpeg,image/png,image/webp" />
+                                    </label>
+                                    <button class="btn btn-outline" type="button" disabled="@(SelectedGalleryImage is null || SavingGalleryImage)" @onclick="AddGalleryImage">
+                                        @(SavingGalleryImage ? "Uploading…" : "Add to gallery")
+                                    </button>
+                                </div>
+                                @if (SelectedGalleryImage is not null)
+                                {
+                                    <div class="admin-selected-image"><b>Selected:</b> @SelectedGalleryImage.Name</div>
+                                }
+                                @if (GalleryImages.Count == 0)
+                                {
+                                    <p class="admin-gallery-empty">No additional gallery images have been added.</p>
+                                }
+                                else
+                                {
+                                    <div class="admin-gallery-list">
+                                        @foreach (var image in GalleryImages)
+                                        {
+                                            <article>
+                                                <img src="@image.ImageUrl" alt="@image.AltText" />
+                                                <div>
+                                                    <b>@image.AltText</b>
+                                                    <small>Gallery rank @(GalleryImages.IndexOf(image) + 1)</small>
+                                                </div>
+                                                <div class="admin-gallery-actions">
+                                                    <button type="button" title="Move image left" disabled="@(SavingGalleryImage || GalleryImages.IndexOf(image) == 0)" @onclick="() => MoveGalleryImage(image, -1)">←</button>
+                                                    <button type="button" title="Move image right" disabled="@(SavingGalleryImage || GalleryImages.IndexOf(image) == GalleryImages.Count - 1)" @onclick="() => MoveGalleryImage(image, 1)">→</button>
+                                                    <button class="remove" type="button" disabled="@SavingGalleryImage" @onclick="() => RemoveGalleryImage(image)">Remove</button>
+                                                </div>
+                                            </article>
+                                        }
+                                    </div>
+                                }
+                            </section>
+                        }
+                        <label>
+                            Badge text<InputText @bind-Value="Editing.Orb" />
+                        </label>
+                        <label>
+                            Color theme<InputSelect @bind-Value="Editing.Theme">
+                            <option value="gold-product">Gold</option>
+                            <option value="teal-product">Teal</option>
+                            <option value="pearl-product">Pearl</option>
+                            <option value="berry-product">Berry</option>
+                        </InputSelect>
+                    </label>
+                    <label>
+                        Label line one<InputText @bind-Value="Editing.LabelOne" />
+                    </label>
+                    <label>
+                        Label line two<InputText @bind-Value="Editing.LabelTwo" />
+                    </label>
+                    <label>
+                        Ranking value<InputNumber @bind-Value="Editing.SortOrder" />
+                        <small>Lower values appear first. Use the arrows in the product list for quick ranking.</small>
+                    </label>
+                    <label class="check">
+                        <InputCheckbox @bind-Value="Editing.IsPublished" /> Published
+                    </label>
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-gold" type="submit" disabled="@Saving">@(Saving ? "Saving…" : "Save product")</button>
+                    @if (Editing.Id != 0)
+                    {
+                        <button class="danger-button" type="button" @onclick="Delete">Delete product</button>
+                    }
+                </div>
+            </EditForm>
         }
     </section>
-    <section class="admin-editor">
-        @if (Editing is null)
-        {
-            <div class="admin-placeholder"><h2>Select a product</h2><p>Choose an item from the catalog or add a new product.</p></div>
-        }
-        else
-        {
-
-            <EditForm Model="Editing" OnValidSubmit="Save">
-                <DataAnnotationsValidator /><ValidationSummary />
-                <div class="form-grid"><label class="wide">Product name<InputText @bind-Value="Editing.Name" /></label><label>Slug<InputText @bind-Value="Editing.Slug" /></label><label>Price<InputNumber @bind-Value="Editing.Price" /></label><label>Category<InputText @bind-Value="Editing.Category" /></label><label>Package detail<InputText @bind-Value="Editing.Detail" /></label><label class="wide">Benefit statement<InputTextArea @bind-Value="Editing.Benefit" /></label><label class="wide">Full product description<InputTextArea @bind-Value="Editing.Description" /></label><label class="wide">Product image<InputFile OnChange="SelectImage" accept="image/jpeg,image/png,image/webp" /><small>JPG, PNG, or WebP · maximum 5 MB. The image is uploaded when you save.</small></label>@if (SelectedImage is not null) { <div class="admin-selected-image wide"><b>Selected:</b> @SelectedImage.Name</div> }@if (!string.IsNullOrWhiteSpace(Editing.ImageUrl)) { <div class="admin-image-preview wide"><img src="@Editing.ImageUrl" alt="Product image preview for @Editing.Name" /><button class="danger-button" type="button" @onclick="RemoveImage">Remove image</button></div> }<label>Badge text<InputText @bind-Value="Editing.Orb" /></label><label>Color theme<InputSelect @bind-Value="Editing.Theme"><option value="gold-product">Gold</option><option value="teal-product">Teal</option><option value="pearl-product">Pearl</option><option value="berry-product">Berry</option></InputSelect></label><label>Label line one<InputText @bind-Value="Editing.LabelOne" /></label><label>Label line two<InputText @bind-Value="Editing.LabelTwo" /></label><label>Sort order<InputNumber @bind-Value="Editing.SortOrder" /></label><label class="check"><InputCheckbox @bind-Value="Editing.IsPublished" /> Published</label></div>
-                <div class="form-actions"><button class="btn btn-gold" type="submit" disabled="@Saving">@(Saving ? "Saving…" : "Save product")</button>@if (Editing.Id != 0) {
-                    <button class="danger-button" type="button" @onclick="Delete">Delete product</button>
-                }
-            </div>
-        </EditForm>
-    }
-</section>
 </div>
 </AdminPortalLayout>

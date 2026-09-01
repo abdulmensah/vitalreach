@@ -16,14 +16,14 @@ namespace VitalReach.Web.Components.Pages
         private HeadquartersSettings? Headquarters;
         private int CartCount => Cart.Values.Sum(x => x.Quantity);
         private decimal Subtotal => Cart.Values.Sum(x => x.Product.Price * x.Quantity);
-        private string OrderEmail
+        private string OrderContactUrl
         {
             get
             {
                 var lines = string.Join("\n", Cart.Values.Select(x => $"{x.Quantity} × {x.Product.Name} — {Money(x.Product.Price * x.Quantity)}"));
                 var body = Uri.EscapeDataString(
                     $"Hello VitalReach,\n\nI would like to order:\n{lines}\n\nSubtotal: {Money(Subtotal)}\n\nPlease confirm availability, shipping, and secure payment instructions.");
-                return $"mailto:hello@vitalreachwellness.com?subject=VitalReach%20order%20request&body={body}";
+                return $"/contact?message={body}";
             }
         }
         private static string Money(decimal value) => value.ToString("C", CultureInfo.GetCultureInfo("en-US"));
@@ -50,7 +50,11 @@ namespace VitalReach.Web.Components.Pages
         private void CloseMenu() => MenuOpen = false;
         private void BeginCheckout() { CartOpen = false; CheckoutOpen = true; }
         private void CloseCheckout() => CheckoutOpen = false;
-        private sealed class CartLine(ProductEntity product, int quantity) { public ProductEntity Product { get; } = product; public int Quantity { get; set; } = quantity; }
+        private sealed class CartLine(ProductEntity product, int quantity)
+        {
+            public ProductEntity Product { get; } = product;
+            public int Quantity { get; set; } = quantity;
+        }
 
 
     }

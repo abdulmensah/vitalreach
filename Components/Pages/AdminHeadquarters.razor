@@ -4,25 +4,58 @@
 
 <PageTitle>Headquarters administration | VitalReach</PageTitle>
 <AdminPortalLayout ActiveSection="headquarters">
-    <header class="admin-title"><div><p class="eyebrow">Secure administration</p><h1>Headquarters</h1><p>This address appears in the storefront footer and on the Shopping &amp; Wellness Center page.</p></div></header>
-    @if (!string.IsNullOrWhiteSpace(Message)) { <div class="admin-message @(IsError ? "error" : "")" role="status">@Message</div> }
+    <header class="admin-title">
+        <div>
+            <p class="eyebrow">Secure administration</p>
+            <h1>Headquarters</h1>
+            <p>This address appears in the storefront footer and on the Shopping &amp; Wellness Center page.</p>
+        </div>
+    </header>
+    @if (!string.IsNullOrWhiteSpace(Message))
+    {
+        <div class="admin-message @(IsError ? "error" : "")" role="status">@Message</div>
+    }
     @if (Settings is not null)
     {
         <section class="admin-editor settings-editor">
-            <EditForm Model="Settings" OnValidSubmit="SaveAsync"><DataAnnotationsValidator /><ValidationSummary />
+            <EditForm Model="Settings" OnValidSubmit="SaveAsync">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
                 <div class="form-grid">
-                    <label class="wide">Center name<InputText @bind-Value="Settings.CenterName" /></label>
-                    <label class="wide">Address line 1<InputText @bind-Value="Settings.AddressLine1" /></label>
-                    <label class="wide">Address line 2<InputText @bind-Value="Settings.AddressLine2" /></label>
-                    <label>City / locality<InputText @bind-Value="Settings.City" /></label>
-                    <label>Region / state<InputText @bind-Value="Settings.Region" /></label>
-                    <label>Postal code<InputText @bind-Value="Settings.PostalCode" /></label>
-                    <label>Country<InputText @bind-Value="Settings.Country" /></label>
-                    <label>Phone<InputText @bind-Value="Settings.Phone" /></label>
-                    <label>Email<InputText @bind-Value="Settings.Email" /></label>
-                    <label class="wide">Opening information<InputTextArea @bind-Value="Settings.Hours" /></label>
+                    <label class="wide">
+                        Center name<InputText @bind-Value="Settings.CenterName" />
+                    </label>
+                    <label class="wide">
+                        Address line 1<InputText @bind-Value="Settings.AddressLine1" />
+                    </label>
+                    <label class="wide">
+                        Address line 2<InputText @bind-Value="Settings.AddressLine2" />
+                    </label>
+                    <label>
+                        City / locality<InputText @bind-Value="Settings.City" />
+                    </label>
+                    <label>
+                        Region / state<InputText @bind-Value="Settings.Region" />
+                    </label>
+                    <label>
+                        Postal code<InputText @bind-Value="Settings.PostalCode" />
+                    </label>
+                    <label>
+                        Country<InputText @bind-Value="Settings.Country" />
+                    </label>
+                    <label>
+                        Phone<InputText @bind-Value="Settings.Phone" />
+                    </label>
+                    <label>
+                        Email<InputText @bind-Value="Settings.Email" />
+                    </label>
+                    <label class="wide">
+                        Opening information<InputTextArea @bind-Value="Settings.Hours" />
+                    </label>
                 </div>
-                <div class="form-actions"><button class="btn btn-gold" type="submit" disabled="@Saving">@(Saving ? "Saving…" : "Save headquarters")</button></div>
+                <div class="form-actions">
+                    <button class="btn btn-gold" type="submit" disabled="@Saving">@(Saving ? "Saving…" : "Save headquarters")</button>
+                </div>
             </EditForm>
         </section>
     }

@@ -3,15 +3,91 @@
 <PageTitle>Shop wellness products | VitalReach</PageTitle>
 <StorefrontHeader />
 <main class="shop-page">
-    <header class="shop-hero"><p class="eyebrow light">The VitalReach collection</p><h1>Wellness for<br /><em>every day.</em></h1><p>Explore thoughtful wellness essentials, filter by category, and open any product for full details.</p></header>
+    <header class="shop-hero">
+        <p class="eyebrow light">The VitalReach collection</p>
+        <h1>
+            Wellness for<br />
+            <em>every day.</em>
+        </h1>
+        <p>Explore thoughtful wellness essentials, filter by category, and open any product for full details.</p>
+    </header>
     <section class="shop-browser">
-        <aside class="shop-facets"><h2>Categories</h2><a class="@(string.IsNullOrWhiteSpace(Category) ? "active" : "")" href="@BuildUrl(null, 1)"><span>All products</span><b>@TotalAcrossCategories</b></a>@foreach (var facet in Facets) { <a class="@(string.Equals(Category, facet.Name, StringComparison.OrdinalIgnoreCase) ? "active" : "")" href="@BuildUrl(facet.Name, 1)"><span>@facet.Name</span><b>@facet.Count</b></a> }</aside>
+        <aside class="shop-facets">
+            <h2>Categories</h2>
+            <a class="@(string.IsNullOrWhiteSpace(Category) ? "active" : "")" href="@BuildUrl(null, 1)">
+                <span>All products</span>
+                <b>@TotalAcrossCategories</b>
+            </a>
+            @foreach (var facet in Facets)
+            {
+                <a class="@(string.Equals(Category, facet.Name, StringComparison.OrdinalIgnoreCase) ? "active" : "")" href="@BuildUrl(facet.Name, 1)">
+                    <span>@facet.Name</span>
+                    <b>@facet.Count</b>
+                </a>
+            }
+        </aside>
         <div class="shop-results">
-            <form class="shop-search" method="get" action="/shop"><label for="product-search">Search products</label><div><input id="product-search" type="search" name="q" value="@Search" placeholder="Search by name, benefit, or category" />@if (!string.IsNullOrWhiteSpace(Category)) { <input type="hidden" name="category" value="@Category" /> }<button type="submit">Search</button></div></form>
-            <div class="results-summary"><p><b>@TotalProducts</b> @(TotalProducts == 1 ? "product" : "products")@if (!string.IsNullOrWhiteSpace(Category)) { <text> in @Category</text> }</p>@if (!string.IsNullOrWhiteSpace(Search) || !string.IsNullOrWhiteSpace(Category)) { <a href="/shop">Clear filters</a> }</div>
-            @if (Products.Count == 0) { <div class="empty-results"><h2>No products matched.</h2><p>Try another search or clear the selected category.</p><a class="btn btn-outline" href="/shop">View all products</a></div> }
-            else { <div class="products shop-products">@foreach (var product in Products) { <ProductCard Product="product" /> }</div> }
-            @if (TotalPages > 1) { <nav class="pagination" aria-label="Product pages">@if (PageNumber > 1) { <a href="@BuildUrl(Category, PageNumber - 1)">← Previous</a> }@for (var page = 1; page <= TotalPages; page++) { var currentPage = page; <a class="@(currentPage == PageNumber ? "active" : "")" aria-current="@(currentPage == PageNumber ? "page" : null)" href="@BuildUrl(Category, currentPage)">@currentPage</a> }@if (PageNumber < TotalPages) { <a href="@BuildUrl(Category, PageNumber + 1)">Next →</a> }</nav> }
+            <form class="shop-search" method="get" action="/shop">
+                <label for="product-search">Search products</label>
+                <div>
+                    <input id="product-search" type="search" name="q" value="@Search" placeholder="Search by name, benefit, or category" />
+                    @if (!string.IsNullOrWhiteSpace(Category))
+                    {
+                        <input type="hidden" name="category" value="@Category" />
+                    }
+                    <button type="submit">Search</button>
+                </div>
+            </form>
+            <div class="results-summary">
+                <p>
+                    <b>@TotalProducts</b>
+                    @(TotalProducts == 1 ? "product" : "products")
+                    @if (!string.IsNullOrWhiteSpace(Category))
+                    {
+                        <text> in @Category</text>
+                    }
+                </p>
+                @if (!string.IsNullOrWhiteSpace(Search) || !string.IsNullOrWhiteSpace(Category))
+                {
+                    <a href="/shop">Clear filters</a>
+                }
+            </div>
+            @if (Products.Count == 0)
+            {
+                <div class="empty-results">
+                    <h2>No products matched.</h2>
+                    <p>Try another search or clear the selected category.</p>
+                    <a class="btn btn-outline" href="/shop">View all products</a>
+                </div>
+            }
+            else
+            {
+
+                <div class="products shop-products">
+                    @foreach (var product in Products)
+                    {
+                        <ProductCard Product="product" />
+                    }
+                </div>
+            }
+            @if (TotalPages > 1)
+            {
+                <nav class="pagination" aria-label="Product pages">
+                    @if (PageNumber > 1)
+                    {
+                        <a href="@BuildUrl(Category, PageNumber - 1)">← Previous</a>
+                    }
+                    @for (var page = 1; page <= TotalPages; page++)
+                    {
+                        var currentPage = page;
+                        <a class="@(currentPage == PageNumber ? "active" : "")" aria-current="@(currentPage == PageNumber ? "page" : null)" href="@BuildUrl(Category, currentPage)">@currentPage</a>
+                    }
+                    @if (PageNumber < TotalPages)
+                    {
+                        <a href="@BuildUrl(Category, PageNumber + 1)">Next →</a>
+                    }
+                </nav>
+            }
         </div>
     </section>
 </main>

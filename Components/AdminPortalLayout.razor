@@ -1,21 +1,50 @@
 <div class="admin-portal">
     <aside class="admin-sidenav">
-        <a class="admin-brand" href="/"><img src="/images/vitalreach-logo.png" alt="VitalReach Wellness Hub" /></a>
+        <a class="admin-brand" href="/">
+            <img src="/images/vitalreach-logo.png" alt="VitalReach Wellness Hub" />
+        </a>
         <nav aria-label="Admin navigation">
-            <a class="@ActiveClass("dashboard")" href="/admin"><span aria-hidden="true">⌂</span><span>Dashboard</span></a>
-            <a class="@ActiveClass("products")" href="/admin/products"><span aria-hidden="true">◇</span><span>Products</span></a>
-            <a class="@ActiveClass("headquarters")" href="/admin/headquarters"><span aria-hidden="true">⌖</span><span>Headquarters</span></a>
-            <a class="@ActiveClass("contacts")" href="/admin/contacts"><span aria-hidden="true">✉</span><span>Messages</span></a>
-            <a class="@ActiveClass("users")" href="/admin/users"><span aria-hidden="true">♙</span><span>Access</span></a>
+            <a class="@ActiveClass("dashboard")" href="/admin">
+                <span aria-hidden="true">⌂</span>
+                <span>Dashboard</span>
+            </a>
+            <a class="@ActiveClass("products")" href="/admin/products">
+                <span aria-hidden="true">◇</span>
+                <span>Products</span>
+            </a>
+            <a class="@ActiveClass("headquarters")" href="/admin/headquarters">
+                <span aria-hidden="true">⌖</span>
+                <span>Headquarters</span>
+            </a>
+            <a class="@ActiveClass("contacts")" href="/admin/contacts">
+                <span aria-hidden="true">✉</span>
+                <span>Messages</span>
+            </a>
+            <a class="@ActiveClass("users")" href="/admin/users">
+                <span aria-hidden="true">♙</span>
+                <span>Access</span>
+            </a>
         </nav>
-        <div class="admin-account"><small>Signed in as</small><span>@AdminEmail</span><a href="/auth/logout">Sign out</a></div>
+        <div class="admin-account">
+            <small>Signed in as</small>
+            <span>@AdminEmail</span>
+            <a href="/auth/logout">Sign out</a>
+        </div>
     </aside>
     <div class="admin-workspace">
-        <header class="admin-mobilebar"><a href="/admin">Admin portal</a><button type="button" @onclick="ToggleNavigation" aria-label="Toggle admin navigation" aria-expanded="@NavigationOpen">Menu</button></header>
+        <header class="admin-mobilebar">
+            <a href="/admin">Admin portal</a>
+            <button type="button" @onclick="ToggleNavigation" aria-label="Toggle admin navigation" aria-expanded="@NavigationOpen">Menu</button>
+        </header>
         @if (NavigationOpen)
         {
             <nav class="admin-mobile-nav" aria-label="Mobile admin navigation">
-                <a href="/admin">Dashboard</a><a href="/admin/products">Products</a><a href="/admin/headquarters">Headquarters</a><a href="/admin/contacts">Messages</a><a href="/admin/users">Access</a><a href="/auth/logout">Sign out</a>
+                <a href="/admin">Dashboard</a>
+                <a href="/admin/products">Products</a>
+                <a href="/admin/headquarters">Headquarters</a>
+                <a href="/admin/contacts">Messages</a>
+                <a href="/admin/users">Access</a>
+                <a href="/auth/logout">Sign out</a>
             </nav>
         }
         <main class="admin-shell">@ChildContent</main>
