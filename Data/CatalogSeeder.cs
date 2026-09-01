@@ -53,6 +53,7 @@ public static class CatalogSeeder
             New("magnesium", "Magnesium Glycinate Complex+", 29m, "Daily Wellness", "Everyday calm & muscle support", "60 capsules", "teal-product", "COMPLEX+", "Magnesium", "Complex+", 20),
             New("collagen", "Marine Collagen Glow", 38m, "Women's Beauty", "Beauty, hydration & glow support", "30 servings", "pearl-product", "GLOW", "Marine Collagen", "Glow", 30),
             New("beetroot", "Beetroot Plus", 27m, "Active Living", "Circulation, endurance & stamina", "60 capsules", "berry-product", "500 mg", "Beetroot", "Plus", 40));
+        await AddMissingSnackProductsAsync(db);
         if (!await db.AdminUsers.AnyAsync()) db.AdminUsers.AddRange(
             AdminUser.Create("abdulmensah@gmail.com", "Abdul Mensah", "system-seed"),
             AdminUser.Create("masaoudaa@gmail.com", "Masaouda", "system-seed"));
@@ -91,6 +92,71 @@ public static class CatalogSeeder
         alter.CommandText = sql;
         await alter.ExecuteNonQueryAsync();
     }
+
+    private static async Task AddMissingSnackProductsAsync(CatalogDbContext db)
+    {
+        var snacks = new[]
+        {
+            Snack(
+                "crunchy-soy-bites-sea-salt-ginger",
+                "Crunchy Soy Bites – Sea Salt & Ginger",
+                "A crisp, savory soybean snack with warming ginger and a clean touch of sea salt.",
+                "Oven-roasted plant protein with a bright, balanced finish—made for convenient everyday snacking.",
+                "/images/products/crunchy-soy-bites-sea-salt-ginger.png",
+                "SEA SALT",
+                "Sea Salt &",
+                "Ginger",
+                "teal-product",
+                50),
+            Snack(
+                "crunchy-soy-bites-spicy-suya",
+                "Crunchy Soy Bites – Spicy Suya",
+                "Oven-roasted soy bites seasoned with a bold, warming West African suya-inspired spice blend.",
+                "A crunchy source of plant protein with rich roasted flavor and a lively chili finish.",
+                "/images/products/crunchy-soy-bites-spicy-suya.png",
+                "SPICY",
+                "Spicy Suya",
+                "Soy Crunch",
+                "berry-product",
+                60),
+            Snack(
+                "crunchy-soy-bites-honey-ginger",
+                "Crunchy Soy Bites – Honey Ginger",
+                "Golden oven-roasted soy bites pairing gentle honey sweetness with the warmth of ginger.",
+                "A satisfyingly crunchy plant-protein snack with a lightly sweet, naturally uplifting flavor.",
+                "/images/products/crunchy-soy-bites-honey-ginger.png",
+                "HONEY",
+                "Honey Ginger",
+                "Soy Crunch",
+                "gold-product",
+                70)
+        };
+
+        var slugs = snacks.Select(product => product.Slug).ToArray();
+        var existingSlugs = await db.Products
+            .Where(product => slugs.Contains(product.Slug))
+            .Select(product => product.Slug)
+            .ToListAsync();
+        db.Products.AddRange(snacks.Where(product => !existingSlugs.Contains(product.Slug, StringComparer.OrdinalIgnoreCase)));
+    }
+
+    private static ProductEntity Snack(string slug, string name, string benefit, string description, string imageUrl, string orb, string one, string two, string theme, int order) => new()
+    {
+        Slug = slug,
+        Name = name,
+        Price = 8m,
+        Category = "Healthy Snacks",
+        Benefit = benefit,
+        Description = description,
+        Detail = "50 g pouch",
+        Theme = theme,
+        Orb = orb,
+        LabelOne = one,
+        LabelTwo = two,
+        ImageUrl = imageUrl,
+        IsPublished = true,
+        SortOrder = order
+    };
 
     private static ProductEntity New(string slug, string name, decimal price, string category, string benefit, string detail, string theme, string orb, string one, string two, int order) => new() { Slug=slug, Name=name, Price=price, Category=category, Benefit=benefit, Detail=detail, Theme=theme, Orb=orb, LabelOne=one, LabelTwo=two, SortOrder=order };
 }
