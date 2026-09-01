@@ -1,17 +1,91 @@
 @page "/shop/{Slug}"
+@rendermode InteractiveServer
 
 <PageTitle>@(Product is null ? "Product not found" : $"{Product.Name} | VitalReach")</PageTitle>
 <StorefrontHeader />
 @if (Product is null)
 {
-    <main class="product-not-found"><h1>Product not found.</h1><p>This product may no longer be available.</p><a class="btn btn-gold" href="/shop">Return to the collection</a></main>
+    <main class="product-not-found">
+        <h1>Product not found.</h1>
+        <p>This product may no longer be available.</p>
+        <a class="btn btn-gold" href="/shop">Return to the collection</a>
+    </main>
 }
 else
 {
     <main class="pdp">
-        <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>/</span><a href="/shop">Shop</a><span>/</span><span>@Product.Name</span></nav>
-        <section class="pdp-main"><div class="pdp-art @Product.Theme">@if (!string.IsNullOrWhiteSpace(Product.ImageUrl)) { <img src="@Product.ImageUrl" alt="@Product.Name" /> } else { <span class="halo">@Product.Orb</span><div class="bottle"><b>V</b><small>VITALREACH</small><i>@Product.LabelOne<br />@Product.LabelTwo</i><span>PREMIUM WELLNESS</span></div> }</div><div class="pdp-copy"><p class="eyebrow">@Product.Category</p><h1>@Product.Name</h1><p class="pdp-benefit">@Product.Benefit</p><div class="pdp-price"><strong>@Product.Price.ToString("C", CultureInfo.GetCultureInfo("en-US"))</strong><span>@Product.Detail</span></div><p>@(string.IsNullOrWhiteSpace(Product.Description) ? Product.Benefit : Product.Description)</p><a class="btn btn-gold" href="@PurchaseEmail">Ask about availability →</a><p class="pdp-note">Product information is general education and is not intended to diagnose, treat, cure, or prevent disease.</p></div></section>
-        <nav class="pdp-pagination" aria-label="Browse products">@if (Previous is not null) { <a href="/shop/@Previous.Slug"><small>Previous product</small><b>← @Previous.Name</b></a> } else { <span></span> }@if (Next is not null) { <a class="next" href="/shop/@Next.Slug"><small>Next product</small><b>@Next.Name →</b></a> }</nav>
+        <nav class="breadcrumbs" aria-label="Breadcrumb">
+            <a href="/">Home</a>
+            <span>/</span>
+            <a href="/shop">Shop</a>
+            <span>/</span>
+            <span>@Product.Name</span>
+        </nav>
+        <section class="pdp-main">
+            <div class="pdp-gallery">
+                <div class="pdp-art @Product.Theme">
+                    @if (!string.IsNullOrWhiteSpace(SelectedImageUrl))
+                    {
+                        <img src="@SelectedImageUrl" alt="@SelectedImageAlt" />
+                    }
+                    else
+                    {
+
+                        <span class="halo">@Product.Orb</span>
+                        <div class="bottle">
+                            <b>V</b>
+                            <small>VITALREACH</small>
+                            <i>@Product.LabelOne<br />@Product.LabelTwo</i>
+                            <span>PREMIUM WELLNESS</span>
+                        </div>
+                    }
+                </div>
+                @if (GalleryImages.Count > 1)
+                {
+                    <div class="pdp-thumbnails" aria-label="Product images">
+                        @foreach (var image in GalleryImages)
+                        {
+                            <button class="@(SelectedImageUrl == image.Url ? "active" : "")" type="button" @onclick="() => SelectImage(image)" aria-label="Show @image.Alt">
+                                <img src="@image.Url" alt="" />
+                            </button>
+                        }
+                    </div>
+                }
+            </div>
+            <div class="pdp-copy">
+                <p class="eyebrow">@Product.Category</p>
+                <h1>@Product.Name</h1>
+                <p class="pdp-benefit">@Product.Benefit</p>
+                <div class="pdp-price">
+                    <strong>@Product.Price.ToString("C", CultureInfo.GetCultureInfo("en-US"))</strong>
+                    <span>@Product.Detail</span>
+                </div>
+                <p>@(string.IsNullOrWhiteSpace(Product.Description) ? Product.Benefit : Product.Description)</p>
+                <a class="btn btn-gold" href="@ContactInquiryUrl">Ask about availability →</a>
+                <p class="pdp-note">Product information is general education and is not intended to diagnose, treat, cure, or prevent disease.</p>
+            </div>
+        </section>
+        <nav class="pdp-pagination" aria-label="Browse products">
+            @if (Previous is not null)
+            {
+                <a href="/shop/@Previous.Slug">
+                    <small>Previous product</small>
+                    <b>← @Previous.Name</b>
+                </a>
+            }
+            else
+            {
+                <span>
+                </span>
+            }
+            @if (Next is not null)
+            {
+                <a class="next" href="/shop/@Next.Slug">
+                    <small>Next product</small>
+                    <b>@Next.Name →</b>
+                </a>
+            }
+        </nav>
     </main>
 }
 <StorefrontFooter Headquarters="Headquarters" />

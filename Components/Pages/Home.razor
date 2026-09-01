@@ -290,17 +290,22 @@
             </h2>
         </div>
         <div>
-            <p>Questions about our collection, partnerships or upcoming availability? We would love to hear from you.</p>@if (Headquarters is not null) {
-            <address>
-                <small>Headquarters</small>@Headquarters.AddressLine1<br />@Headquarters.CityRegion, @Headquarters.Country
-            </address>
-            <a class="phone" href="@Headquarters.PhoneHref">
-                <small>Call us</small>@Headquarters.Phone
-            </a>
-            <a class="btn btn-gold" href="mailto:@Headquarters.Email?subject=VitalReach%20Wellness%20Inquiry">Email VitalReach ↗</a>
-        }
-    </div>
-</section>
+            <p>Questions about our collection, partnerships or upcoming availability? We would love to hear from you.</p>
+@*             @if (Headquarters is not null)
+            {
+                <address>
+                    <small>Headquarters</small>@Headquarters.AddressLine1, @(Headquarters.AddressLine2 ?? "")<br />@Headquarters.CityRegion, @Headquarters.Country
+                </address>
+                <a class="phone" href="@Headquarters.PhoneHref">
+                    <small>Call us</small>@Headquarters.Phone
+                </a>
+            <a class="btn btn-gold" href="/wellness-center">Learn more &amp; plan your visit →</a>
+
+            }
+ *@
+            <a class="btn btn-gold" href="/contact#contact-content?message=Hello%20VitalReach%2C%0A%0AI%20would%20like%20to%20get%20in%20touch%20with%20your%20team.%0A%0AThank%20you.">Start a Converstation ↗</a>
+        </div>
+    </section>
 </main>
 <StorefrontFooter Headquarters="Headquarters" />
 
@@ -364,7 +369,7 @@
             <p class="eyebrow">Secure checkout</p>
             <h2>You're almost there.</h2>
             <p>Online payment is being connected. Send your prepared order to our team and we’ll confirm availability, shipping, and a secure payment link.</p>
-            <a class="btn btn-gold" href="@OrderEmail">Email my order →</a>
+            <a class="btn btn-gold" href="@OrderContactUrl">Contact us about my order →</a>
         </section>
     </div>
 }

@@ -4,8 +4,49 @@
 
 <PageTitle>Contact messages | VitalReach</PageTitle>
 <AdminPortalLayout ActiveSection="contacts">
-    <header class="admin-title"><div><p class="eyebrow">Secure administration</p><h1>Contact messages</h1><p>Review messages submitted through the VitalReach contact form.</p></div></header>
-    @if (!string.IsNullOrWhiteSpace(StatusMessage)) { <div class="admin-message @(IsError ? "error" : "")" role="status">@StatusMessage</div> }
-    @if (Submissions.Count == 0) { <div class="admin-placeholder"><h2>No contact messages yet.</h2><p>New submissions will appear here.</p></div> }
-    else { <section class="contact-submissions">@foreach (var submission in Submissions) { <article class="@(submission.IsRead ? "read" : "unread")"><header><div><span>@(submission.IsRead ? "Read" : "New")</span><h2>@submission.Name</h2><p>@submission.CreatedUtc.ToLocalTime().ToString("MMM d, yyyy · h:mm tt")</p></div><div><a href="mailto:@submission.Email">@submission.Email</a><a href="tel:@submission.Phone">@submission.Phone</a></div></header><p>@submission.Message</p><div class="contact-submission-actions"><button @onclick="() => ToggleReadAsync(submission)">Mark as @(submission.IsRead ? "unread" : "read")</button><button class="delete" @onclick="() => DeleteAsync(submission)">Delete</button></div></article> }</section> }
+    <header class="admin-title">
+        <div>
+            <p class="eyebrow">Secure administration</p>
+            <h1>Contact messages</h1>
+            <p>Review messages submitted through the VitalReach contact form.</p>
+        </div>
+    </header>
+    @if (!string.IsNullOrWhiteSpace(StatusMessage))
+    {
+        <div class="admin-message @(IsError ? "error" : "")" role="status">@StatusMessage</div>
+    }
+    @if (Submissions.Count == 0)
+    {
+        <div class="admin-placeholder">
+            <h2>No contact messages yet.</h2>
+            <p>New submissions will appear here.</p>
+        </div>
+    }
+    else
+    {
+
+        <section class="contact-submissions">
+            @foreach (var submission in Submissions)
+            {
+                <article class="@(submission.IsRead ? "read" : "unread")">
+                    <header>
+                        <div>
+                            <span>@(submission.IsRead ? "Read" : "New")</span>
+                            <h2>@submission.Name</h2>
+                            <p>@submission.CreatedUtc.ToLocalTime().ToString("MMM d, yyyy · h:mm tt")</p>
+                        </div>
+                        <div>
+                            <a href="mailto:@submission.Email">@submission.Email</a>
+                            <a href="tel:@submission.Phone">@submission.Phone</a>
+                        </div>
+                    </header>
+                    <p>@submission.Message</p>
+                    <div class="contact-submission-actions">
+                        <button @onclick="() => ToggleReadAsync(submission)">Mark as @(submission.IsRead ? "unread" : "read")</button>
+                        <button class="delete" @onclick="() => DeleteAsync(submission)">Delete</button>
+                    </div>
+                </article>
+            }
+        </section>
+    }
 </AdminPortalLayout>

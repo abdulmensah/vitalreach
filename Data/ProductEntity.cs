@@ -22,4 +22,5 @@ public sealed class ProductEntity
     public bool IsPublished { get; set; } = true;
     public int SortOrder { get; set; }
     public DateTimeOffset UpdatedUtc { get; set; } = DateTimeOffset.UtcNow;
+    public List<ProductImage> Images { get; set; } = [];
 }

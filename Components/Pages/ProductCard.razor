@@ -1,1 +1,43 @@
-<article class="product @Product.Theme"><a href="/shop/@Product.Slug" aria-label="View @Product.Name"><div class="product-art">@if (!string.IsNullOrWhiteSpace(Product.ImageUrl)) { <img class="product-image" src="@Product.ImageUrl" alt="@Product.Name" loading="lazy" /> } else { <span class="halo">@Product.Orb</span><div class="bottle"><b>V</b><small>VITALREACH</small><i>@Product.LabelOne<br>@Product.LabelTwo</i><span>PREMIUM WELLNESS</span></div> }</div></a><p class="category">@Product.Category</p><h3><a href="/shop/@Product.Slug">@Product.Name</a></h3><p class="benefit">@Product.Benefit</p><div class="price-row"><strong>@Product.Price.ToString("C", CultureInfo.GetCultureInfo("en-US"))</strong><span>@Product.Detail</span></div>@if (OnAdd.HasDelegate) { <button class="add-cart" @onclick="() => OnAdd.InvokeAsync(Product)">Add to bag <span>+</span></button> } else { <a class="add-cart" href="/shop/@Product.Slug">View product <span>→</span></a> }</article>
+<article class="product @Product.Theme">
+    <a href="/shop/@Product.Slug" aria-label="View @Product.Name">
+        <div class="product-art">
+            @if (!string.IsNullOrWhiteSpace(Product.ImageUrl))
+            {
+                <img class="product-image" src="@Product.ImageUrl" alt="@Product.Name" loading="lazy" />
+            }
+            else
+            {
+
+                <span class="halo">@Product.Orb</span>
+                <div class="bottle">
+                    <b>V</b>
+                    <small>VITALREACH</small>
+                    <i>@Product.LabelOne<br>@Product.LabelTwo</i>
+                    <span>PREMIUM WELLNESS</span>
+                </div>
+            }
+        </div>
+    </a>
+    <p class="category">@Product.Category</p>
+    <h3>
+        <a href="/shop/@Product.Slug">@Product.Name</a>
+    </h3>
+    <p class="benefit">@Product.Benefit</p>
+    <div class="price-row">
+        <strong>@Product.Price.ToString("C", CultureInfo.GetCultureInfo("en-US"))</strong>
+        <span>@Product.Detail</span>
+    </div>
+    @if (OnAdd.HasDelegate)
+    {
+        <button class="add-cart" @onclick="() => OnAdd.InvokeAsync(Product)">
+            Add to bag <span>+</span>
+        </button>
+    }
+    else
+    {
+
+        <a class="add-cart" href="/shop/@Product.Slug">
+            View product <span>→</span>
+        </a>
+    }
+</article>

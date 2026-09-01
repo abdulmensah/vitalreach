@@ -5,10 +5,71 @@
 @if (Headquarters is not null)
 {
     <main class="center-page">
-        <section class="center-hero"><div><p class="eyebrow light">VitalReach headquarters</p><h1>Shopping and wellness,<br /><em>closer to home.</em></h1><p>Visit the home of VitalReach in Accra for product guidance, shopping support, and practical wellness education in a welcoming, culturally connected setting.</p><div class="actions"><a class="btn btn-gold" href="/shop">Browse products →</a><a class="underlink light-link" href="mailto:@Headquarters.Email?subject=Wellness%20Center%20Visit">Plan your visit ↗</a></div></div></section>
-        <section class="center-intro"><div><p class="eyebrow">A dedicated destination</p><h2>Welcome to the<br />VitalReach center.</h2></div><div><p>The @Headquarters.CenterName brings our wellness collection and education mission together at our headquarters. Visitors can learn about available products, ask practical questions, and connect with our team before making informed wellness choices.</p><p>Product information is educational and does not replace advice from a qualified healthcare professional. Availability and in-person services should be confirmed before visiting.</p></div></section>
-        <section class="center-services"><article><span>01</span><h3>Shop the collection</h3><p>Explore available VitalReach products and receive help understanding formats, labels, intended use, and ordering options.</p><a href="/shop">Explore products →</a></article><article><span>02</span><h3>Wellness guidance</h3><p>Have a thoughtful conversation about building responsible daily routines and questions to take to your healthcare team.</p><a href="mailto:@Headquarters.Email?subject=Wellness%20Center%20Consultation">Request information →</a></article><article><span>03</span><h3>Health education</h3><p>Access clear kidney-health education about screening, blood pressure, diabetes, medication safety, and prevention.</p><a href="/#kidney-reading">Visit the health guide →</a></article></section>
-        <section class="center-location"><div><p class="eyebrow light">Visit our headquarters</p><h2>@Headquarters.CenterName</h2><address>@Headquarters.AddressLine1<br />@if (!string.IsNullOrWhiteSpace(Headquarters.AddressLine2)) { @Headquarters.AddressLine2<br /> }@Headquarters.CityRegion<br />@Headquarters.Country</address><p>@Headquarters.Hours</p></div><div><a href="@Headquarters.MapUrl" target="_blank" rel="noopener noreferrer">Open in Google Maps ↗</a><a href="@Headquarters.PhoneHref">@Headquarters.Phone</a><a href="mailto:@Headquarters.Email">@Headquarters.Email</a></div></section>
+        <section class="center-hero">
+            <div>
+                <p class="eyebrow light">VitalReach headquarters</p>
+                <h1>
+                    Shopping and wellness,<br />
+                    <em>closer to home.</em>
+                </h1>
+                <p>Visit the home of VitalReach in Accra for product guidance, shopping support, and practical wellness education in a welcoming, culturally connected setting.</p>
+                <div class="actions">
+                    <a class="btn btn-gold" href="/shop">Browse products →</a>
+                    <a class="underlink light-link" href="/contact?message=Hello%20VitalReach%2C%0A%0AI%20would%20like%20to%20plan%20a%20visit%20to%20the%20Shopping%20%26%20Wellness%20Center.%20Please%20share%20the%20available%20dates%20and%20times.%0A%0AThank%20you.">Plan your visit ↗</a>
+                </div>
+            </div>
+        </section>
+        <section class="center-intro">
+            <div>
+                <p class="eyebrow">A dedicated destination</p>
+                <h2>Welcome to the<br />VitalReach center.</h2>
+            </div>
+            <div>
+                <p>The @Headquarters.CenterName brings our wellness collection and education mission together at our headquarters. Visitors can learn about available products, ask practical questions, and connect with our team before making informed wellness choices.</p>
+                <p>Product information is educational and does not replace advice from a qualified healthcare professional. Availability and in-person services should be confirmed before visiting.</p>
+            </div>
+        </section>
+        <section class="center-services">
+            <article>
+                <span>01</span>
+                <h3>Shop the collection</h3>
+                <p>Explore available VitalReach products and receive help understanding formats, labels, intended use, and ordering options.</p>
+                <a href="/shop">Explore products →</a>
+            </article>
+            <article>
+                <span>02</span>
+                <h3>Wellness guidance</h3>
+                <p>Have a thoughtful conversation about building responsible daily routines and questions to take to your healthcare team.</p>
+                <a href="/contact?message=Hello%20VitalReach%2C%0A%0AI%20would%20like%20more%20information%20about%20a%20wellness%20consultation.%20Please%20contact%20me%20with%20the%20next%20steps.%0A%0AThank%20you.">Request information →</a>
+            </article>
+            <article>
+                <span>03</span>
+                <h3>Health education</h3>
+                <p>Access clear kidney-health education about screening, blood pressure, diabetes, medication safety, and prevention.</p>
+                <a href="/#kidney-reading">Visit the health guide →</a>
+            </article>
+        </section>
+        <section class="center-location">
+            <div>
+                <p class="eyebrow light">Visit our headquarters</p>
+                <h2>@Headquarters.CenterName</h2>
+                <address>
+                    @Headquarters.AddressLine1<br />
+                    @if (!string.IsNullOrWhiteSpace(Headquarters.AddressLine2))
+                    {
+                        @Headquarters.AddressLine2
+                        <br />
+                    }
+                    @Headquarters.CityRegion<br />@Headquarters.Country
+                </address>
+                <p>@Headquarters.Hours</p>
+            </div>
+            <div>
+                <a href="@Headquarters.MapUrl" target="_blank" rel="noopener noreferrer">Open in Google Maps ↗</a>
+                <a href="@Headquarters.PhoneHref">@Headquarters.Phone</a>
+                <a href="/contact?message=Hello%20VitalReach%2C%0A%0AI%20would%20like%20more%20information%20about%20the%20Shopping%20%26%20Wellness%20Center.%0A%0AThank%20you.">@Headquarters.Email</a>
+            </div>
+        </section>
     </main>
     <StorefrontFooter Headquarters="Headquarters" />
 }
