@@ -13,21 +13,70 @@
     </header>
     <section id="catalog" class="shop-browser">
         <aside class="shop-facets">
-            <h2>Categories</h2>
-            <a class="@(string.IsNullOrWhiteSpace(Category) ? "active" : "")" aria-current="@(string.IsNullOrWhiteSpace(Category) ? "true" : null)" href="@BuildUrl(null, 1)">
-                <span>All products</span>
-                <b>@TotalAcrossCategories</b>
-            </a>
-            @foreach (var facet in Facets)
-            {
-                <a class="@(string.Equals(Category, facet.Name, StringComparison.OrdinalIgnoreCase) ? "active" : "")" aria-current="@(string.Equals(Category, facet.Name, StringComparison.OrdinalIgnoreCase) ? "true" : null)" href="@BuildUrl(facet.Name, 1)">
-                    <span>@facet.Name</span>
-                    <b>@facet.Count</b>
+            <div class="shop-facet-desktop">
+                <h2>Categories</h2>
+                <a class="@(string.IsNullOrWhiteSpace(Category) ? "active" : "")"
+                   aria-current="@(string.IsNullOrWhiteSpace(Category) ? "true" : null)"
+                   href="@BuildUrl(null, 1)">
+
+                    <span>All products</span>
+                    <b>@TotalAcrossCategories</b>
                 </a>
-            }
+                @foreach (var facet in Facets)
+                {
+                    <a class="@(string.Equals(Category, facet.Name, StringComparison.OrdinalIgnoreCase) ? "active" : "")"
+                       aria-current="@(string.Equals(Category, facet.Name, StringComparison.OrdinalIgnoreCase) ? "true" : null)"
+                       href="@BuildUrl(facet.Name, 1)">
+
+                        <span>@facet.Name</span>
+                        <b>@facet.Count</b>
+                    </a>
+                }
+            </div>
+            <details class="shop-facet-mobile">
+                <summary>
+                    <span class="shop-facet-summary-copy">
+                        <small>Browse the collection</small>
+                        <strong>Shop by category</strong>
+                        <em>Currently viewing: @SelectedCategoryLabel</em>
+                    </span>
+                    <i aria-hidden="true"></i>
+                </summary>
+                <div class="shop-facet-list">
+                    <h2>Categories</h2>
+                    <div class="shop-facet-mobile-heading">
+                        <div>
+                            <span>Choose a category</span>
+                        </div>
+                        @*
+                         <div>
+                            <span>Find your focus</span>
+                            <strong>Choose a category</strong>
+                        </div>
+                        <small>@Facets.Count categories · @TotalAcrossCategories products</small>
+ *@
+                    </div>
+                    <a class="@(string.IsNullOrWhiteSpace(Category) ? "active" : "")"
+                       aria-current="@(string.IsNullOrWhiteSpace(Category) ? "true" : null)"
+                       href="@BuildUrl(null, 1)">
+
+                        <span><small>Complete collection</small>All products</span>
+                        <b>@TotalAcrossCategories</b>
+                    </a>
+                    @foreach (var facet in Facets)
+                    {
+                        <a class="@(string.Equals(Category, facet.Name, StringComparison.OrdinalIgnoreCase) ? "active" : "")"
+                           aria-current="@(string.Equals(Category, facet.Name, StringComparison.OrdinalIgnoreCase) ? "true" : null)"
+                           href="@BuildUrl(facet.Name, 1)">
+                            <span><small>Wellness category</small>@facet.Name</span>
+                            <b>@facet.Count</b>
+                        </a>
+                    }
+                </div>
+            </details>
         </aside>
         <div class="shop-results">
-            <form class="shop-search" method="get" action="/shop#catalog">
+            <form class="shop-search" method="get" action="/shop">
                 <label for="product-search">Search products</label>
                 <div>
                     <input id="product-search" type="search" name="q" value="@Search" placeholder="Search by name, benefit, or category" />
@@ -80,7 +129,9 @@
                     @for (var page = 1; page <= TotalPages; page++)
                     {
                         var currentPage = page;
-                        <a class="@(currentPage == PageNumber ? "active" : "")" aria-current="@(currentPage == PageNumber ? "page" : null)" href="@BuildUrl(Category, currentPage)">@currentPage</a>
+                        <a class="@(currentPage == PageNumber ? "active" : "")"
+                           aria-current="@(currentPage == PageNumber ? "page" : null)"
+                           href="@BuildUrl(Category, currentPage)">@currentPage</a>
                     }
                     @if (PageNumber < TotalPages)
                     {

@@ -1,0 +1,123 @@
+@page "/health-guide"
+
+<PageTitle>Kidney Health Guide | VitalReach Wellness Hub</PageTitle>
+<StorefrontHeader />
+<main class="health-guide-page">
+    <section class="health-guide-hero">
+        <div>
+            <p class="eyebrow light">VitalReach Kidney Health Ghana</p>
+            <h1>Know your kidneys.<br /><em>Protect your life.</em></h1>
+            <p>Clear, practical information to help individuals and families understand kidney risk, screening, everyday prevention, and the questions to take to a qualified healthcare professional.</p>
+            <a class="btn btn-gold" href="#start">Start the guide →</a>
+        </div>
+    </section>
+
+    <nav class="health-guide-nav" aria-label="Health guide topics">
+        @foreach (var topic in GuideTopics)
+        {
+            <a href="@topic.Href"><span>@topic.Number</span>@topic.Label</a>
+        }
+    </nav>
+
+    <section class="health-guide-intro" id="start">
+        <div>
+            <p class="eyebrow">Why kidney health matters</p>
+            <h2>Quiet work.<br /><em>Lasting impact.</em></h2>
+        </div>
+        <div>
+            <p>Your kidneys filter waste and extra fluid from your blood. They also help balance fluids and minerals, support healthy blood pressure, and contribute to red-blood-cell and bone health.</p>
+            <p>Early chronic kidney disease often has no symptoms. Understanding your personal risk and having the right blood and urine tests can help detect problems earlier, when there may be more opportunity to protect kidney function.</p>
+        </div>
+    </section>
+
+    <section class="health-guide-section" id="risk">
+        <header>
+            <p class="eyebrow">01 · Understand your risk</p>
+            <h2>Who should start the conversation?</h2>
+            <p>Anyone can develop kidney disease, but some health conditions and family factors increase the likelihood.</p>
+        </header>
+        <div class="health-risk-grid">
+            @foreach (var risk in RiskFactors)
+            {
+                <article>
+                    <span>@risk.Number</span>
+                    <h3>@risk.Title</h3>
+                    <p>@risk.Description</p>
+                </article>
+            }
+        </div>
+        <p class="health-guide-callout">If you have diabetes, high blood pressure, heart disease, or a family history of kidney failure, ask a qualified healthcare professional how often your kidneys should be checked.</p>
+    </section>
+
+    <section class="health-tests" id="screening">
+        <header>
+            <p class="eyebrow light">02 · Screening</p>
+            <h2>Know the two tests<br />that tell a bigger story.</h2>
+            <p>A healthcare professional interprets these results alongside your health history. One result alone may not establish a diagnosis, and repeat testing may be needed.</p>
+        </header>
+        <div>
+            @foreach (var test in ScreeningTests)
+            {
+                <article>
+                    <span>@test.Abbreviation</span>
+                    <div>
+                        <h3>@test.Title</h3>
+                        <p>@test.Description</p>
+                        <strong>@test.Question</strong>
+                    </div>
+                </article>
+            }
+        </div>
+    </section>
+
+    <section class="health-guide-section" id="protect">
+        <header>
+            <p class="eyebrow">03 · Everyday protection</p>
+            <h2>Small choices support the bigger picture.</h2>
+            <p>Your personal plan depends on your health, medicines, and test results. These principles can help you begin a useful conversation with your care team.</p>
+        </header>
+        <div class="health-action-grid">
+            @foreach (var action in ProtectionActions)
+            {
+                <article>
+                    <span>@action.Number</span>
+                    <h3>@action.Title</h3>
+                    <p>@action.Description</p>
+                </article>
+            }
+        </div>
+    </section>
+
+    <section class="health-medication" id="medicines">
+        <div>
+            <p class="eyebrow light">04 · Medication and supplement safety</p>
+            <h2>Ask before you mix.</h2>
+            <p>Some over-the-counter pain medicines—including NSAIDs such as ibuprofen and naproxen—can harm the kidneys, particularly in people who are dehydrated or already have kidney disease, diabetes, high blood pressure, or heart disease.</p>
+            <p>Tell your physician or pharmacist about every prescription, over-the-counter medicine, vitamin, herb, supplement, and energy product you use. Never stop a prescribed medicine without professional guidance.</p>
+        </div>
+        <aside>
+            <p class="eyebrow">Take this list with you</p>
+            <h3>Five questions for your next visit</h3>
+            <ol>
+                @foreach (var question in VisitQuestions)
+                {
+                    <li>@question</li>
+                }
+            </ol>
+        </aside>
+    </section>
+
+    <section class="health-guide-sources">
+        <div>
+            <p class="eyebrow">Learn from trusted sources</p>
+            <h2>Keep asking informed questions.</h2>
+        </div>
+        <div>
+            <p>This guide is educational and does not replace medical advice, diagnosis, or treatment. Speak with a qualified healthcare professional about your individual needs.</p>
+            <a href="https://www.niddk.nih.gov/health-information/kidney-disease/chronic-kidney-disease-ckd/tests-diagnosis" target="_blank" rel="noopener noreferrer">NIDDK: Kidney tests and diagnosis ↗</a>
+            <a href="https://www.cdc.gov/kidney-disease/risk-factors/index.html" target="_blank" rel="noopener noreferrer">CDC: Kidney disease risk factors ↗</a>
+            <a href="https://www.kidney.org/kidney-topics/pain-medicines-and-kidney-disease" target="_blank" rel="noopener noreferrer">National Kidney Foundation: Medicine safety ↗</a>
+        </div>
+    </section>
+</main>
+<StorefrontFooter />

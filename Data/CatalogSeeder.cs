@@ -71,6 +71,7 @@ public static class CatalogSeeder
         await AddMissingPersonalCareProductsAsync(db);
         await AddMissingPackagingConceptProductsAsync(db);
         await AddMissingShelfCollectionProductsAsync(db);
+        await AddMissingCampaignProductsAsync(db);
         if (!await db.AdminUsers.AnyAsync()) db.AdminUsers.AddRange(
             AdminUser.Create("abdulmensah@gmail.com", "Abdul Mensah", "system-seed"),
             AdminUser.Create("masaoudaa@gmail.com", "Masaouda", "system-seed"));
@@ -459,7 +460,9 @@ public static class CatalogSeeder
             ("castor-oil", "/images/products/castor-oil-shelf.jpg", "Castor Oil retail shelf display", 20),
             ("herbal-shampoo", "/images/products/herbal-shampoo-shelf.jpg", "Herbal Shampoo retail shelf display", 20),
             ("castor-oil-conditioner", "/images/products/castor-oil-conditioner-shelf.jpg", "Castor Oil Conditioner retail shelf display", 20),
-            ("herbal-soap", "/images/products/herbal-soap-shelf.jpg", "Herbal Soap retail shelf display", 20)
+            ("herbal-soap", "/images/products/herbal-soap-shelf.jpg", "Herbal Soap retail shelf display", 20),
+            ("liposomal-glutathione-gold", "/images/products/liposomal-glutathione-gold-presentation.jpg", "Liposomal Glutathione Gold premium presentation box", 30),
+            ("energy", "/images/products/ultra-energy-shot-lifestyle.jpg", "Ultra Energy Shot with botanical ingredients", 20)
         };
 
         var slugs = gallery.Select(image => image.Slug).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
@@ -473,7 +476,7 @@ public static class CatalogSeeder
 
     private static async Task SeedProductGalleryImagesOnceAsync(CatalogDbContext db)
     {
-        const string seedKey = "product-gallery-v2";
+        const string seedKey = "product-gallery-v3";
         var connection = db.Database.GetDbConnection();
         await connection.OpenAsync();
         try
@@ -510,6 +513,91 @@ public static class CatalogSeeder
         var slugs = products.Select(product => product.Slug).ToArray();
         var existingSlugs = await db.Products.Where(product => slugs.Contains(product.Slug)).Select(product => product.Slug).ToListAsync();
         db.Products.AddRange(products.Where(product => !existingSlugs.Contains(product.Slug, StringComparer.OrdinalIgnoreCase)));
+    }
+
+    private static async Task AddMissingCampaignProductsAsync(CatalogDbContext db)
+    {
+        var products = new[]
+        {
+            Concept(
+                "tri-maca-vitality",
+                "Tri-Maca Vitality",
+                39m,
+                "Active Living",
+                "Plant-based vitality, stamina, and everyday wellness support",
+                "A complete black, red, and yellow maca-root formula developed to complement active routines focused on energy, balance, and overall wellbeing.",
+                "90 vegetable capsules",
+                "/images/products/tri-maca-vitality.jpg",
+                "MACA",
+                "Tri-Maca",
+                "Vitality",
+                "gold-product",
+                350),
+            Concept(
+                "shea-castor-body-cream-250ml",
+                "Shea & Castor Body Cream – 250 ml",
+                18m,
+                "Body Care",
+                "Rich everyday moisture for soft, comfortable-feeling skin",
+                "A nourishing body cream with shea butter, castor oil, olive oil, and coconut oil, made without parabens or mineral oil.",
+                "250 ml",
+                "/images/products/shea-castor-body-cream-250ml.jpg",
+                "250 ML",
+                "Shea & Castor",
+                "Body Cream",
+                "gold-product",
+                360),
+            Concept(
+                "shea-castor-body-cream-500ml",
+                "Shea & Castor Body Cream – 500 ml",
+                28m,
+                "Body Care",
+                "Generous daily hydration for the whole body",
+                "A nourishing body cream with shea butter, castor oil, olive oil, and coconut oil, made without parabens or mineral oil.",
+                "500 ml",
+                "/images/products/shea-castor-body-cream-500ml.jpg",
+                "500 ML",
+                "Shea & Castor",
+                "Body Cream",
+                "gold-product",
+                370),
+            Concept(
+                "shea-castor-body-cream-1kg",
+                "Shea & Castor Body Cream – 1 kg Family Size",
+                48m,
+                "Body Care",
+                "Family-size hydration for soft, nourished-feeling skin",
+                "A family-size body cream with shea butter, castor oil, olive oil, and coconut oil, made without parabens or mineral oil.",
+                "1 kg family size",
+                "/images/products/shea-castor-body-cream-1kg.jpg",
+                "1 KG",
+                "Shea & Castor",
+                "Body Cream",
+                "gold-product",
+                380),
+            Concept(
+                "vitality-duo-gift-set",
+                "Vitality Duo Gift Set",
+                59m,
+                "Gift Sets",
+                "A coordinated two-piece set for vitality, energy, and everyday wellbeing",
+                "A premium presentation set pairing Tri-Maca Vitality with Ultra Energy Shot for convenient plant-based stamina, focus, and wellness support.",
+                "2-piece gift set",
+                "/images/products/vitality-duo-gift-set.jpg",
+                "DUO",
+                "Vitality Duo",
+                "Gift Set",
+                "gold-product",
+                390)
+        };
+
+        var slugs = products.Select(product => product.Slug).ToArray();
+        var existingSlugs = await db.Products.Where(product => slugs.Contains(product.Slug)).Select(product => product.Slug).ToListAsync();
+        db.Products.AddRange(products.Where(product => !existingSlugs.Contains(product.Slug, StringComparer.OrdinalIgnoreCase)));
+
+        var energy = await db.Products.SingleOrDefaultAsync(product => product.Slug == "energy");
+        if (energy is not null && string.IsNullOrWhiteSpace(energy.ImageUrl))
+            energy.ImageUrl = "/images/products/ultra-energy-shot-lifestyle.jpg";
     }
 
     private static ProductEntity Concept(string slug, string name, decimal price, string category, string benefit, string description, string detail, string imageUrl, string orb, string one, string two, string theme, int order) => new()
