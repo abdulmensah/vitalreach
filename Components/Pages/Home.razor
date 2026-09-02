@@ -4,13 +4,13 @@
 
 <div class="announcement">Proudly Ghanaian-American <span>✦</span> Free US shipping over $75</div>
 <header class="site-header" id="top">
-    <a class="logo" href="#top">
+    <a class="logo" href="/#top">
         <img src="images/vitalreach-logo_header.png" alt="VitalReach Wellness Hub" />
     </a>
     <nav class="desktop-nav">
         <a href="/shop">Shop</a>
-        <a href="#ghana">Ghana Mission</a>
-        <a href="#journal">Health Guide</a>
+        <a href="/#ghana">Ghana Mission</a>
+        <a href="/health-guide">Health Guide</a>
         <a href="/wellness-center">Wellness Center</a>
         <a href="/contact">Contact</a>
     </nav>
@@ -32,10 +32,10 @@
         <a href="/shop" @onclick="CloseMenu">
             <span>01</span> Shop
         </a>
-        <a href="#ghana" @onclick="CloseMenu">
+        <a href="/#ghana" @onclick="CloseMenu">
             <span>02</span> Ghana Mission
         </a>
-        <a href="#journal" @onclick="CloseMenu">
+        <a href="/health-guide" @onclick="CloseMenu">
             <span>03</span> Health Guide
         </a>
         <a href="/wellness-center" @onclick="CloseMenu">
@@ -60,10 +60,10 @@
             </h1>
             <p class="lead">Premium wellness essentials and trusted health education—created to support families everywhere, with a special commitment to kidney-health awareness in Ghana.</p>
             <div class="actions">
-                <a class="btn btn-gold" href="#shop">
+                <a class="btn btn-gold" href="/#shop">
                     Shop the collection <span>→</span>
                 </a>
-                <a class="underlink" href="#about">Meet VitalReach ↗</a>
+                <a class="underlink" href="/#about">Meet VitalReach ↗</a>
             </div>
             <div class="trust">
                 <span>Plant-based options</span>
@@ -81,26 +81,27 @@
     <section class="mission" id="ghana">
         <div class="mission-badge">
             <b>GH</b>
-            <span>Education that<br>reaches home</span>
         </div>
         <div>
             <p class="eyebrow">Our commitment to Ghana</p>
+            <span>Education that reaches home.</span>
+
             <h2>
                 Improving kidney-health awareness <em>in Ghana.</em>
             </h2>
             <p>Kidney disease can develop quietly. VitalReach Wellness Hub provides clear, practical education to help Ghanaians understand prevention, early screening, blood pressure, diabetes, medication safety, hydration and the kidney numbers that matter.</p>
             <strong>Educating Ghana. Reaching the world.</strong>
         </div>
-        <a class="btn btn-outline" href="#kidney-reading">Explore Kidney Health Ghana →</a>
+        <a class="btn btn-outline" href="/health-guide">Explore Kidney Health Ghana →</a>
     </section>
     <nav class="ticker" aria-label="VitalReach values">
-        <a href="#shop">Premium quality</a>
+        <a href="/#shop">Premium quality</a>
         <i aria-hidden="true">✦</i>
         <a href="/terms">Responsible wellness</a>
         <i aria-hidden="true">✦</i>
-        <a href="#journal">Health education</a>
+        <a href="/health-guide">Health education</a>
         <i aria-hidden="true">✦</i>
-        <a href="#ghana">Global vision</a>
+        <a href="/#ghana">Global vision</a>
     </nav>
     <section class="section shop" id="shop">
         <header class="section-heading">
@@ -113,11 +114,26 @@
             </div>
             <p>Thoughtfully selected formulas designed to fit your everyday routine. Build your bundle and begin your wellness journey.</p>
         </header>
-        <div class="products">
-            @foreach (var product in Products)
-            {
-                <ProductCard Product="product" OnAdd="AddToCart" />
-            }
+        <div class="featured-carousel" data-product-carousel>
+            <div class="products" data-carousel-track aria-label="Featured products">
+                @foreach (var product in Products)
+                {
+                    <ProductCard Product="product" OnAdd="AddToCart" />
+                }
+            </div>
+            <div class="featured-carousel-controls" aria-label="Featured product carousel controls">
+                <button type="button" data-carousel-prev aria-label="View previous featured product">←</button>
+                <div class="featured-carousel-progress">
+                    <span data-carousel-status aria-live="polite">1 / @Products.Count</span>
+                    <div class="featured-carousel-dots" aria-label="Choose a featured product">
+                        @for (var index = 0; index < Products.Count; index++)
+                        {
+                            <button type="button" class="@(index == 0 ? "active" : "")" data-carousel-index="@index" aria-label="View featured product @(index + 1)" aria-current="@(index == 0 ? "true" : null)"></button>
+                        }
+                    </div>
+                </div>
+                <button type="button" data-carousel-next aria-label="View next featured product">→</button>
+            </div>
         </div>
         <p class="disclaimer">Product descriptions are for general information. Final labels and claims remain subject to formulation, testing, and regulatory review.</p>
         <a class="shop-all-link" href="/shop">Shop all products →</a>
@@ -153,12 +169,12 @@
                 <div class="story-value story-value-roots">
                     <span aria-hidden="true">◆</span>
                     <b>Ghanaian-American</b>
-                    <small>Rooted locally. Reaching globally.</small>
+                    <small>Rooted locally.</small><small> Reaching globally.</small>
                 </div>
                 <div class="story-value story-value-wellness">
                     <span aria-hidden="true">●</span>
                     <b>Whole-person wellness</b>
-                    <small>Education, products &amp; support</small>
+                    <small>Education, products</small><small> &amp; support</small>
                 </div>
             </div>
             <div class="seal">
@@ -183,125 +199,21 @@
             </div>
         </div>
     </section>
-    <section class="guide" id="kidney-reading">
-        <div class="guide-intro">
-            <p class="eyebrow light">Kidney Health Ghana</p>
-            <h2>Know your kidney numbers.</h2>
-            <p>A practical guide for individuals and families in Ghana—and everywhere—to understand screening, blood pressure, diabetes and early conversations with a healthcare professional.</p>
-            <a class="btn btn-gold" href="#kidney-series">Read the guide →</a>
-        </div>
-        <div class="guide-list">
-            <article>
-                <b>01</b>
-                <div>
-                    <small>SCREENING</small>
-                    <h3>Know your kidney numbers</h3>
-                    <p>Ask about eGFR, a blood-test estimate of kidney filtering, and uACR, a urine test that checks for albumin.</p>
-                </div>
-            </article>
-            <article>
-                <b>02</b>
-                <div>
-                    <small>PREVENTION</small>
-                    <h3>Blood pressure &amp; diabetes</h3>
-                    <p>Know your blood pressure and, if you have diabetes, your blood-glucose goals.</p>
-                </div>
-            </article>
-            <article>
-                <b>03</b>
-                <div>
-                    <small>MEDICATION SAFETY</small>
-                    <h3>Ask before you mix</h3>
-                    <p>Check with a physician or pharmacist before combining medicines with alcohol, caffeine, supplements or energy products.</p>
-                </div>
-            </article>
-            <article>
-                <b>04</b>
-                <div>
-                    <small>DAILY CARE</small>
-                    <h3>Build a routine that lasts</h3>
-                    <p>Appropriate hydration, balanced meals, movement, rest and regular checkups support long-term health.</p>
-                </div>
-            </article>
-        </div>
-    </section>
-    <section class="kidney-series" id="kidney-series">
-        <header>
-            <p class="eyebrow">VitalReach Kidney Health Ghana Series</p>
-            <h2>
-                Know your kidneys.<br>
-                <em>Protect your life.</em>
-            </h2>
-            <p>Your kidneys work quietly every day—filtering waste, balancing fluids and electrolytes, helping regulate blood pressure, supporting red blood cell production and keeping bones strong. Kidney disease can also develop quietly, which is why prevention and early testing matter.</p>
-        </header>
-        <div class="episode-grid">
-            <article>
-                <span>EPISODE 01</span>
-                <h3>Know your kidney numbers</h3>
-                <p>Ask your healthcare professional about two important tests: eGFR, a blood-test estimate of how well your kidneys filter, and uACR, a urine test that checks for albumin, a protein that may leak into urine when kidneys are damaged. Results often need to be repeated and interpreted with your full health history.</p>
-            </article>
-            <article>
-                <span>EPISODE 02</span>
-                <h3>Blood pressure &amp; diabetes</h3>
-                <p>High blood pressure and diabetes are major kidney-health concerns. Know your blood pressure and, if you have diabetes, your blood-glucose goals. Take prescribed medicines as directed and discuss how often your kidney function and urine albumin should be checked.</p>
-            </article>
-            <article>
-                <span>EPISODE 03 · MEDICATION SAFETY</span>
-                <h3>Pain medicines, alcohol &amp; energy drinks</h3>
-                <p>Some over-the-counter pain medicines, including ibuprofen and naproxen, can harm the kidneys—especially when a person is dehydrated or already has kidney disease, diabetes or high blood pressure. Alcohol can increase certain medication risks, while highly caffeinated energy drinks may raise heart rate and blood pressure.</p>
-                <p>Tramadol is a controlled prescription opioid medication. Never combine tramadol with alcohol; this can cause dangerous drowsiness, slowed breathing, overdose or death. Ask a physician or pharmacist before mixing any medicine with alcohol, caffeine, supplements or energy products.</p>
-            </article>
-            <article>
-                <span>EPISODE 04</span>
-                <h3>Daily prevention &amp; care</h3>
-                <p>Stay appropriately hydrated, eat balanced meals, limit excess salt and sugar, avoid overuse of pain medicines and attend regular checkups. If you already have heart or kidney disease, follow the fluid and nutrition plan given by your healthcare team.</p>
-            </article>
-        </div>
-        <aside class="kidney-questions">
-            <div>
-                <p class="eyebrow light">Ask at your next visit</p>
-                <h3>Five kidney-health questions</h3>
-            </div>
-            <ol>
-                <li>What is my eGFR?</li>
-                <li>What is my urine albumin or uACR result?</li>
-                <li>What is my blood pressure?</li>
-                <li>What is my HbA1c level if I have diabetes?</li>
-                <li>How often should my kidneys be checked?</li>
-            </ol>
-        </aside>
-        <p class="medical-note">This guide is for education and does not replace medical advice, diagnosis or treatment. Speak with a qualified healthcare professional about your individual needs. Reviewed against guidance from <a href="https://www.niddk.nih.gov/health-information/kidney-disease/chronic-kidney-disease-ckd/prevention" target="_blank" rel="noopener noreferrer">NIDDK</a> and the <a href="https://www.kidney.org/kidney-topics/know-your-kidney-numbers-two-simple-tests" target="_blank" rel="noopener noreferrer">National Kidney Foundation</a>.</p>
-    </section>
-    <section class="journal" id="journal">
-        <header>
+    <span id="kidney-reading" class="anchor-target" aria-hidden="true"></span>
+    <section class="health-preview" id="journal">
+        <div class="health-preview-visual" role="img" aria-label="VitalReach kidney-health education and community wellness"></div>
+        <div class="health-preview-copy">
             <p class="eyebrow">VitalReach Health Guide</p>
-            <h2>
-                Knowledge is part<br>of your <em>wellness.</em>
-            </h2>
-            <p>Clear, practical education to help you ask better questions and make more informed decisions with your healthcare team.</p>
-        </header>
-        <div>
-            <article>
-                <b>01</b>
-                <small>KIDNEY HEALTH</small>
-                <h3>Know your kidney numbers</h3>
-                <p>A practical guide to screening, blood pressure, diabetes and early conversations with your healthcare professional.</p>
-                <a href="#kidney-reading">Read the guide →</a>
-            </article>
-            <article>
-                <b>02</b>
-                <small>MEDICATION SAFETY</small>
-                <h3>Pain medicines, alcohol &amp; energy drinks</h3>
-                <p>Understand the risks of mixing alcohol or highly caffeinated energy drinks with pain medicines, including tramadol.</p>
-                <a href="#kidney-series">Read the guide →</a>
-            </article>
-            <article>
-                <b>03</b>
-                <small>DAILY WELLNESS</small>
-                <h3>Build a routine that lasts</h3>
-                <p>Small, consistent choices for nutrition, movement, hydration, rest and responsible supplementation.</p>
-                <a href="#contact">Connect with us →</a>
-            </article>
+            <h2>Knowledge is part<br />of your <em>wellness.</em></h2>
+            <p>Kidney disease can develop quietly. Learn the risk factors, understand the two tests that matter, and prepare better questions for your healthcare professional.</p>
+            <div class="health-preview-topics">
+                <span>Risk factors</span>
+                <span>eGFR &amp; uACR</span>
+                <span>Daily protection</span>
+                <span>Medicine safety</span>
+            </div>
+            <a class="btn btn-gold" href="/health-guide">Explore the complete guide →</a>
+            <small>Educational information—not medical advice, diagnosis, or treatment.</small>
         </div>
     </section>
     <section class="contact" id="contact">
@@ -313,7 +225,7 @@
         </div>
         <div>
             <p>Questions about our collection, partnerships or upcoming availability? We would love to hear from you.</p>
-@*             @if (Headquarters is not null)
+            @*             @if (Headquarters is not null)
             {
                 <address>
                     <small>Headquarters</small>@Headquarters.AddressLine1, @(Headquarters.AddressLine2 ?? "")<br />@Headquarters.CityRegion, @Headquarters.Country
@@ -325,7 +237,7 @@
 
             }
  *@
-            <a class="btn btn-gold" href="/contact#contact-content?message=Hello%20VitalReach%2C%0A%0AI%20would%20like%20to%20get%20in%20touch%20with%20your%20team.%0A%0AThank%20you.">Start a Converstation ↗</a>
+            <a class="btn btn-gold" href="/contact?message=Hello%20VitalReach%2C%0A%0AI%20would%20like%20to%20get%20in%20touch%20with%20your%20team.%0A%0AThank%20you.#contact-content">Start a Converstation ↗</a>
         </div>
     </section>
 </main>

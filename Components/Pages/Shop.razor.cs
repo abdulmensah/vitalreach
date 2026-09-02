@@ -20,6 +20,9 @@ public partial class Shop
     private int TotalProducts;
     private int TotalAcrossCategories;
     private int TotalPages = 1;
+    private string SelectedCategoryLabel => string.IsNullOrWhiteSpace(Category)
+        ? "All products"
+        : Category;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -38,7 +41,10 @@ public partial class Shop
         if (!string.IsNullOrWhiteSpace(Search))
         {
             var term = Search.Trim();
-            query = query.Where(x => x.Name.Contains(term) || x.Category.Contains(term) || x.Benefit.Contains(term) || x.Description.Contains(term));
+            query = query.Where(x => x.Name.Contains(term) ||
+            x.Category.Contains(term) ||
+            x.Benefit.Contains(term) ||
+            x.Description.Contains(term));
         }
 
         TotalProducts = await query.CountAsync();
@@ -57,7 +63,7 @@ public partial class Shop
         if (!string.IsNullOrWhiteSpace(Search)) values.Add($"q={Uri.EscapeDataString(Search.Trim())}");
         if (!string.IsNullOrWhiteSpace(category)) values.Add($"category={Uri.EscapeDataString(category)}");
         if (page > 1) values.Add($"page={page}");
-        return values.Count == 0 ? "/shop#catalog" : $"/shop?{string.Join("&", values)}#catalog";
+        return values.Count == 0 ? "/shop" : $"/shop?{string.Join("&", values)}";
     }
 
     private sealed record CategoryFacet(string Name, int Count);

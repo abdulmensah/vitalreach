@@ -30,7 +30,7 @@ namespace VitalReach.Web.Components.Pages
         protected override async Task OnInitializedAsync()
         {
             await using var db = await DbFactory.CreateDbContextAsync();
-            Products = await db.Products.AsNoTracking().Where(x => x.IsPublished).OrderBy(x => x.SortOrder).Take(3).ToListAsync();
+            Products = await db.Products.AsNoTracking().Where(x => x.IsPublished).OrderBy(x => x.SortOrder).Take(4).ToListAsync();
             Headquarters = await db.Headquarters.AsNoTracking().SingleAsync(x => x.Id == 1);
         }
         private void AddToCart(ProductEntity product)

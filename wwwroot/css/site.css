@@ -18,7 +18,9 @@ html {
 body {
     margin: 0;
     color: var(--ink);
-    font-family: "DM Sans",sans-serif
+    font-family: "DM Sans",sans-serif;
+    font-size: 17px;
+    line-height: 1.6
 }
 
 .scroll-to-top {
@@ -74,7 +76,7 @@ button {
     text-align: center;
     background: var(--deep);
     color: #dce8df;
-    font-size: 10px;
+    font-size: 15px;
     letter-spacing: .16em;
     text-transform: uppercase
 }
@@ -105,7 +107,7 @@ button {
 .site-header nav {
     display: flex;
     gap: 36px;
-    font-size: 12px
+    font-size: 15px
 }
 
     .site-header nav a:hover {
@@ -118,7 +120,7 @@ button {
     text-transform: uppercase;
     letter-spacing: .12em;
     padding: 12px 16px;
-    font-size: 10px;
+    font-size: 15px;
     cursor: pointer
 }
 
@@ -151,7 +153,7 @@ button {
     text-transform: uppercase;
     color: #98742e;
     letter-spacing: .22em;
-    font-size: 10px;
+    font-size: 15px;
     font-weight: 700;
     margin: 0 0 22px
 }
@@ -171,7 +173,7 @@ button {
 .lead {
     color: #49635e;
     max-width: 620px;
-    font: 17px/1.7 "Playfair Display",serif;
+    font: 19px/1.7 "Playfair Display",serif;
     margin: 28px 0
 }
 
@@ -186,7 +188,7 @@ button {
     padding: 16px 21px;
     text-transform: uppercase;
     letter-spacing: .12em;
-    font-size: 10px;
+    font-size: 15px;
     font-weight: 700;
     border: 0;
     cursor: pointer
@@ -210,7 +212,7 @@ button {
     border-bottom: 1px solid #9caea8;
     padding: 10px 0;
     text-transform: uppercase;
-    font-size: 10px;
+    font-size: 15px;
     letter-spacing: .1em
 }
 
@@ -221,7 +223,7 @@ button {
     color: #58706b;
     text-transform: uppercase;
     letter-spacing: .1em;
-    font-size: 9px
+    font-size: 15px
 }
 
     .trust span:before {
@@ -249,7 +251,7 @@ button {
         text-transform: uppercase;
         letter-spacing: .16em;
         color: #98742e;
-        font-size: 8px;
+        font-size: 15px;
         margin-bottom: 8px
     }
 
@@ -286,7 +288,7 @@ button {
     }
 
     .mission-badge span {
-        font-size: 7px;
+        font-size: 15px;
         letter-spacing: .12em;
         text-transform: uppercase
     }
@@ -312,7 +314,7 @@ button {
     justify-content: space-around;
     text-transform: uppercase;
     letter-spacing: .2em;
-    font-size: 9px
+    font-size: 15px
 }
 
     .ticker i {
@@ -337,19 +339,30 @@ button {
     .section-heading > p {
         max-width: 430px;
         color: var(--muted);
-        font: 16px/1.7 "Playfair Display",serif
+        font: 18px/1.7 "Playfair Display",serif
     }
 
 .products {
     display: grid;
-    grid-template-columns: repeat(3,1fr);
+    grid-template-columns: repeat(4,1fr);
     gap: 16px
 }
 
+.featured-carousel-controls {
+    display: none
+}
+
 .product {
+    min-height: 350px;
+    display: flex;
+    flex-direction: column;
     background: #f2f4ef;
     padding: 12px 12px 23px
 }
+
+    .product > a:first-child {
+        display: block
+    }
 
 .product-art {
     height: 310px;
@@ -422,7 +435,7 @@ button {
 
     .bottle small {
         color: var(--teal);
-        font-size: 7px;
+        font-size: 13px;
         letter-spacing: .12em;
         margin-top: 7px
     }
@@ -430,13 +443,13 @@ button {
     .bottle i {
         text-align: center;
         color: var(--teal);
-        font: italic 14px/1.1 "Playfair Display",serif;
+        font: italic 13px/1.1 "Playfair Display",serif;
         margin-top: 14px
     }
 
     .bottle span {
         margin-top: auto;
-        font-size: 5px;
+        font-size: 0.5rem;
         letter-spacing: .12em
     }
 
@@ -444,7 +457,7 @@ button {
     color: #a17b31;
     text-transform: uppercase;
     letter-spacing: .15em;
-    font-size: 8px;
+    font-size: 15px;
     margin: 19px 8px 6px
 }
 
@@ -457,8 +470,13 @@ button {
 
 .benefit {
     color: #73827e;
-    font-size: 11px;
+    font-size: 15px;
     margin: 7px 8px 17px
+}
+
+.product-card-footer {
+    margin-top: auto;
+    margin-bottom: 0
 }
 
 .price-row {
@@ -476,7 +494,7 @@ button {
     }
 
     .price-row span {
-        font-size: 8px;
+        font-size: 15px;
         text-transform: uppercase;
         letter-spacing: .1em;
         color: #98742e
@@ -493,7 +511,7 @@ button {
     border: 0;
     text-transform: uppercase;
     letter-spacing: .12em;
-    font-size: 9px;
+    font-size: 15px;
     cursor: pointer
 }
 
@@ -504,7 +522,7 @@ button {
 .disclaimer {
     text-align: center;
     color: #7a8986;
-    font-size: 9px;
+    font-size: 15px;
     max-width: 800px;
     margin: 24px auto 0
 }
@@ -518,9 +536,7 @@ button {
 }
 
 .story-art {
-    background:
-        radial-gradient(circle at 50% 44%,#ffffff 0 22%,transparent 52%),
-        linear-gradient(145deg,#f9f6ec,#dfeae4);
+    background: radial-gradient(circle at 50% 44%,#ffffff 0 22%,transparent 52%), linear-gradient(145deg,#f9f6ec,#dfeae4);
     display: grid;
     place-items: center;
     position: relative;
@@ -608,13 +624,14 @@ button {
         color: #98742e;
         text-transform: uppercase;
         letter-spacing: .16em;
-        font-size: 7px
+        font-size: 15px
     }
 
 .story-value {
     position: absolute;
     z-index: 3;
-    min-width: 150px;
+    min-width: 250px;
+    min-height: 90px;
     padding: 12px 14px;
     border: 1px solid #bf943b73;
     background: #fffdf2f2;
@@ -633,30 +650,35 @@ button {
 
     .story-value b {
         color: var(--teal);
-        font: 500 13px "Playfair Display",serif
+        font: 500 15px "Playfair Display",serif
     }
 
     .story-value small {
         margin-top: 3px;
         color: #657c76;
-        font-size: 7px;
+        font-size: 15px;
         text-transform: uppercase;
         letter-spacing: .08em
     }
 
+        .story-value small:last-child {
+            margin-left: 25px;
+            margin-top: -5px;
+        }
+
 .story-value-care {
-    left: 0;
+    left: -150px;
     top: 17%
 }
 
 .story-value-roots {
-    right: 0;
+    right: -170px;
     top: 24%
 }
 
 .story-value-wellness {
-    left: 13%;
-    bottom: 6%
+    left: 25%;
+    bottom: 0%
 }
 
 .story-art .seal {
@@ -671,7 +693,7 @@ button {
     background: var(--cream);
     color: var(--teal);
     padding: 25px 35px;
-    font-size: 9px;
+    font-size: 15px;
     letter-spacing: .14em;
     line-height: 1.7
 }
@@ -720,7 +742,7 @@ button {
     }
 
     .founder small {
-        font-size: 8px;
+        font-size: 15px;
         text-transform: uppercase;
         letter-spacing: .16em;
         color: #a9beb8
@@ -762,7 +784,7 @@ button {
 .guide-list small {
     color: #dbbd73;
     letter-spacing: .16em;
-    font-size: 8px
+    font-size: 15px
 }
 
 .guide-list h3 {
@@ -772,7 +794,7 @@ button {
 
 .guide-list p {
     color: #c8d8d4;
-    font: 14px/1.6 "Playfair Display",serif;
+    font: 15px/1.6 "Playfair Display",serif;
     margin: 0
 }
 
@@ -810,7 +832,7 @@ address, .phone {
     color: #98742e;
     text-transform: uppercase;
     letter-spacing: .17em;
-    font: 700 8px "DM Sans",sans-serif
+    font: 700 15px "DM Sans",sans-serif
 }
 
 .phone {
@@ -843,7 +865,7 @@ footer {
         grid-template-columns: 1fr 1fr;
         gap: 12px;
         text-transform: uppercase;
-        font-size: 9px;
+        font-size: 15px;
         letter-spacing: .1em
     }
 
@@ -852,7 +874,7 @@ footer {
         padding-top: 23px;
         border-top: 1px solid #31504d;
         color: #75908a;
-        font-size: 9px
+        font-size: 15px
     }
 
 .cart-backdrop {
@@ -892,7 +914,7 @@ footer {
             text-transform: uppercase;
             letter-spacing: .16em;
             color: #98742e;
-            font-size: 8px
+            font-size: 15px
         }
 
         .cart header h2 {
@@ -934,7 +956,7 @@ footer {
 
     .cart-empty p {
         color: var(--muted);
-        font-size: 13px
+        font-size: 15px
     }
 
     .cart-empty .btn {
@@ -961,7 +983,7 @@ footer {
 
     .cart-item p {
         color: #98742e;
-        font-size: 12px
+        font-size: 15px
     }
 
 .quantity {
@@ -982,7 +1004,7 @@ footer {
     border: 0;
     background: none;
     color: #8b645a;
-    font-size: 10px;
+    font-size: 15px;
     text-decoration: underline;
     cursor: pointer
 }
@@ -1001,7 +1023,7 @@ footer {
     }
 
     .cart-summary p {
-        font-size: 10px;
+        font-size: 15px;
         color: var(--muted)
     }
 
@@ -1013,7 +1035,7 @@ footer {
     padding: 16px;
     text-transform: uppercase;
     letter-spacing: .12em;
-    font-size: 9px;
+    font-size: 15px;
     cursor: pointer
 }
 
@@ -1126,7 +1148,7 @@ footer {
     }
 
     .announcement {
-        font-size: 7px
+        font-size: 15px
     }
 
     .hero-copy {
@@ -1163,11 +1185,19 @@ footer {
         padding: 55px 22px
     }
 
-        .mission > a {
-            grid-column: auto;
-            width: 100%;
-            justify-content: center
-        }
+    a.btn, button {
+        font-size: 15px;
+    }
+
+    .contact > div:last-child > p {
+        font-size: 31px
+    }
+
+    .mission > a {
+        grid-column: auto;
+        width: 100%;
+        justify-content: center
+    }
 
     .mission-badge {
         width: 95px;
@@ -1193,6 +1223,100 @@ footer {
     .products {
         grid-template-columns: 1fr
     }
+
+    .featured-carousel {
+        width: calc(100vw - 40px);
+        overflow: hidden
+    }
+
+        .featured-carousel .products {
+            display: flex;
+            gap: 14px;
+            overflow-x: auto;
+            overscroll-behavior-x: contain;
+            scroll-behavior: smooth;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none;
+            touch-action: pan-x pan-y
+        }
+
+            .featured-carousel .products::-webkit-scrollbar {
+                display: none
+            }
+
+            .featured-carousel .product {
+                flex: 0 0 88%;
+                scroll-snap-align: start;
+                scroll-snap-stop: always
+            }
+
+    .featured-carousel-controls {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        margin-top: 24px
+    }
+
+        .featured-carousel-controls > button {
+            display: grid;
+            width: 46px;
+            height: 46px;
+            flex: 0 0 46px;
+            padding: 0;
+            place-items: center;
+            border: 1px solid var(--teal);
+            border-radius: 50%;
+            background: #fff;
+            color: var(--teal);
+            cursor: pointer
+        }
+
+            .featured-carousel-controls > button:disabled {
+                border-color: #b9c7c2;
+                color: #9baba6;
+                cursor: default
+            }
+
+    .featured-carousel-progress {
+        display: grid;
+        gap: 8px;
+        justify-items: center;
+        color: var(--teal);
+        font-size: 15px;
+        font-weight: 700
+    }
+
+    .featured-carousel-dots {
+        display: flex;
+        align-items: center;
+        gap: 7px
+    }
+
+        .featured-carousel-dots button {
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            border: 0;
+            border-radius: 50%;
+            background: transparent;
+            cursor: pointer;
+            position: relative
+        }
+
+            .featured-carousel-dots button::after {
+                content: "";
+                position: absolute;
+                inset: 9px;
+                border-radius: 50%;
+                background: #b8c6c1;
+                transition: transform .2s ease,background .2s ease
+            }
+
+            .featured-carousel-dots button.active::after {
+                background: var(--gold);
+                transform: scale(1.5)
+            }
 
     .product-art {
         height: 350px
@@ -1221,9 +1345,9 @@ footer {
         padding: 9px 10px
     }
 
-    .story-value b {
-        font-size: 11px
-    }
+        .story-value b {
+            font-size: 15px
+        }
 
     .story-value-roots {
         top: 18%
@@ -1334,7 +1458,7 @@ footer {
     text-transform: uppercase;
     color: #98742e;
     letter-spacing: .18em;
-    font-size: 9px;
+    font-size: 15px;
     font-weight: 700;
     margin: 34px 0 14px
 }
@@ -1350,7 +1474,7 @@ footer {
     max-width: 590px;
     margin: 0;
     color: var(--muted);
-    font: 14px/1.75 "DM Sans",sans-serif
+    font: 15px/1.75 "DM Sans",sans-serif
 }
 
 .standards-grid article > a {
@@ -1359,7 +1483,7 @@ footer {
     color: var(--teal);
     text-transform: uppercase;
     letter-spacing: .12em;
-    font-size: 9px;
+    font-size: 15px;
     font-weight: 700
 }
 
@@ -1476,7 +1600,7 @@ footer {
         display: flex;
         align-items: center;
         gap: 18px;
-        font-size: 12px
+        font-size: 15px
     }
 
         .admin-header > div a {
@@ -1558,7 +1682,7 @@ footer {
     border-radius: 50%;
     background: #edf3f0;
     color: var(--teal);
-    font-size: 10px;
+    font-size: 15px;
     font-weight: 700
 }
 
@@ -1587,7 +1711,7 @@ footer {
 
     .admin-product i {
         font-style: normal;
-        font-size: 8px;
+        font-size: 15px;
         text-transform: uppercase;
         letter-spacing: .1em;
         padding: 6px
@@ -1645,7 +1769,7 @@ footer {
         gap: 7px;
         text-transform: uppercase;
         letter-spacing: .08em;
-        font-size: 9px;
+        font-size: 15px;
         font-weight: 700;
         color: #586d68
     }
@@ -1662,7 +1786,7 @@ footer {
         color: var(--ink);
         text-transform: none;
         letter-spacing: normal;
-        font-size: 14px;
+        font-size: 15px;
         font-weight: 400
     }
 
@@ -1697,7 +1821,7 @@ footer {
 
 .validation-message, .validation-errors {
     color: #a02f27;
-    font-size: 12px
+    font-size: 15px
 }
 
 .admin-message {
@@ -1743,7 +1867,7 @@ footer {
 .admin-header nav {
     display: flex;
     gap: 25px;
-    font-size: 11px;
+    font-size: 15px;
     text-transform: uppercase;
     letter-spacing: .1em
 }
@@ -1788,7 +1912,7 @@ footer {
         background: #edf3ef;
         text-transform: uppercase;
         letter-spacing: .1em;
-        font-size: 8px;
+        font-size: 15px;
         font-weight: 700
     }
 
@@ -1808,7 +1932,7 @@ footer {
 
     .access-table i {
         font-style: normal;
-        font-size: 8px;
+        font-size: 15px;
         text-transform: uppercase;
         letter-spacing: .1em;
         padding: 6px
@@ -1869,7 +1993,7 @@ footer {
 
     .site-header .desktop-nav {
         gap: 36px;
-        font-size: 11px;
+        font-size: 15px;
         text-transform: uppercase;
         letter-spacing: .08em
     }
@@ -1947,7 +2071,7 @@ footer {
         color: #dbbd73;
         text-transform: uppercase;
         letter-spacing: .2em;
-        font-size: 9px
+        font-size: 15px
     }
 
     .mobile-menu > a {
@@ -1961,7 +2085,7 @@ footer {
 
         .mobile-menu > a span {
             color: var(--gold);
-            font: 10px "DM Sans",sans-serif;
+            font: 15px "DM Sans",sans-serif;
             letter-spacing: .1em
         }
 
@@ -2037,7 +2161,7 @@ footer {
     .legal-header > a:last-child {
         text-transform: uppercase;
         letter-spacing: .1em;
-        font-size: 9px;
+        font-size: 15px;
         color: var(--teal);
         border-bottom: 1px solid var(--gold);
         padding-bottom: 5px
@@ -2068,7 +2192,7 @@ footer {
 .legal-date {
     text-transform: uppercase;
     letter-spacing: .13em;
-    font-size: 9px;
+    font-size: 15px;
     color: #98742e
 }
 
@@ -2084,7 +2208,7 @@ footer {
 }
 
 .legal-page h3 {
-    font: 600 14px "DM Sans",sans-serif;
+    font: 600 15px "DM Sans",sans-serif;
     color: var(--teal);
     margin: 25px 0 8px
 }
@@ -2120,7 +2244,7 @@ footer {
     gap: 25px;
     padding: 30px 7vw;
     background: var(--deep);
-    font-size: 10px
+    font-size: 15px
 }
 
     .legal-footer span {
@@ -2155,6 +2279,378 @@ footer {
         }
 }
 
+/* Health guide preview and dedicated guide */
+.anchor-target {
+    display: block;
+    scroll-margin-top: 100px
+}
+
+.health-preview {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 650px;
+    background: #f8f4ea
+}
+
+.health-preview-visual {
+    min-height: 560px;
+    background: linear-gradient(0deg,rgba(2,46,43,.12),rgba(2,46,43,.12)),url(/images/vitalreach-kidney-education.png) center/cover
+}
+
+.health-preview-copy {
+    padding: clamp(65px,8vw,120px) 7vw;
+    align-self: center
+}
+
+    .health-preview-copy h2 {
+        margin: 0;
+        color: var(--teal);
+        font: 500 clamp(48px,5vw,72px)/.98 "Playfair Display",serif
+    }
+
+        .health-preview-copy h2 em {
+            color: var(--gold);
+            font-weight: 500
+        }
+
+    .health-preview-copy > p:not(.eyebrow) {
+        max-width: 650px;
+        margin: 26px 0;
+        color: var(--muted);
+        font: 18px/1.75 "Playfair Display",serif
+    }
+
+.health-preview-topics {
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+    gap: 0 28px;
+    margin: 0 0 34px
+}
+
+    .health-preview-topics span {
+        padding: 14px 0;
+        border-bottom: 1px solid #d7d3c7;
+        color: #36524f;
+        font-size: 16px;
+        font-weight: 600
+    }
+
+.health-preview-copy > small {
+    display: block;
+    margin-top: 20px;
+    color: #788681;
+    font-size: 15px
+}
+
+.health-guide-hero {
+    min-height: 680px;
+    padding: 105px 7vw;
+    display: flex;
+    align-items: center;
+    color: #fff;
+    background: linear-gradient(90deg,rgba(2,35,33,.98) 0%,rgba(2,46,43,.88) 43%,rgba(2,46,43,.3) 72%),url(/images/vitalreach-kidney-education.png) center/cover
+}
+
+    .health-guide-hero > div {
+        max-width: 800px
+    }
+
+    .health-guide-hero h1 {
+        margin: 0;
+        color: #fff;
+        font: 500 clamp(55px,7vw,94px)/.96 "Playfair Display",serif
+    }
+
+        .health-guide-hero h1 em {
+            color: var(--gold);
+            font-weight: 500
+        }
+
+    .health-guide-hero p:not(.eyebrow) {
+        max-width: 700px;
+        margin: 28px 0;
+        color: #d6e2df;
+        font: 19px/1.7 "Playfair Display",serif
+    }
+
+.health-guide-nav {
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    padding: 0 7vw;
+    background: var(--teal);
+    color: #fff
+}
+
+    .health-guide-nav a {
+        display: flex;
+        gap: 15px;
+        padding: 26px 20px;
+        border-right: 1px solid #47736e;
+        font-size: 15px;
+        font-weight: 600
+    }
+
+        .health-guide-nav a:first-child {
+            border-left: 1px solid #47736e
+        }
+
+    .health-guide-nav span {
+        color: var(--gold);
+        font-family: "Playfair Display",serif
+    }
+
+.health-guide-intro {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8vw;
+    padding: 105px 7vw
+}
+
+    .health-guide-intro h2, .health-guide-section > header h2, .health-guide-sources h2 {
+        margin: 0;
+        color: var(--teal);
+        font: 500 clamp(46px,5vw,68px)/1 "Playfair Display",serif
+    }
+
+        .health-guide-intro h2 em {
+            color: var(--gold);
+            font-weight: 500
+        }
+
+    .health-guide-intro > div:last-child {
+        color: var(--muted);
+        font: 18px/1.8 "Playfair Display",serif
+    }
+
+.health-guide-section {
+    padding: 100px 7vw;
+    background: #f8f4ea
+}
+
+    .health-guide-section > header {
+        display: grid;
+        grid-template-columns: 1.1fr .9fr;
+        gap: 24px 7vw;
+        align-items: end;
+        margin-bottom: 48px
+    }
+
+        .health-guide-section > header .eyebrow {
+            grid-column: 1/-1;
+            margin-bottom: 0
+        }
+
+        .health-guide-section > header > p:last-child {
+            margin: 0;
+            color: var(--muted);
+            font: 17px/1.75 "Playfair Display",serif
+        }
+
+.health-risk-grid, .health-action-grid {
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    border-top: 1px solid #cbd5ce;
+    border-left: 1px solid #cbd5ce
+}
+
+    .health-risk-grid article, .health-action-grid article {
+        padding: 38px 32px;
+        border-right: 1px solid #cbd5ce;
+        border-bottom: 1px solid #cbd5ce;
+        background: #fff
+    }
+
+    .health-risk-grid span, .health-action-grid span {
+        color: var(--gold);
+        font: 22px "Playfair Display",serif
+    }
+
+    .health-risk-grid h3, .health-action-grid h3 {
+        margin: 25px 0 14px;
+        color: var(--teal);
+        font: 500 27px/1.15 "Playfair Display",serif
+    }
+
+    .health-risk-grid p, .health-action-grid p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.75
+    }
+
+.health-guide-callout {
+    margin: 38px 0 0;
+    padding: 24px 30px;
+    border-left: 4px solid var(--gold);
+    background: #fff;
+    color: #36524f;
+    font: 17px/1.7 "Playfair Display",serif
+}
+
+.health-tests {
+    display: grid;
+    grid-template-columns: .8fr 1.2fr;
+    gap: 7vw;
+    padding: 105px 7vw;
+    background: var(--teal);
+    color: #fff
+}
+
+    .health-tests header h2, .health-medication h2 {
+        margin: 0;
+        color: #fff;
+        font: 500 clamp(44px,5vw,66px)/1 "Playfair Display",serif
+    }
+
+    .health-tests header > p:last-child, .health-medication > div > p:not(.eyebrow) {
+        color: #c9d9d5;
+        font-size: 16px;
+        line-height: 1.75
+    }
+
+    .health-tests article {
+        display: grid;
+        grid-template-columns: 105px 1fr;
+        gap: 30px;
+        padding: 35px 0;
+        border-top: 1px solid #47736e
+    }
+
+        .health-tests article > span {
+            color: var(--gold);
+            font: 500 35px "Playfair Display",serif
+        }
+
+        .health-tests article h3 {
+            margin: 0 0 10px;
+            color: #fff;
+            font: 500 29px "Playfair Display",serif
+        }
+
+        .health-tests article p {
+            color: #c9d9d5;
+            font-size: 15px;
+            line-height: 1.75
+        }
+
+        .health-tests article strong {
+            display: block;
+            color: #f2cc75;
+            font-size: 15px
+        }
+
+.health-medication {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8vw;
+    padding: 105px 7vw;
+    background: #073f3b;
+    color: #fff
+}
+
+    .health-medication aside {
+        padding: 45px;
+        background: #f8f4ea;
+        color: var(--ink)
+    }
+
+        .health-medication aside h3 {
+            margin: 0 0 25px;
+            color: var(--teal);
+            font: 500 36px/1.1 "Playfair Display",serif
+        }
+
+        .health-medication aside ol {
+            margin: 0;
+            padding-left: 24px
+        }
+
+        .health-medication aside li {
+            padding: 11px 0 11px 8px;
+            border-bottom: 1px solid #ddd7ca;
+            color: #36524f;
+            font-size: 15px
+        }
+
+.health-guide-sources {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8vw;
+    padding: 95px 7vw;
+    background: #fff
+}
+
+    .health-guide-sources > div:last-child > p {
+        color: var(--muted);
+        font: 17px/1.75 "Playfair Display",serif
+    }
+
+    .health-guide-sources a {
+        display: block;
+        padding: 15px 0;
+        border-bottom: 1px solid #d7dfda;
+        color: var(--teal);
+        font-size: 15px;
+        font-weight: 600
+    }
+
+@media(max-width:950px) {
+    .health-preview, .health-guide-intro, .health-tests, .health-medication, .health-guide-sources {
+        grid-template-columns: 1fr
+    }
+
+    .health-preview-visual {
+        min-height: 520px
+    }
+
+    .health-guide-nav, .health-risk-grid, .health-action-grid {
+        grid-template-columns: repeat(2,1fr)
+    }
+}
+
+@media(max-width:650px) {
+    .health-preview-copy, .health-guide-hero, .health-guide-intro, .health-guide-section, .health-tests, .health-medication, .health-guide-sources {
+        padding: 65px 22px
+    }
+
+    .health-preview-visual {
+        min-height: 420px
+    }
+
+    .health-preview-topics, .health-guide-nav, .health-risk-grid, .health-action-grid, .health-guide-section > header {
+        grid-template-columns: 1fr
+    }
+
+    .health-guide-nav {
+        padding: 0 22px
+    }
+
+        .health-guide-nav a, .health-guide-nav a:first-child {
+            border-left: 0;
+            border-right: 0;
+            border-bottom: 1px solid #47736e
+        }
+
+    .health-guide-hero {
+        min-height: 650px;
+        align-items: flex-end;
+        background-image: linear-gradient(0deg,rgba(2,35,33,.98),rgba(2,46,43,.72) 62%,rgba(2,46,43,.2)),url(/images/vitalreach-kidney-education.png)
+    }
+
+    .health-guide-section > header .eyebrow {
+        grid-column: 1
+    }
+
+    .health-tests article {
+        grid-template-columns: 1fr;
+        gap: 8px
+    }
+
+    .health-medication aside {
+        padding: 32px 25px
+    }
+}
+
 /* Kidney Health Ghana content */
 #ghana, #kidney-reading, #kidney-series, #journal, #contact {
     scroll-margin-top: 100px
@@ -2165,7 +2661,7 @@ footer {
     color: #98742e;
     text-transform: uppercase;
     letter-spacing: .13em;
-    font-size: 9px;
+    font-size: 15px;
     margin-top: 18px
 }
 
@@ -2221,7 +2717,7 @@ footer {
         color: #98742e;
         text-transform: uppercase;
         letter-spacing: .15em;
-        font-size: 8px;
+        font-size: 15px;
         font-weight: 700
     }
 
@@ -2233,7 +2729,7 @@ footer {
 
     .episode-grid p, .journal article p {
         color: var(--muted);
-        font: 14px/1.75 "DM Sans",sans-serif
+        font: 15px/1.75 "DM Sans",sans-serif
     }
 
 .kidney-questions {
@@ -2260,7 +2756,7 @@ footer {
     .kidney-questions li {
         padding: 7px 12px;
         color: #d7e3df;
-        font: 14px/1.5 "DM Sans",sans-serif;
+        font: 15px/1.5 "DM Sans",sans-serif;
         break-inside: avoid
     }
 
@@ -2269,7 +2765,7 @@ footer {
     margin: 28px auto 0;
     text-align: center;
     color: #778681;
-    font-size: 10px;
+    font-size: 15px;
     line-height: 1.7
 }
 
@@ -2320,7 +2816,7 @@ footer {
             color: var(--teal);
             text-transform: uppercase;
             letter-spacing: .12em;
-            font-size: 9px;
+            font-size: 15px;
             font-weight: 700
         }
 
@@ -2394,7 +2890,7 @@ footer {
     padding: 12px 15px;
     background: #e7f4ef;
     color: #22695f;
-    font-size: 12px
+    font-size: 15px
 }
 
 .admin-gallery-manager {
@@ -2410,7 +2906,7 @@ footer {
     .admin-gallery-manager > header small, .admin-gallery-empty, .admin-gallery-list small {
         margin-top: 4px;
         color: var(--muted);
-        font-size: 10px
+        font-size: 15px
     }
 
 .admin-gallery-upload {
@@ -2487,7 +2983,7 @@ footer {
 
 .form-grid label small {
     color: var(--muted);
-    font-size: 9px;
+    font-size: 15px;
     font-weight: 400;
     letter-spacing: 0;
     text-transform: none
@@ -2512,7 +3008,7 @@ footer {
     color: var(--teal);
     text-transform: uppercase;
     letter-spacing: .12em;
-    font-size: 9px;
+    font-size: 15px;
     font-weight: 700
 }
 
@@ -2554,7 +3050,7 @@ footer {
 .footer-identity address {
     margin: 18px 0 0;
     color: #aabfba;
-    font: 12px/1.65 "DM Sans",sans-serif
+    font: 15px/1.65 "DM Sans",sans-serif
 }
 
     .footer-identity address b {
@@ -2563,7 +3059,7 @@ footer {
         color: #dbbd73;
         text-transform: uppercase;
         letter-spacing: .13em;
-        font-size: 8px
+        font-size: 15px
     }
 
     .footer-identity address a:hover {
@@ -2576,11 +3072,11 @@ footer {
     display: flex;
     align-items: center;
     color: #fff;
-    background: linear-gradient(105deg,rgba(2,46,43,.98),rgba(6,63,59,.75)),url(/images/vitalreach-kidney-education.png) center/cover
+    background: linear-gradient(90deg,rgba(2,35,33,.96) 0%,rgba(2,46,43,.82) 38%,rgba(2,46,43,.18) 68%,rgba(2,46,43,.06) 100%),url(/images/wellness-center/wellness-center-reception.png) center/cover
 }
 
     .center-hero > div {
-        max-width: 850px
+        max-width: 760px
     }
 
     .center-hero h1 {
@@ -2648,7 +3144,7 @@ footer {
     .center-services p {
         min-height: 100px;
         color: var(--muted);
-        font-size: 14px;
+        font-size: 15px;
         line-height: 1.7
     }
 
@@ -2656,9 +3152,168 @@ footer {
         color: var(--teal);
         text-transform: uppercase;
         letter-spacing: .1em;
-        font-size: 9px;
+        font-size: 15px;
         font-weight: 700
     }
+
+.center-experience {
+    padding: 105px 7vw;
+    background: #f7f3e9
+}
+
+    .center-experience > header {
+        display: grid;
+        grid-template-columns: 1.1fr .9fr;
+        column-gap: 8vw;
+        align-items: end;
+        margin-bottom: 54px
+    }
+
+        .center-experience > header .eyebrow {
+            grid-column: 1/-1
+        }
+
+        .center-experience > header h2 {
+            margin: 0;
+            color: var(--teal);
+            font: 500 clamp(44px,5vw,68px)/1 "Playfair Display",serif
+        }
+
+            .center-experience > header h2 em {
+                color: #b58a26;
+                font-weight: 500
+            }
+
+        .center-experience > header > p:last-child {
+            margin: 0;
+            color: var(--muted);
+            font: 16px/1.8 "Playfair Display",serif
+        }
+
+.center-experience-grid {
+    display: grid;
+    gap: 34px
+}
+
+    .center-experience-grid article {
+        display: grid;
+        grid-template-columns: minmax(0,1.15fr) minmax(360px,.85fr);
+        background: #fff;
+        overflow: hidden
+    }
+
+        .center-experience-grid article:nth-child(even) img {
+            order: 2
+        }
+
+    .center-experience-grid img {
+        width: 100%;
+        height: 100%;
+        min-height: 500px;
+        object-fit: cover
+    }
+
+    .center-experience-grid article > div {
+        padding: clamp(38px,5vw,70px);
+        align-self: center
+    }
+
+    .center-experience-grid h3 {
+        margin: 10px 0 20px;
+        color: var(--teal);
+        font: 500 clamp(34px,4vw,50px)/1.05 "Playfair Display",serif
+    }
+
+    .center-experience-grid article > div > p:not(.eyebrow) {
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.75
+    }
+
+    .center-experience-grid ul {
+        margin: 26px 0 30px;
+        padding: 0;
+        list-style: none
+    }
+
+    .center-experience-grid li {
+        position: relative;
+        padding: 12px 0 12px 24px;
+        border-bottom: 1px solid #e6dfcf;
+        color: #36524f;
+        font-size: 15px
+    }
+
+        .center-experience-grid li::before {
+            content: "◆";
+            position: absolute;
+            left: 0;
+            color: var(--gold);
+            font-size: 15px
+        }
+
+    .center-experience-grid a {
+        color: var(--teal);
+        text-transform: uppercase;
+        letter-spacing: .1em;
+        font-size: 15px;
+        font-weight: 700
+    }
+
+.center-visit {
+    padding: 100px 7vw;
+    display: grid;
+    grid-template-columns: .75fr 1.25fr;
+    gap: 8vw;
+    background: #073f3b;
+    color: #fff
+}
+
+.center-visit-heading h2 {
+    margin: 0;
+    color: #fff;
+    font: 500 clamp(42px,5vw,65px)/1 "Playfair Display",serif
+}
+
+.center-visit ol {
+    margin: 0;
+    padding: 0;
+    list-style: none
+}
+
+.center-visit li {
+    display: grid;
+    grid-template-columns: 58px 1fr;
+    gap: 22px;
+    padding: 25px 0;
+    border-top: 1px solid #47736e
+}
+
+    .center-visit li > span {
+        color: var(--gold);
+        font: 21px "Playfair Display",serif
+    }
+
+    .center-visit li h3 {
+        margin: 0 0 8px;
+        color: #fff;
+        font: 500 27px "Playfair Display",serif
+    }
+
+    .center-visit li p {
+        margin: 0;
+        color: #c9d9d5;
+        font-size: 15px;
+        line-height: 1.7
+    }
+
+.center-disclaimer {
+    grid-column: 2;
+    margin: -2vw 0 0 80px;
+    color: #9eb9b4;
+    font-size: 15px;
+    line-height: 1.7
+}
 
 .center-location {
     padding: 80px 7vw;
@@ -2719,7 +3374,8 @@ footer {
     display: grid;
     grid-template-columns: 230px 1fr;
     gap: 50px;
-    background: #fbfaf5
+    background: #fbfaf5;
+    scroll-margin-top: 95px
 }
 
 .shop-facets {
@@ -2727,6 +3383,14 @@ footer {
     position: sticky;
     top: 120px
 }
+
+    .shop-facet-mobile {
+        display: none
+    }
+
+    .shop-facet-mobile-heading, .shop-facet-mobile .shop-facet-list a span small {
+        display: none
+    }
 
     .shop-facets h2 {
         font: 500 25px "Playfair Display",serif;
@@ -2739,13 +3403,19 @@ footer {
         padding: 13px 4px;
         border-bottom: 1px solid #dbe3de;
         color: var(--muted);
-        font-size: 12px
+        font-size: 15px
     }
 
         .shop-facets a.active {
             color: var(--teal);
             font-weight: 700;
             border-color: var(--gold)
+        }
+
+        .shop-facets a:focus-visible {
+            outline: 0;
+            background: #edf2ed;
+            box-shadow: inset 3px 0 var(--gold)
         }
 
     .shop-facets b {
@@ -2758,8 +3428,12 @@ footer {
     color: var(--teal);
     text-transform: uppercase;
     letter-spacing: .12em;
-    font-size: 9px;
+    font-size: 15px;
     font-weight: 700
+}
+
+.shop-facets a {
+    padding: 3px 4px;
 }
 
 .shop-search > div {
@@ -2768,11 +3442,11 @@ footer {
 
 .shop-search input {
     flex: 1;
-    min-width: 0;
+    min-width: 100%;
     padding: 14px;
     border: 1px solid #b9c9c4;
     background: #fff;
-    font: 14px "DM Sans",sans-serif
+    font: 15px "DM Sans",sans-serif
 }
 
 .shop-search button {
@@ -2782,7 +3456,7 @@ footer {
     color: #fff;
     text-transform: uppercase;
     letter-spacing: .1em;
-    font-size: 9px;
+    font-size: 15px;
     cursor: pointer
 }
 
@@ -2795,13 +3469,13 @@ footer {
 
     .results-summary p {
         color: var(--muted);
-        font-size: 12px
+        font-size: 15px
     }
 
     .results-summary a {
         color: #8d6b27;
         text-decoration: underline;
-        font-size: 11px
+        font-size: 15px
     }
 
 .shop-products {
@@ -2821,6 +3495,7 @@ footer {
 
 .pagination {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
     gap: 8px;
@@ -2835,7 +3510,7 @@ footer {
         place-items: center;
         border: 1px solid #b9c9c4;
         color: var(--teal);
-        font-size: 11px
+        font-size: 15px
     }
 
         .pagination a.active {
@@ -2847,7 +3522,7 @@ footer {
 .breadcrumbs {
     padding: 26px 7vw;
     color: var(--muted);
-    font-size: 11px;
+    font-size: 15px;
     display: flex;
     gap: 10px
 }
@@ -2885,8 +3560,8 @@ footer {
     }
 
     .pdp-art > img {
-        width: 100%;
-        height: 100%;
+        width: auto;
+        height: 600px;
         object-fit: contain
     }
 
@@ -2925,7 +3600,7 @@ footer {
 
     .pdp-price span {
         color: var(--muted);
-        font-size: 11px
+        font-size: 15px
     }
 
 .pdp-copy > p:not(.eyebrow):not(.pdp-benefit):not(.pdp-note) {
@@ -2935,7 +3610,7 @@ footer {
 
 .pdp-note {
     color: #7a8986;
-    font-size: 9px;
+    font-size: 15px;
     line-height: 1.6
 }
 
@@ -2962,7 +3637,7 @@ footer {
         text-transform: uppercase;
         letter-spacing: .12em;
         color: #98742e;
-        font-size: 8px
+        font-size: 15px
     }
 
 .product-not-found {
@@ -3019,6 +3694,19 @@ footer {
         .center-services p {
             min-height: 0
         }
+
+    .center-experience-grid article {
+        grid-template-columns: 1fr
+    }
+
+        .center-experience-grid article:nth-child(even) img {
+            order: 0
+        }
+
+    .center-experience-grid img {
+        min-height: 0;
+        aspect-ratio: 16/9
+    }
 }
 
 @media(max-width:800px) {
@@ -3034,23 +3722,234 @@ footer {
         grid-template-columns: 1fr
     }
 
-    .shop-browser {
+    .center-experience > header, .center-visit {
         grid-template-columns: 1fr
     }
 
-    .shop-facets {
-        position: static
+    .center-experience > header {
+        gap: 24px
+    }
+
+    .center-disclaimer {
+        grid-column: 1;
+        margin: 0
+    }
+
+    .shop-browser {
+        grid-template-columns: minmax(0,1fr)
+    }
+
+    .shop-facets, .shop-results {
+        min-width: 0;
+        width: 100%
     }
 
     .shop-facets {
-        display: grid;
-        grid-template-columns: repeat(2,1fr);
-        gap: 0 18px
+        position: static;
+        display: block
     }
 
-        .shop-facets h2 {
-            grid-column: 1/-1
+    .shop-facet-desktop {
+        display: none
+    }
+
+    .shop-facet-mobile {
+        display: block
+    }
+
+        .shop-facets details > summary {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            min-height: 112px;
+            padding: 20px 22px;
+            border: 1px solid #b9c9c4;
+            border-left: 4px solid var(--gold);
+            background: linear-gradient(110deg,#fff,#f5f1e7);
+            color: var(--teal);
+            cursor: pointer;
+            list-style: none;
+            box-shadow: 0 12px 30px rgba(3,50,46,.08)
         }
+
+            .shop-facets details > summary::-webkit-details-marker {
+                display: none
+            }
+
+            .shop-facet-summary-copy {
+                display: grid;
+                gap: 3px
+            }
+
+            .shop-facet-summary-copy > small {
+                color: #98742e;
+                font-size: 15px;
+                font-style: normal;
+                font-weight: 700;
+                letter-spacing: .12em;
+                text-transform: uppercase
+            }
+
+            .shop-facet-summary-copy > strong {
+                font: 500 28px "Playfair Display",serif
+            }
+
+            .shop-facet-summary-copy > em {
+                color: var(--muted);
+                font-size: 15px;
+                font-style: normal
+            }
+
+            .shop-facets details > summary i {
+                position: relative;
+                width: 24px;
+                height: 24px;
+                flex: 0 0 24px;
+                border-radius: 50%;
+                background: var(--teal)
+            }
+
+                .shop-facets details > summary i::before, .shop-facets details > summary i::after {
+                    content: "";
+                    position: absolute;
+                    top: 11px;
+                    left: 5px;
+                    width: 14px;
+                    height: 2px;
+                    background: #fff;
+                    transition: transform .2s ease
+                }
+
+                .shop-facets details > summary i::after {
+                    transform: rotate(90deg)
+                }
+
+        .shop-facets details[open] > summary {
+            border-color: var(--gold);
+            background: #f8f4ea;
+            box-shadow: none
+        }
+
+            .shop-facets details[open] > summary i::after {
+                transform: rotate(0)
+            }
+
+        .shop-facets details > summary:focus-visible {
+            outline: 2px solid var(--teal);
+            outline-offset: 2px
+        }
+
+    .shop-facet-list {
+        display: none;
+        grid-template-columns: repeat(2,minmax(0,1fr));
+        gap: 10px;
+        padding: 18px;
+        border: 1px solid #d8d2c4;
+        border-top: 0;
+        background: #fff
+    }
+
+    .shop-facets details[open] .shop-facet-list {
+        display: grid
+    }
+
+    .shop-facet-mobile-heading {
+        grid-column: 1/-1;
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 18px;
+        padding: 4px 2px 14px;
+        border-bottom: 1px solid #d8dfda
+    }
+
+        .shop-facet-mobile-heading > div {
+            display: grid;
+            gap: 2px
+        }
+
+        .shop-facet-mobile-heading span {
+            color: #98742e;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: .1em;
+            text-transform: uppercase
+        }
+
+        .shop-facet-mobile-heading strong {
+            color: var(--teal);
+            font: 500 24px "Playfair Display",serif
+        }
+
+        .shop-facet-mobile-heading > small {
+            color: var(--muted);
+            font-size: 15px;
+            text-align: right
+        }
+
+    .shop-facet-list > a {
+        position: relative;
+        min-height: 68px;
+        padding: 12px 14px;
+        border: 1px solid #dbe3de;
+        background: #fbfaf5;
+        transition: border-color .2s ease,background .2s ease,transform .2s ease
+    }
+
+        .shop-facet-list > a span {
+            display: grid;
+            color: var(--teal);
+            font-weight: 600;
+            line-height: 1.25
+        }
+
+            .shop-facet-list > a span small {
+                display: block;
+                margin-bottom: 3px;
+                color: #7a8985;
+                font-size: 15px;
+                font-weight: 400
+            }
+
+        .shop-facet-list > a b {
+            display: grid;
+            min-width: 32px;
+            height: 32px;
+            padding: 0 7px;
+            place-items: center;
+            border-radius: 50%;
+            background: #efe8d7;
+            color: #876923
+        }
+
+        .shop-facet-list > a.active {
+            border-color: var(--gold);
+            background: #f5efdf;
+            box-shadow: inset 4px 0 var(--gold)
+        }
+
+            .shop-facet-list > a.active::after {
+                content: "Selected";
+                position: absolute;
+                right: 12px;
+                bottom: 4px;
+                color: #876923;
+                font-size: 15px;
+                font-weight: 700
+            }
+
+    .shop-facet-list h2 {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0,0,0,0);
+        white-space: nowrap;
+        border: 0
+    }
 
     .pdp-art {
         min-height: 450px
@@ -3058,17 +3957,20 @@ footer {
 
     .admin-header nav {
         gap: 10px;
-        font-size: 9px
+        font-size: 15px
     }
 }
 
 @media(max-width:600px) {
-    .center-callout, .center-hero, .center-intro, .center-location {
+    .center-callout, .center-hero, .center-intro, .center-experience, .center-visit, .center-location {
         padding: 60px 22px
     }
 
     .center-hero {
-        min-height: 560px
+        min-height: 620px;
+        align-items: flex-end;
+        background-position: 62% center;
+        background-image: linear-gradient(0deg,rgba(2,35,33,.98) 0%,rgba(2,46,43,.86) 43%,rgba(2,46,43,.18) 78%,rgba(2,46,43,.08) 100%),url(/images/wellness-center/wellness-center-reception.png)
     }
 
         .center-hero .actions {
@@ -3077,6 +3979,27 @@ footer {
 
     .center-services {
         padding: 0 22px 65px
+    }
+
+    .shop-facet-list {
+        grid-template-columns: 1fr
+    }
+
+    .center-experience > header {
+        margin-bottom: 35px
+    }
+
+    .center-experience-grid {
+        gap: 22px
+    }
+
+        .center-experience-grid article > div {
+            padding: 32px 24px 38px
+        }
+
+    .center-visit li {
+        grid-template-columns: 44px 1fr;
+        gap: 12px
     }
 
     .shop-hero {
@@ -3088,7 +4011,11 @@ footer {
     }
 
     .shop-products {
-        grid-template-columns: 1fr
+        grid-template-columns: minmax(0,1fr)
+    }
+
+    .shop-products > * {
+        min-width: 0
     }
 
     .shop-search > div {
@@ -3113,14 +4040,13 @@ footer {
     }
 
     .footer-identity address {
-        font-size: 11px
+        font-size: 15px
     }
 
     .admin-header nav a {
-        font-size: 8px
+        font-size: 15px
     }
 }
-
 /* Contact form and admin inbox */
 .contact-page-hero {
     padding: 90px 7vw;
@@ -3178,7 +4104,7 @@ footer {
         color: #586d68;
         text-transform: uppercase;
         letter-spacing: .09em;
-        font-size: 9px;
+        font-size: 15px;
         font-weight: 700
     }
 
@@ -3192,7 +4118,7 @@ footer {
         border: 1px solid #b9c9c4;
         background: #fff;
         color: var(--ink);
-        font: 14px "DM Sans",sans-serif;
+        font: 16px "DM Sans",sans-serif;
         letter-spacing: normal;
         text-transform: none
     }
@@ -3202,7 +4128,7 @@ footer {
     }
 
     .contact-form-grid .validation-message {
-        font-size: 11px;
+        font-size: 15px;
         text-transform: none;
         letter-spacing: 0
     }
@@ -3220,7 +4146,7 @@ footer {
     padding: 15px 18px;
     background: #e5f1ed;
     color: #17564f;
-    font-size: 13px
+    font-size: 15px
 }
 
     .form-status.error {
@@ -3245,7 +4171,7 @@ footer {
     }
 
 .contact-details {
-    width:70%;
+    width: 70%;
     position: absolute;
     right: 22px;
     bottom: 22px;
@@ -3264,32 +4190,32 @@ footer {
     .contact-details address {
         margin: 0;
         color: #d1dfdb;
-        font-size: 12px;
+        font-size: 15px;
         line-height: 1.55
     }
 
-    .contact-detail-links {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 7px 16px;
-        margin: 13px 0 8px
-    }
+.contact-detail-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px 16px;
+    margin: 13px 0 8px
+}
 
     .contact-detail-links a {
         color: #fff;
-        font: 500 13px "Playfair Display",serif
+        font: 500 15px "Playfair Display",serif
     }
 
-    .contact-details > p:not(.eyebrow) {
-        margin: 8px 0 13px;
-        color: #a9beb8;
-        font-size: 11px;
-        line-height: 1.5
-    }
+.contact-details > p:not(.eyebrow) {
+    margin: 8px 0 13px;
+    color: #a9beb8;
+    font-size: 15px;
+    line-height: 1.5
+}
 
-    .contact-details .underlink {
-        font-size: 8px
-    }
+.contact-details .underlink {
+    font-size: 15px
+}
 
 .contact-submissions {
     display: grid;
@@ -3319,7 +4245,7 @@ footer {
         color: #98742e;
         text-transform: uppercase;
         letter-spacing: .12em;
-        font-size: 8px;
+        font-size: 15px;
         font-weight: 700
     }
 
@@ -3332,7 +4258,7 @@ footer {
     .contact-submissions header p {
         margin: 0;
         color: var(--muted);
-        font-size: 10px
+        font-size: 15px
     }
 
     .contact-submissions header > div:last-child {
@@ -3341,7 +4267,7 @@ footer {
         gap: 8px;
         text-align: right;
         color: #8d6b27;
-        font-size: 12px
+        font-size: 15px
     }
 
     .contact-submissions article > p {
@@ -3412,11 +4338,11 @@ footer {
         min-height: 520px
     }
 
-    .contact-map iframe {
-        height: 680px;
-        min-height: 680px;
-        transform: translateY(-105px)
-    }
+        .contact-map iframe {
+            height: 680px;
+            min-height: 680px;
+            transform: translateY(-105px)
+        }
 
     .contact-form-grid {
         grid-template-columns: 1fr
@@ -3431,7 +4357,6 @@ footer {
         max-width: 55vw
     }
 }
-
 /* Shared administration portal */
 .admin-portal {
     min-height: 100vh;
@@ -3476,7 +4401,7 @@ footer {
         padding: 13px 15px;
         border-radius: 3px;
         color: #c7d9d5;
-        font-size: 12px;
+        font-size: 15px;
         text-transform: uppercase;
         letter-spacing: .09em
     }
@@ -3511,18 +4436,18 @@ footer {
         color: #9fb9b4;
         text-transform: uppercase;
         letter-spacing: .1em;
-        font-size: 8px
+        font-size: 15px
     }
 
     .admin-account span {
         overflow: hidden;
         text-overflow: ellipsis;
-        font-size: 11px
+        font-size: 15px
     }
 
     .admin-account a {
         color: #d9b45a;
-        font-size: 11px;
+        font-size: 15px;
         text-decoration: underline
     }
 
@@ -3565,7 +4490,7 @@ footer {
         color: #647873;
         text-transform: uppercase;
         letter-spacing: .1em;
-        font-size: 9px;
+        font-size: 15px;
         font-weight: 700
     }
 
@@ -3618,7 +4543,7 @@ footer {
     .admin-quick-actions span {
         margin: 10px 0 20px;
         color: var(--muted);
-        font-size: 12px;
+        font-size: 15px;
         line-height: 1.6
     }
 
@@ -3626,7 +4551,7 @@ footer {
         margin-top: auto;
         color: #98742e;
         font-style: normal;
-        font-size: 11px;
+        font-size: 15px;
         text-transform: uppercase;
         letter-spacing: .08em
     }
@@ -3668,7 +4593,7 @@ footer {
             color: #fff;
             text-transform: uppercase;
             letter-spacing: .1em;
-            font-size: 9px
+            font-size: 15px
         }
 
     .admin-mobile-nav {
@@ -3681,7 +4606,7 @@ footer {
         .admin-mobile-nav a {
             padding: 10px;
             color: #fff;
-            font-size: 10px;
+            font-size: 15px;
             text-align: center
         }
 

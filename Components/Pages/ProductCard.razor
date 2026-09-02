@@ -23,21 +23,24 @@
         <a href="/shop/@Product.Slug">@Product.Name</a>
     </h3>
     <p class="benefit">@Product.Benefit</p>
-    <div class="price-row">
-        <strong>@Product.Price.ToString("C", CultureInfo.GetCultureInfo("en-US"))</strong>
-        <span>@Product.Detail</span>
-    </div>
-    @if (OnAdd.HasDelegate)
-    {
-        <button class="add-cart" @onclick="() => OnAdd.InvokeAsync(Product)">
-            Add to bag <span>+</span>
-        </button>
-    }
-    else
-    {
+    <div class="product-card-footer">
+        <div class="price-row">
+            <strong>@Product.Price.ToString("C", CultureInfo.GetCultureInfo("en-US"))</strong>
+            <span>@Product.Detail</span>
+        </div>
+        @if (OnAdd.HasDelegate)
+        {
+            <button class="add-cart" @onclick="() => OnAdd.InvokeAsync(Product)">
+                Add to bag <span>+</span>
+            </button>
+        }
+        else
+        {
 
-        <a class="add-cart" href="/shop/@Product.Slug">
-            View product <span>→</span>
-        </a>
-    }
+            <a class="add-cart" href="/shop/@Product.Slug">
+                View product <span>→</span>
+            </a>
+        }
+
+    </div>
 </article>
