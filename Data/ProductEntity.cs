@@ -23,4 +23,9 @@ public sealed class ProductEntity
     public int SortOrder { get; set; }
     public DateTimeOffset UpdatedUtc { get; set; } = DateTimeOffset.UtcNow;
     public List<ProductImage> Images { get; set; } = [];
+    public List<ProductVariant> Variants { get; set; } = [];
+    [MaxLength(40)] public string TaxCode { get; set; } = "";
+    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+    public decimal DisplayPrice => Variants.Where(v => v.CanOrder).Select(v => (decimal?)v.Price).Min()
+        ?? Variants.Select(v => (decimal?)v.Price).Min() ?? Price;
 }

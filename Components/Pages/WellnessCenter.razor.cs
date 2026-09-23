@@ -49,6 +49,9 @@ public partial class WellnessCenter
 
     [Inject] private IDbContextFactory<CatalogDbContext> DbFactory { get; set; } = default!;
     private HeadquartersSettings? Headquarters;
+    private string MapEmbedUrl => Headquarters is null
+        ? "about:blank"
+        : $"https://www.google.com/maps?q={Uri.EscapeDataString(string.Join(", ", new[] { Headquarters.AddressLine1, Headquarters.AddressLine2, Headquarters.City, Headquarters.Region, Headquarters.Country }.Where(value => !string.IsNullOrWhiteSpace(value))))}&output=embed";
 
     protected override async Task OnInitializedAsync()
     {

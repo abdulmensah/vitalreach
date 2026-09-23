@@ -22,6 +22,12 @@ builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddDbContextFactory<CatalogDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("Catalog") ?? "Data Source=App_Data/vitalreach.db"));
 builder.Services.AddSingleton<ProductImageStorage>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<CartSession>();
+builder.Services.AddScoped<CommerceService>();
+builder.Services.AddScoped<PaymentService>();
+builder.Services.AddScoped<TaxQuoteService>();
+builder.Services.AddHttpClient("payments", client => client.Timeout = TimeSpan.FromSeconds(30));
 var googleClientId = builder.Configuration["Authentication:Google:ClientId"];
 var googleClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
 var googleConfigured = !string.IsNullOrWhiteSpace(googleClientId) && !string.IsNullOrWhiteSpace(googleClientSecret);
@@ -60,6 +66,21 @@ app.UseForwardedHeaders();
 if (!app.Environment.IsDevelopment()) { app.UseExceptionHandler("/Error", createScopeForErrors: true); app.UseHsts(); }
 
 app.UseHttpsRedirection();
+app.Use(async (context, next) =>
+{
+    var protection = context.RequestServices.GetRequiredService<IDataProtectionProvider>();
+    var cartId = CartSession.Resolve(context, protection);
+    if (string.IsNullOrEmpty(cartId))
+    {
+        cartId = Guid.NewGuid().ToString("N");
+        context.Response.Cookies.Append(CartSession.CookieName,
+            protection.CreateProtector(CartSession.CookieName).Protect(cartId),
+            new CookieOptions { HttpOnly = true, Secure = context.Request.IsHttps, SameSite = SameSiteMode.Lax,
+                IsEssential = true, MaxAge = TimeSpan.FromDays(30), Path = "/" });
+    }
+    context.Items[CartSession.CookieName] = cartId;
+    await next(context);
+});
 app.UseStaticFiles();
 var productImagesPath = ProductImageStorage.ResolveStoragePath(builder.Configuration, builder.Environment);
 Directory.CreateDirectory(productImagesPath);
@@ -88,6 +109,29 @@ app.MapGet("/auth/logout", () => Results.SignOut(
     new Microsoft.AspNetCore.Authentication.AuthenticationProperties { RedirectUri = "/" },
     [CookieAuthenticationDefaults.AuthenticationScheme]));
 app.MapGet("/health", () => Results.Ok(new { status = "healthy", service = "vitalreach-qa" }));
+app.MapPost("/payments/{provider}/webhook", async (string provider, HttpRequest request, PaymentService payments) =>
+{
+    if (provider is not ("stripe" or "paystack")) return Results.NotFound();
+    // Bound payload size even for chunked requests.
+    using var reader = new StreamReader(request.Body);
+    var buffer = new char[1024 * 1024 + 1];
+    var length = 0;
+    while (length < buffer.Length)
+    {
+        var count = await reader.ReadAsync(buffer.AsMemory(length));
+        if (count == 0) break;
+        length += count;
+    }
+    if (length > 1024 * 1024) return Results.StatusCode(413);
+    try
+    {
+        var valid = await payments.WebhookAsync(provider == "stripe" ? "Stripe" : "Paystack", new string(buffer, 0, length),
+            request.Headers[provider == "stripe" ? "Stripe-Signature" : "x-paystack-signature"].ToString());
+        return valid ? Results.Ok() : Results.BadRequest();
+    }
+    catch (System.Text.Json.JsonException) { return Results.BadRequest(); }
+    catch (KeyNotFoundException) { return Results.BadRequest(); }
+});
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
 app.Run();

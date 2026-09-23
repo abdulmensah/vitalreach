@@ -1,0 +1,32 @@
+@page "/checkout"
+@rendermode InteractiveServer
+<PageTitle>Checkout | VitalReach</PageTitle>
+<StorefrontHeader />
+<main class="commerce-page">
+    <h1>Checkout</h1>
+    <p>Submit your delivery details to receive a confirmed shipping and tax quote. No payment is collected at this step.</p>
+    @if (Message is not null) { <p class="admin-message error" role="alert">@Message</p> }
+    @if (Bag?.CanCheckout == true)
+    {
+        @foreach (var line in Bag.Items) { <p>@line.Quantity × @line.ProductName — @line.VariantName · @Money(line.UnitPrice * line.Quantity)</p> }
+        <h2>Items subtotal: @Money(Bag.Subtotal)</h2>
+        <EditForm Model="Input" OnValidSubmit="Submit" FormName="checkout">
+            <DataAnnotationsValidator /><ValidationSummary />
+            <div class="form-grid">
+                <label>Full name<InputText @bind-Value="Input.Name" autocomplete="name" /></label>
+                <label>Email<InputText @bind-Value="Input.Email" autocomplete="email" type="email" /></label>
+                <label>Phone<InputText @bind-Value="Input.Phone" autocomplete="tel" /></label>
+                <label>Country<InputSelect @bind-Value="Input.Country"><option value="GH">Ghana</option><option value="US">United States</option></InputSelect></label>
+                <label class="wide">Street address / Ghana digital address<InputText @bind-Value="Input.Address" autocomplete="street-address" /></label>
+                <label>City<InputText @bind-Value="Input.City" autocomplete="address-level2" /></label>
+                <label>State / region<InputText @bind-Value="Input.Region" autocomplete="address-level1" /></label>
+                <label>ZIP / postal code (required for US)<InputText @bind-Value="Input.PostalCode" autocomplete="postal-code" /></label>
+                <label class="wide">Delivery notes<InputTextArea @bind-Value="Input.Notes" /></label>
+            </div>
+            <p>Review your details before submitting. <a href="/privacy">Privacy policy</a></p>
+            <button class="btn btn-gold" disabled="@Busy" type="submit">@(Busy ? "Submitting…" : "Request confirmed total")</button>
+        </EditForm>
+    }
+    else { <p>Please review your bag before checkout.</p> }
+    <a href="/cart">Return to bag</a>
+</main>

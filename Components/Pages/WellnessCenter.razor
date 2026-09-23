@@ -88,23 +88,17 @@
         </section>
         <section class="center-location">
             <div>
-                <p class="eyebrow light">Visit our headquarters</p>
+                <p class="eyebrow">Visit our headquarters</p>
                 <h2>@Headquarters.CenterName</h2>
-                <address>
-                    @Headquarters.AddressLine1<br />
-                    @if (!string.IsNullOrWhiteSpace(Headquarters.AddressLine2))
-                    {
-                        @Headquarters.AddressLine2
-                        <br />
-                    }
-                    @Headquarters.CityRegion<br />@Headquarters.Country
-                </address>
+                <div class="center-location-contacts">
+                    <a href="@Headquarters.PhoneHref">@Headquarters.Phone</a>
+                    <a href="@CenterInformationUrl">@Headquarters.Email</a>
+                </div>
                 <p>@Headquarters.Hours</p>
             </div>
-            <div>
+            <div class="center-location-map">
+                <iframe src="@MapEmbedUrl" title="Google map showing the VitalReach headquarters location" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
                 <a href="@Headquarters.MapUrl" target="_blank" rel="noopener noreferrer">Open in Google Maps ↗</a>
-                <a href="@Headquarters.PhoneHref">@Headquarters.Phone</a>
-                <a href="@CenterInformationUrl">@Headquarters.Email</a>
             </div>
         </section>
     </main>

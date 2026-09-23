@@ -2,7 +2,7 @@
 @rendermode InteractiveServer
 <PageTitle>Wellness with purpose | VitalReach Wellness Hub</PageTitle>
 
-<div class="announcement">Proudly Ghanaian-American <span>✦</span> Free US shipping over $75</div>
+<div class="announcement">Proudly Ghanaian-American <span>✦</span> Wellness with purpose</div>
 <header class="site-header" id="top">
     <a class="logo" href="/#top">
         <img src="images/vitalreach-logo_header.png" alt="VitalReach Wellness Hub" />
@@ -20,9 +20,7 @@
             <span></span>
             <span></span>
         </button>
-        <button class="cart-trigger" @onclick="OpenCart">
-            Bag <span>@CartCount</span>
-        </button>
+        <a class="cart-trigger" href="/cart">Bag</a>
     </div>
 </header>
 @if (MenuOpen)
@@ -51,6 +49,7 @@
     </nav>
 }
 <main>
+    @if (CartMessage is not null) { <p class="admin-message error" role="alert">@CartMessage</p> }
     <section class="hero">
         <div class="hero-copy">
             <p class="eyebrow">Wellness, rooted in purpose</p>
@@ -242,68 +241,3 @@
     </section>
 </main>
 <StorefrontFooter Headquarters="Headquarters" />
-
-@if (CartOpen)
-{
-    <div class="cart-backdrop" @onclick="CloseCart">
-    </div>
-}
-<aside class="cart @(CartOpen ? "open" : "")" aria-hidden="@(!CartOpen)">
-    <header>
-        <div>
-            <small>Your selection</small>
-            <h2>Shopping bag</h2>
-        </div>
-        <button class="cart-close" @onclick="CloseCart">×</button>
-    </header>
-    @if (Cart.Count == 0)
-    {
-        <div class="cart-empty">
-            <span>V</span>
-            <h3>Your bag is waiting.</h3>
-            <p>Add a few wellness essentials to begin.</p>
-            <button class="btn btn-outline" @onclick="CloseCart">Explore products</button>
-        </div>
-    }
-    else
-    {
-
-        <div class="cart-items">
-            @foreach (var line in Cart.Values)
-            {
-                <article class="cart-item">
-                    <div>
-                        <h3>@line.Product.Name</h3>
-                        <p>@Money(line.Product.Price)</p>
-                        <div class="quantity">
-                            <button @onclick="() => ChangeQuantity(line.Product.Slug, -1)">−</button>
-                            <span>@line.Quantity</span>
-                            <button @onclick="() => ChangeQuantity(line.Product.Slug, 1)">+</button>
-                        </div>
-                    </div>
-                    <button class="remove" @onclick="() => Remove(line.Product.Slug)">Remove</button>
-                </article>
-            }
-        </div>
-        <div class="cart-summary">
-            <div>
-                <span>Subtotal</span>
-                <strong>@Money(Subtotal)</strong>
-            </div>
-            <p>Shipping and taxes calculated at checkout.</p>
-            <button class="checkout" @onclick="BeginCheckout">Continue to checkout →</button>
-        </div>
-    }
-</aside>
-@if (CheckoutOpen)
-{
-    <div class="modal-backdrop" @onclick="CloseCheckout">
-        <section class="checkout-dialog" @onclick:stopPropagation>
-            <button class="dialog-close" @onclick="CloseCheckout">×</button>
-            <p class="eyebrow">Secure checkout</p>
-            <h2>You're almost there.</h2>
-            <p>Online payment is being connected. Send your prepared order to our team and we’ll confirm availability, shipping, and a secure payment link.</p>
-            <a class="btn btn-gold" href="@OrderContactUrl">Contact us about my order →</a>
-        </section>
-    </div>
-}

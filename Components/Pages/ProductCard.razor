@@ -25,13 +25,19 @@
     <p class="benefit">@Product.Benefit</p>
     <div class="product-card-footer">
         <div class="price-row">
-            <strong>@Product.Price.ToString("C", CultureInfo.GetCultureInfo("en-US"))</strong>
-            <span>@Product.Detail</span>
+            <strong>@((OnAdd.HasDelegate ? SelectedVariant?.Price ?? Product.DisplayPrice : Product.DisplayPrice).ToString("C", CultureInfo.GetCultureInfo("en-US")))</strong>
+            <span>@(OnAdd.HasDelegate ? SelectedVariant?.DisplayName : Product.Variants.Count > 1 ? $"From · {Product.Variants.Count} variants" : Product.Variants.FirstOrDefault()?.DisplayName)</span>
         </div>
         @if (OnAdd.HasDelegate)
         {
-            <button class="add-cart" @onclick="() => OnAdd.InvokeAsync(Product)">
-                Add to bag <span>+</span>
+            @if (Product.Variants.Count > 1)
+            {
+                <label class="variant-picker">Choose variant for @Product.Name
+                    <select @bind="SelectedVariantId">@foreach (var variant in Product.Variants) { <option value="@variant.Id">@variant.DisplayName @(!variant.CanOrder ? "— unavailable" : "")</option> }</select>
+                </label>
+            }
+            <button class="add-cart" disabled="@(SelectedVariant?.CanOrder != true)" @onclick="Add">
+                @(SelectedVariant?.CanOrder == true ? "Add to bag" : "Unavailable") <span>+</span>
             </button>
         }
         else

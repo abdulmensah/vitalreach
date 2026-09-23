@@ -1,0 +1,28 @@
+@page "/cart"
+@rendermode InteractiveServer
+<PageTitle>Your bag | VitalReach</PageTitle>
+<StorefrontHeader />
+<main class="commerce-page">
+    <h1>Your bag</h1>
+    <a href="/orders">View your orders</a>
+    @if (Message is not null) { <p role="status" class="admin-message error">@Message</p> }
+    @if (Bag is null) { <p>Loading your bag…</p> }
+    else if (Bag.Items.Count == 0) { <p>Your bag is empty.</p><a href="/shop" class="btn btn-gold">Explore products</a> }
+    else
+    {
+        @foreach (var row in Bag.Items)
+        {
+            <article class="commerce-line" @key="row.VariantId">
+                <div><h2>@row.ProductName</h2><p>@row.VariantName · SKU @row.Sku</p><p>@Money(row.UnitPrice) each</p>
+                @if (!row.Available) { <p role="alert">This item or quantity is unavailable. Adjust the quantity or remove it.</p> }</div>
+                <div class="quantity"><button aria-label="Decrease quantity of @row.ProductName" disabled="@Busy" @onclick="() => Change(row, -1)">−</button><span>@row.Quantity</span><button aria-label="Increase quantity of @row.ProductName" disabled="@(Busy || row.Quantity >= 99 || row.StockQuantity.HasValue && row.Quantity >= row.StockQuantity)" @onclick="() => Change(row, 1)">+</button></div>
+                <strong>@Money(row.UnitPrice * row.Quantity)</strong>
+                <button class="danger-button" disabled="@Busy" @onclick="() => Remove(row)">Remove</button>
+            </article>
+        }
+        <h2>Items subtotal: @Money(Bag.Subtotal)</h2>
+        <p>Shipping and applicable tax will be confirmed before payment. Items are not reserved until your quote is confirmed.</p>
+        @if (Bag.CanCheckout) { <a class="btn btn-gold" href="/checkout">Continue to checkout →</a> }
+        <a class="underlink" href="/shop">Continue shopping</a>
+    }
+</main>

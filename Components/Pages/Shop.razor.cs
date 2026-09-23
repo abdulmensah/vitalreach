@@ -50,7 +50,7 @@ public partial class Shop
         TotalProducts = await query.CountAsync();
         TotalPages = Math.Max(1, (int)Math.Ceiling(TotalProducts / (double)PageSize));
         PageNumber = Math.Min(PageNumber, TotalPages);
-        Products = await query.OrderBy(x => x.SortOrder).ThenBy(x => x.Name)
+        Products = await query.Include(x => x.Variants).OrderBy(x => x.SortOrder).ThenBy(x => x.Name)
             .Skip((PageNumber - 1) * PageSize)
             .Take(PageSize)
             .ToListAsync();

@@ -78,6 +78,8 @@ public static class CatalogSeeder
         if (!await db.Headquarters.AnyAsync()) db.Headquarters.Add(new HeadquartersSettings());
         await db.SaveChangesAsync();
         await SeedProductGalleryImagesOnceAsync(db);
+        await VariantSchema.EnsureAsync(db);
+        await CommerceSchema.EnsureAsync(db);
     }
 
     private static async Task EnsureProductColumnsAsync(CatalogDbContext db)
@@ -98,6 +100,8 @@ public static class CatalogSeeder
                 await AddColumnAsync(connection, "ALTER TABLE \"Products\" ADD COLUMN \"ImageUrl\" TEXT NULL;");
             if (!existingColumns.Contains(nameof(ProductEntity.Description)))
                 await AddColumnAsync(connection, "ALTER TABLE \"Products\" ADD COLUMN \"Description\" TEXT NOT NULL DEFAULT '';");
+            if (!existingColumns.Contains(nameof(ProductEntity.TaxCode)))
+                await AddColumnAsync(connection, "ALTER TABLE \"Products\" ADD COLUMN \"TaxCode\" TEXT NOT NULL DEFAULT '';");
         }
         finally
         {
