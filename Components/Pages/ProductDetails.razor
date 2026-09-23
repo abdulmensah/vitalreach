@@ -45,7 +45,9 @@ else
                     <div class="pdp-thumbnails" aria-label="Product images">
                         @foreach (var image in GalleryImages)
                         {
-                            <button class="@(SelectedImageUrl == image.Url ? "active" : "")" type="button" @onclick="() => SelectImage(image)" aria-label="Show @image.Alt">
+                            <button class="@(SelectedImageUrl == image.Url ? "active" : "")"
+                                    type="button" @onclick="() => SelectImage(image)"
+                                    aria-label="Show @image.Alt">
                                 <img src="@image.Url" alt="" />
                             </button>
                         }
@@ -56,12 +58,26 @@ else
                 <p class="eyebrow">@Product.Category</p>
                 <h1>@Product.Name</h1>
                 <p class="pdp-benefit">@Product.Benefit</p>
+                @if (Product.Variants.Count > 1)
+                {
+                    <label class="variant-picker">Choose a variant
+                        <select @bind="SelectedVariantId" @bind:after="VariantChanged">
+                            @foreach (var variant in Product.Variants) { <option value="@variant.Id">@variant.DisplayName @(!variant.CanOrder ? "— unavailable" : "")</option> }
+                        </select>
+                    </label>
+                }
                 <div class="pdp-price">
-                    <strong>@Product.Price.ToString("C", CultureInfo.GetCultureInfo("en-US"))</strong>
-                    <span>@Product.Detail</span>
+                    <strong>@((SelectedVariant?.Price ?? Product.DisplayPrice).ToString("C", CultureInfo.GetCultureInfo("en-US")))</strong>
+                    <span>@SelectedVariant?.DisplayName</span>
                 </div>
+                <p>SKU: @SelectedVariant?.Sku · @(SelectedVariant?.CanOrder != true ? "Currently unavailable" : SelectedVariant.StockQuantity.HasValue ? $"{SelectedVariant.StockQuantity} in stock" : "Contact us to confirm availability")</p>
                 <p>@(string.IsNullOrWhiteSpace(Product.Description) ? Product.Benefit : Product.Description)</p>
-                <a class="btn btn-gold" href="@ContactInquiryUrl">Ask about availability →</a>
+                @if (SelectedVariant?.CanOrder == true)
+                {
+                    <button type="button" class="btn btn-gold" disabled="@Adding" @onclick="AddToCart">@(Adding ? "Adding…" : "Add to bag →")</button>
+                    <a class="underlink" href="@ContactInquiryUrl">Ask a question</a>
+                }
+                @if (CartMessage is not null) { <p role="alert">@CartMessage</p> }
                 <p class="pdp-note">Product information is general education and is not intended to diagnose, treat, cure, or prevent disease.</p>
             </div>
         </section>

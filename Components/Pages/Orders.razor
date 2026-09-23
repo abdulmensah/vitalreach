@@ -1,0 +1,29 @@
+@page "/orders"
+@rendermode InteractiveServer
+<PageTitle>Your orders | VitalReach</PageTitle>
+<StorefrontHeader />
+<main class="commerce-page">
+    <h1>Your orders</h1>
+    <p>Orders placed from this browser. Keep your order number for support if you change devices or clear cookies.</p>
+    @if (Message is not null) { <p class="admin-message" role="status">@Message</p> }
+    <button class="btn btn-outline" disabled="@Busy" @onclick="Load">Refresh order status</button>
+    @foreach (var order in Items)
+    {
+        <article class="commerce-order">
+            <h2>@order.Number</h2><p>@StatusLabel(order.Status) · @order.CreatedUtc.ToString("yyyy-MM-dd")</p>
+            @foreach (var line in order.Items) { <p>@line.Quantity × @line.ProductName — @line.VariantName · @Money(line.UnitPrice * line.Quantity)</p> }
+            <p>Items: @Money(order.Subtotal) · Shipping: @Amount(order.Shipping) · Tax: @Amount(order.Tax)</p>
+            @if (order.PaymentAmount.HasValue) { <h3>Total to pay: @order.PaymentCurrency @order.PaymentAmount.Value.ToString("N2")</h3> }
+            else { <p>Shipping, tax, and final total are awaiting confirmation.</p> }
+            @if (order.PaymentCurrency == "GHS" && order.PaymentAmount.HasValue) { <p>Confirmed conversion: 1 USD = @order.ExchangeRate.ToString("0.####") GHS</p> }
+            @if (order.Status == OrderStatus.AwaitingPayment)
+            {
+                <p class="preserve-lines">@order.PaymentInstructions</p>
+                <button class="btn btn-gold" disabled="@Busy" @onclick="() => Pay(order)">Pay securely with @(order.PaymentCurrency == "GHS" ? "Paystack" : "Stripe") →</button>
+            }
+            @if (!string.IsNullOrEmpty(order.TrackingReference)) { <p>Delivery reference: @order.TrackingReference</p> }
+        </article>
+    }
+    @if (Items.Count == 0) { <p>No orders have been placed from this browser yet.</p> }
+    <a href="/shop">Continue shopping</a>
+</main>

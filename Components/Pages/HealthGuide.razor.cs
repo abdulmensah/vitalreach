@@ -6,10 +6,10 @@ public partial class HealthGuide
 {
     private static readonly GuideTopic[] GuideTopics =
     [
-        new("01", "Risk factors", "#risk"),
-        new("02", "Screening", "#screening"),
-        new("03", "Daily protection", "#protect"),
-        new("04", "Medicine safety", "#medicines")
+        new("01", "Risk factors", "/health-guide#risk"),
+        new("02", "Screening", "/health-guide#screening"),
+        new("03", "Daily protection", "/health-guide#protect"),
+        new("04", "Medicine safety", "/health-guide#medicines")
     ];
 
     private static readonly GuideCard[] RiskFactors =

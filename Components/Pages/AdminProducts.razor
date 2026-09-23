@@ -19,23 +19,33 @@
     <div class="admin-grid">
         <section class="admin-list">
             <div class="admin-list-heading">
-                <h2>Product ranking</h2>
-                <small>Top-ranked products appear first.</small>
+                <h2>Products</h2>
+                <small>@VisibleProducts.Count of @Products.Count products</small>
             </div>
-            @foreach (var product in Products)
+            <div class="catalog-filters">
+                <label>Search<input @bind="Search" @bind:event="oninput" placeholder="Name, SKU, or variant" /></label>
+                <label>Category<select @bind="CategoryFilter"><option value="">All categories</option>@foreach (var category in Categories) { <option value="@category">@category</option> }</select></label>
+                <label>Status<select @bind="StatusFilter"><option value="">All statuses</option><option value="published">Published</option><option value="hidden">Hidden</option></select></label>
+                <label>Availability<select @bind="AvailabilityFilter"><option value="">All availability</option><option value="available">Available variants</option><option value="unavailable">No available variants</option></select></label>
+                <label>Sort by<select @bind="Sort"><option value="rank">Storefront rank</option><option value="name">Name A–Z</option><option value="name-desc">Name Z–A</option><option value="price">Price low–high</option><option value="price-desc">Price high–low</option><option value="updated">Recently updated</option></select></label>
+                <button type="button" class="btn btn-outline" @onclick="ResetFilters">Reset filters</button>
+                @if (!CanRank) { <small>Reset filters and sort by storefront rank to reorder products.</small> }
+            </div>
+            @if (VisibleProducts.Count == 0) { <p class="admin-gallery-empty">No products match these filters.</p> }
+            @foreach (var product in VisibleProducts)
             {
                 <div class="admin-product-row @(Editing?.Id == product.Id ? "selected" : "")">
                     <span class="admin-product-rank" aria-label="Rank @(Products.IndexOf(product) + 1)">@(Products.IndexOf(product) + 1)</span>
                     <button class="admin-product" type="button" @onclick="() => Edit(product)">
                         <span>
                             <b>@product.Name</b>
-                            <small>@product.Category · @product.Price.ToString("C")</small>
+                            <small>@product.Category · From @product.DisplayPrice.ToString("C") · @product.Variants.Count variant(s)</small>
                         </span>
                         <i class="@(product.IsPublished ? "published" : "draft")">@(product.IsPublished ? "Published" : "Hidden")</i>
                     </button>
                     <div class="admin-rank-actions" aria-label="Change rank for @product.Name">
-                        <button type="button" title="Move up" aria-label="Move @product.Name up" disabled="@(Ranking || Products.IndexOf(product) == 0)" @onclick="() => MoveProduct(product, -1)">↑</button>
-                        <button type="button" title="Move down" aria-label="Move @product.Name down" disabled="@(Ranking || Products.IndexOf(product) == Products.Count - 1)" @onclick="() => MoveProduct(product, 1)">↓</button>
+                        <button type="button" title="Move up" aria-label="Move @product.Name up" disabled="@(!CanRank || Ranking || Products.IndexOf(product) == 0)" @onclick="() => MoveProduct(product, -1)">↑</button>
+                        <button type="button" title="Move down" aria-label="Move @product.Name down" disabled="@(!CanRank || Ranking || Products.IndexOf(product) == Products.Count - 1)" @onclick="() => MoveProduct(product, 1)">↓</button>
                     </div>
                 </div>
             }
@@ -62,13 +72,11 @@
                             Slug<InputText @bind-Value="Editing.Slug" />
                         </label>
                         <label>
-                            Price<InputNumber @bind-Value="Editing.Price" />
-                        </label>
-                        <label>
                             Category<InputText @bind-Value="Editing.Category" />
                         </label>
+                        <label>Stripe product tax code<InputText @bind-Value="Editing.TaxCode" /><small>Required for automated US tax. Select the correct code for this product.</small></label>
                         <label>
-                            Package detail<InputText @bind-Value="Editing.Detail" />
+                            Product summary<InputText @bind-Value="Editing.Detail" />
                         </label>
                         <label class="wide">
                             Benefit statement<InputTextArea @bind-Value="Editing.Benefit" />
@@ -76,6 +84,36 @@
                         <label class="wide">
                             Full product description<InputTextArea @bind-Value="Editing.Description" />
                         </label>
+                        <section class="variant-editor wide">
+                            <h2>Sellable variants</h2>
+                            <p>Add only combinations you sell. Leave stock blank when availability must be confirmed; zero means out of stock.</p>
+                            @foreach (var variant in Editing.Variants)
+                            {
+                                <fieldset @key="variant">
+                                    <legend>@variant.Name</legend>
+                                    <div class="form-grid">
+                                        <label>Variant name<InputText @bind-Value="variant.Name" /></label>
+                                        <label>SKU<InputText @bind-Value="variant.Sku" /></label>
+                                        <label>Price (USD)<InputNumber @bind-Value="variant.Price" /></label>
+                                        <label>Stock quantity<InputNumber @bind-Value="variant.StockQuantity" /></label>
+                                        <label>Format (capsules, tablets, powder…)<InputText @bind-Value="variant.Format" /></label>
+                                        <label>Item count<InputNumber @bind-Value="variant.Count" /></label>
+                                        <label>Strength (for example 200 mg)<InputText @bind-Value="variant.Strength" /></label>
+                                        <label>Color<InputText @bind-Value="variant.Color" /></label>
+                                        <label>Size<InputText @bind-Value="variant.Size" /></label>
+                                        <label>Flavor or scent<InputText @bind-Value="variant.Flavor" /></label>
+                                        <label>Material<InputText @bind-Value="variant.Material" /></label>
+                                        <label>Net contents<InputNumber @bind-Value="variant.NetContent" /></label>
+                                        <label>Net contents unit<InputSelect @bind-Value="variant.NetContentUnit"><option value="">None</option>@foreach (var unit in VariantValidation.ContentUnits) { <option value="@unit">@unit</option> }</InputSelect></label>
+                                        <label>Shipping weight (g)<InputNumber @bind-Value="variant.ShippingWeightGrams" /></label>
+                                        <label class="wide">Variant image URL (optional)<InputText @bind-Value="variant.ImageUrl" /><small>Leave empty to use the product image.</small></label>
+                                        <label class="check"><InputCheckbox @bind-Value="variant.IsAvailable" /> Available for enquiries</label>
+                                    </div>
+                                    <button type="button" class="danger-button" disabled="@(Editing.Variants.Count == 1 || Saving)" @onclick="() => RemoveVariant(variant)">Remove variant</button>
+                                </fieldset>
+                            }
+                            <button type="button" class="btn btn-outline" disabled="@Saving" @onclick="AddVariant">Add variant</button>
+                        </section>
                         <label class="wide">
                             Product image<InputFile OnChange="SelectImage" accept="image/jpeg,image/png,image/webp" />
                             <small>JPG, PNG, or WebP · maximum 5 MB. The image is uploaded when you save.</small>

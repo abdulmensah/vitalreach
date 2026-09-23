@@ -18,7 +18,10 @@ public partial class AdminContacts
     private async Task LoadAsync()
     {
         await using var db = await DbFactory.CreateDbContextAsync();
-        Submissions = await db.ContactSubmissions.AsNoTracking().OrderBy(x => x.IsRead).ThenByDescending(x => x.CreatedUtc).ToListAsync();
+        // SQLite cannot order DateTimeOffset values. Sort after materializing so offsets
+        // are compared as actual instants without changing existing stored timestamps.
+        var submissions = await db.ContactSubmissions.AsNoTracking().ToListAsync();
+        Submissions = submissions.OrderBy(x => x.IsRead).ThenByDescending(x => x.CreatedUtc).ThenByDescending(x => x.Id).ToList();
     }
 
     private async Task ToggleReadAsync(ContactSubmission selected)

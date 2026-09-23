@@ -27,6 +27,48 @@ namespace VitalReach.Web.Components.Pages
         private bool Ranking;
         private bool SavingGalleryImage;
         private string AdminEmail = "";
+        private string Search = "";
+        private string CategoryFilter = "";
+        private string StatusFilter = "";
+        private string AvailabilityFilter = "";
+        private string Sort = "rank";
+        private bool CanRank => Sort == "rank" && string.IsNullOrWhiteSpace(Search)
+            && CategoryFilter == "" && StatusFilter == "" && AvailabilityFilter == "";
+        private IEnumerable<string> Categories => Products.Select(p => p.Category).Distinct().OrderBy(c => c);
+        private List<ProductEntity> VisibleProducts
+        {
+            get
+            {
+                var term = Search.Trim();
+                var query = Products.Where(p => (term.Length == 0 ||
+                    p.Name.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+                    p.Slug.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+                    p.Category.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+                    p.Variants.Any(v => v.Sku.Contains(term, StringComparison.OrdinalIgnoreCase)
+                        || v.DisplayName.Contains(term, StringComparison.OrdinalIgnoreCase)))
+                    && (CategoryFilter == "" || p.Category == CategoryFilter)
+                    && (StatusFilter == "" || p.IsPublished == (StatusFilter == "published"))
+                    && (AvailabilityFilter == "" || p.Variants.Any(v => v.CanOrder) == (AvailabilityFilter == "available")));
+                return (Sort switch
+                {
+                    "name" => query.OrderBy(p => p.Name),
+                    "name-desc" => query.OrderByDescending(p => p.Name),
+                    "price" => query.OrderBy(p => p.DisplayPrice),
+                    "price-desc" => query.OrderByDescending(p => p.DisplayPrice),
+                    "updated" => query.OrderByDescending(p => p.UpdatedUtc),
+                    _ => query.OrderBy(p => p.SortOrder)
+                }).ThenBy(p => p.Name).ThenBy(p => p.Id).ToList();
+            }
+        }
+        private void ResetFilters() { Search = CategoryFilter = StatusFilter = AvailabilityFilter = ""; Sort = "rank"; }
+        private void AddVariant()
+        {
+            Editing?.Variants.Add(new ProductVariant { Sku = $"VR-{Guid.NewGuid():N}"[..15].ToUpperInvariant() });
+        }
+        private void RemoveVariant(ProductVariant variant)
+        {
+            if (Editing?.Variants.Count > 1) Editing.Variants.Remove(variant);
+        }
         protected override async Task OnInitializedAsync()
         {
             var state = await AuthenticationStateProvider.GetAuthenticationStateAsync();
@@ -37,7 +79,7 @@ namespace VitalReach.Web.Components.Pages
         private async Task Load()
         {
             await using var db = await DbFactory.CreateDbContextAsync();
-            Products = await db.Products.AsNoTracking().OrderBy(x => x.SortOrder).ThenBy(x => x.Name).ToListAsync();
+            Products = await db.Products.AsNoTracking().Include(x => x.Variants).OrderBy(x => x.SortOrder).ThenBy(x => x.Name).ToListAsync();
         }
 
         private void NewProduct()
@@ -53,6 +95,7 @@ namespace VitalReach.Web.Components.Pages
             SelectedGalleryImage = null;
             GalleryImages = [];
             GalleryAltText = "";
+            AddVariant();
         }
 
         private async Task Edit(ProductEntity product, bool clearMessage = true)
@@ -64,6 +107,7 @@ namespace VitalReach.Web.Components.Pages
                 Name = product.Name,
                 Price = product.Price,
                 Category = product.Category,
+                TaxCode = product.TaxCode,
                 Benefit = product.Benefit,
                 Description = product.Description,
                 Detail = product.Detail,
@@ -74,7 +118,8 @@ namespace VitalReach.Web.Components.Pages
                 ImageUrl = product.ImageUrl,
                 IsPublished = product.IsPublished,
                 SortOrder = product.SortOrder,
-                UpdatedUtc = product.UpdatedUtc
+                UpdatedUtc = product.UpdatedUtc,
+                Variants = product.Variants.Select(v => v.Copy()).ToList()
             };
             if (clearMessage)
             {
@@ -103,6 +148,8 @@ namespace VitalReach.Web.Components.Pages
         private async Task Save()
         {
             if (Editing is null) return;
+            var validationError = VariantValidation.Validate(Editing.Variants);
+            if (validationError is not null) { IsError = true; Message = validationError; return; }
             Saving = true;
             Editing.UpdatedUtc = DateTimeOffset.UtcNow;
             await using var db = await DbFactory.CreateDbContextAsync();
@@ -112,12 +159,43 @@ namespace VitalReach.Web.Components.Pages
             string? uploadedImageUrl = null;
             try
             {
+                var skus = Editing.Variants.Select(v => v.Sku).ToArray();
+                if (await db.ProductVariants.AnyAsync(v => v.ProductId != Editing.Id && skus.Contains(v.Sku)))
+                    throw new InvalidOperationException("A variant SKU is already used by another product. Choose a unique SKU.");
                 if (SelectedImage is not null)
                 {
                     uploadedImageUrl = await ImageStorage.SaveAsync(SelectedImage);
                     Editing.ImageUrl = uploadedImageUrl;
                 }
-                if (Editing.Id == 0) db.Products.Add(Editing); else db.Products.Update(Editing);
+                // Keep the legacy price in sync for older integrations; variants own pricing.
+                Editing.Price = Editing.DisplayPrice;
+                if (Editing.Id == 0) db.Products.Add(Editing);
+                else
+                {
+                    var existing = await db.Products.Include(p => p.Variants).SingleAsync(p => p.Id == Editing.Id);
+                    foreach (var original in existing.Variants)
+                    {
+                        var edited = Editing.Variants.FirstOrDefault(v => v.Id == original.Id);
+                        if (edited is not null && edited.Version != original.Version)
+                            throw new InvalidOperationException("Variant stock or details changed while you were editing. Reopen the product before saving.");
+                        if ((edited is null || edited.StockQuantity != original.StockQuantity) &&
+                            await db.CommerceOrderItems.AnyAsync(i => i.VariantId == original.Id && i.StockReserved &&
+                                db.CommerceOrders.Any(o => o.Id == i.OrderId && (o.Status == OrderStatus.AwaitingPayment || o.Status == OrderStatus.Paid))))
+                            throw new InvalidOperationException("This variant has reserved order stock. Fulfill or cancel those orders before removing it or adjusting stock.");
+                    }
+                    db.Entry(existing).CurrentValues.SetValues(Editing);
+                    foreach (var removed in existing.Variants.Where(v => Editing.Variants.All(e => e.Id != v.Id)).ToList())
+                        db.ProductVariants.Remove(removed);
+                    foreach (var variant in Editing.Variants)
+                    {
+                        if (variant.Id == 0) existing.Variants.Add(variant.Copy());
+                        else
+                        {
+                            var updatedVariant = variant.Copy(); updatedVariant.Version++;
+                            db.Entry(existing.Variants.Single(v => v.Id == variant.Id)).CurrentValues.SetValues(updatedVariant);
+                        }
+                    }
+                }
                 await db.SaveChangesAsync();
                 IsError = false;
                 Message = $"Product “{Editing.Name}” has been saved successfully.";
@@ -131,7 +209,7 @@ namespace VitalReach.Web.Components.Pages
                 await ImageStorage.DeleteAsync(uploadedImageUrl);
                 Editing.ImageUrl = previousImageUrl;
                 IsError = true;
-                Message = "That slug is already in use. Choose a unique slug.";
+                Message = "The product could not be saved. Check that the slug and every variant SKU are unique, then try again.";
             }
             catch (InvalidOperationException exception)
             {
@@ -156,6 +234,11 @@ namespace VitalReach.Web.Components.Pages
             await using var db = await DbFactory.CreateDbContextAsync();
             var product = await db.Products.FindAsync(Editing.Id);
             if (product is null) return;
+            if (await db.CommerceOrderItems.AnyAsync(i => db.ProductVariants.Any(v => v.Id == i.VariantId && v.ProductId == product.Id)
+                && i.StockReserved && db.CommerceOrders.Any(o => o.Id == i.OrderId && (o.Status == OrderStatus.AwaitingPayment || o.Status == OrderStatus.Paid))))
+            {
+                IsError = true; Message = "This product has reserved order stock. Fulfill or cancel those orders before deleting it."; return;
+            }
             var galleryImageUrls = await db.ProductImages.Where(image => image.ProductId == product.Id).Select(image => image.ImageUrl).ToListAsync();
             db.Products.Remove(product);
             await db.SaveChangesAsync();
@@ -171,7 +254,7 @@ namespace VitalReach.Web.Components.Pages
 
         private async Task MoveProduct(ProductEntity product, int direction)
         {
-            if (Ranking || direction is < -1 or > 1 || direction == 0) return;
+            if (!CanRank || Ranking || direction is < -1 or > 1 || direction == 0) return;
             var currentIndex = Products.FindIndex(candidate => candidate.Id == product.Id);
             var targetIndex = currentIndex + direction;
             if (currentIndex < 0 || targetIndex < 0 || targetIndex >= Products.Count) return;

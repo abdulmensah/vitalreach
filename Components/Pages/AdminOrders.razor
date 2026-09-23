@@ -1,0 +1,60 @@
+@page "/admin/orders"
+@rendermode InteractiveServer
+@attribute [Authorize(Policy = "Admin")]
+<PageTitle>Orders | VitalReach administration</PageTitle>
+<AdminPortalLayout ActiveSection="orders">
+    <h1>Orders</h1>
+    @if (Message is not null) { <p class="admin-message" role="status">@Message</p> }
+    <div class="catalog-filters">
+        <label>Search<input @bind="Search" @bind:event="oninput" placeholder="Order, customer, email, SKU" /></label>
+        <label>Status<select @bind="Status"><option value="">All statuses</option>@foreach (var status in Enum.GetValues<OrderStatus>()) { <option value="@status">@Orders.StatusLabel(status)</option> }</select></label>
+        <button class="btn btn-outline" disabled="@Busy" @onclick="Load">Refresh</button>
+    </div>
+    <div class="admin-grid">
+        <section class="admin-list">
+            @foreach (var order in Filtered) { <button class="admin-product" disabled="@Busy" @onclick="() => Select(order)"><span><b>@order.Number</b><small>@order.CustomerName · @Orders.StatusLabel(order.Status)</small></span><span>@Money(order.Subtotal)</span></button> }
+            @if (!Filtered.Any()) { <p>No matching orders.</p> }
+        </section>
+        <section class="admin-editor">
+            @if (Selected is not null)
+            {
+                <h2>@Selected.Number</h2><p>@Orders.StatusLabel(Selected.Status) · @Selected.CreatedUtc.ToString("u")</p>
+                <p>@Selected.CustomerName · @Selected.Email · @Selected.Phone</p>
+                <p>@Selected.Address, @Selected.City, @Selected.Region, @Selected.PostalCode, @Selected.Country</p>
+                <p>@Selected.Notes</p>
+                @foreach (var line in Selected.Items) { <p>@line.Quantity × @line.ProductName — @line.VariantName (@line.Sku) · @Money(line.UnitPrice * line.Quantity)</p> }
+                <h3>Items subtotal: @Money(Selected.Subtotal)</h3>
+                @if (Selected.Status == OrderStatus.QuoteRequested)
+                {
+                    <p>Confirm stock, a delivery quote, and the applicable jurisdictional tax before issuing a payable quote. Amounts below are USD.</p>
+                    <div class="form-grid">
+                        <label>Confirmed shipping (USD)<input type="number" min="0" step="0.01" @bind="Shipping" /></label>
+                        <label>Applicable tax (USD)<input type="number" min="0" step="0.01" @bind="Tax" /></label>
+                        <label>USD-to-GHS rate (Ghana only)<input type="number" min="0.0001" step="0.0001" @bind="ExchangeRate" disabled="@(Selected.Country == "US")" /></label>
+                        <label class="wide">Tax review / evidence<textarea @bind="TaxEvidence" maxlength="2000"></textarea></label>
+                        <label class="wide">Customer quote instructions<textarea @bind="Instructions" maxlength="2000"></textarea></label>
+                    </div>
+                    @if (Selected.Country == "US") { <button class="btn btn-outline" disabled="@Busy" @onclick="CalculateTax">Calculate US tax</button> }
+                    <button class="btn btn-gold" disabled="@Busy" @onclick='() => Act("quote")'>Confirm quote &amp; reserve stock</button>
+                }
+                else
+                {
+                    <p>Shipping: @Selected.Shipping · Tax: @Selected.Tax · Total: @Selected.PaymentCurrency @Selected.PaymentAmount</p>
+                    <p>Tax evidence: @Selected.TaxEvidence</p>
+                    <p>Payment reference: @Selected.PaymentReference</p>
+                }
+                @if (Selected.Status is OrderStatus.Paid or OrderStatus.AwaitingPayment)
+                {
+                    <label class="variant-picker">@(Selected.Status == OrderStatus.Paid ? "Carrier/tracking or collection reference" : "Verified offline payment reference")<input @bind="Reference" maxlength="250" /></label>
+                    @if (Selected.Status == OrderStatus.Paid) { <button class="btn btn-gold" disabled="@Busy" @onclick='() => Act("ship")'>Mark shipped / collected</button> }
+                    else { <button class="btn btn-outline" disabled="@Busy" @onclick='() => Act("paid")'>Record verified offline payment</button> }
+                }
+                @if (Selected.Status is OrderStatus.QuoteRequested or OrderStatus.AwaitingPayment)
+                { <button class="danger-button" disabled="@Busy" @onclick='() => Act("cancel")'>Cancel unpaid order &amp; release stock</button> }
+                <h3>Order history</h3>
+                @foreach (var item in Selected.Events.OrderByDescending(x => x.CreatedUtc)) { <p>@item.CreatedUtc.ToString("u") · @item.Actor · @item.Description</p> }
+            }
+            else { <p>Select an order to review and fulfill it.</p> }
+        </section>
+    </div>
+</AdminPortalLayout>
