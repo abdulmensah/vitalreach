@@ -233,7 +233,7 @@ button {
     }
 
 .hero-visual {
-    background: var(--deep) url(/images/vitalreach-hero-landscape-composite.jpg) center/cover no-repeat;
+    background: var(--deep) url(/images/vitalreach-hero-black-jacket.jpeg) center/cover no-repeat;
     position: relative
 }
 
