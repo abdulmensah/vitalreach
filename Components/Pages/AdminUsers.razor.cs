@@ -2,6 +2,7 @@
 #nullable enable
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using VitalReach.Web.Data;
 
@@ -11,6 +12,7 @@ namespace VitalReach.Web.Components.Pages
     {
         [Inject] IDbContextFactory<CatalogDbContext> DbFactory { get; set; } = default!;
         [Inject] AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
+        [Inject] IAuthorizationService Authorization { get; set; } = default!;
 
         private List<AdminUser> Users = [];
         private AdminUser NewUser = new();
@@ -27,6 +29,7 @@ namespace VitalReach.Web.Components.Pages
 
         private async Task Load()
         {
+            if (!await CanManage()) return;
             await using var db = await DbFactory.CreateDbContextAsync();
             Users = await db.AdminUsers.AsNoTracking().OrderByDescending(x => x.IsActive).ThenBy(x => x.DisplayName).ToListAsync();
         }
@@ -42,6 +45,7 @@ namespace VitalReach.Web.Components.Pages
 
         private async Task AddUser()
         {
+            if (!await CanManage()) return;
             await using var db = await DbFactory.CreateDbContextAsync();
             var email = NewUser.Email.Trim().ToLowerInvariant();
             if (await db.AdminUsers.AnyAsync(x => x.NormalizedEmail == email.ToUpper()))
@@ -59,9 +63,12 @@ namespace VitalReach.Web.Components.Pages
 
         private async Task Toggle(AdminUser selected)
         {
+            if (!await CanManage()) return;
             await using var db = await DbFactory.CreateDbContextAsync();
             var user = await db.AdminUsers.FindAsync(selected.Id);
             if (user is null) return;
+            if (user.NormalizedEmail == CurrentEmail.ToUpperInvariant()) { Error("You cannot disable your own account."); return; }
+            if (user.IsActive && user.IsSuperAdmin && await db.AdminUsers.CountAsync(x => x.IsActive && x.IsSuperAdmin) <= 1) { Error("At least one active superadmin is required."); return; }
             if (user.IsActive && await db.AdminUsers.CountAsync(x => x.IsActive) <= 1)
             {
                 Error("At least one active administrator is required.");
@@ -76,9 +83,12 @@ namespace VitalReach.Web.Components.Pages
 
         private async Task Delete(AdminUser selected)
         {
+            if (!await CanManage()) return;
             await using var db = await DbFactory.CreateDbContextAsync();
             var user = await db.AdminUsers.FindAsync(selected.Id);
             if (user is null) return;
+            if (user.NormalizedEmail == CurrentEmail.ToUpperInvariant()) { Error("You cannot remove your own account."); return; }
+            if (user.IsActive && user.IsSuperAdmin && await db.AdminUsers.CountAsync(x => x.IsActive && x.IsSuperAdmin) <= 1) { Error("The last active superadmin cannot be removed."); return; }
             if (user.IsActive && await db.AdminUsers.CountAsync(x => x.IsActive) <= 1)
             {
                 Error("The last active administrator cannot be removed.");
@@ -87,6 +97,30 @@ namespace VitalReach.Web.Components.Pages
             db.AdminUsers.Remove(user);
             await db.SaveChangesAsync();
             Success($"Administrator “{user.Email}” has been removed successfully.");
+            await Load();
+        }
+
+        private async Task<bool> CanManage()
+        {
+            var state = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            if ((await Authorization.AuthorizeAsync(state.User, null, "SuperAdmin")).Succeeded) return true;
+            Users = []; Adding = false; Error("Active superadmin access is required."); return false;
+        }
+
+        private async Task ToggleRole(AdminUser selected, bool superadmin)
+        {
+            if (!await CanManage()) return;
+            await using var db = await DbFactory.CreateDbContextAsync();
+            var user = await db.AdminUsers.FindAsync(selected.Id);
+            if (user is null) return;
+            if (superadmin && user.NormalizedEmail == CurrentEmail.ToUpperInvariant()) { Error("You cannot revoke your own superadmin role."); return; }
+            if (superadmin) user.IsSuperAdmin = !user.IsSuperAdmin;
+            else user.IsClinicalReviewer = !user.IsClinicalReviewer;
+            user.UpdatedBy = CurrentEmail; user.UpdatedUtc = DateTimeOffset.UtcNow;
+            db.ConsultationAudits.Add(new ConsultationAudit { Reviewer = CurrentEmail, CreatedUtc = DateTime.UtcNow,
+                Action = $"Access: {user.Email}; clinical={user.IsClinicalReviewer}; superadmin={user.IsSuperAdmin}" });
+            await db.SaveChangesAsync();
+            Success("Access updated. Clinical permissions are checked again on every record operation.");
             await Load();
         }
 

@@ -1,6 +1,6 @@
 @page "/admin/users"
 @rendermode InteractiveServer
-@attribute [Authorize(Policy = "Admin")]
+@attribute [Authorize(Policy = "SuperAdmin")]
 
 <PageTitle>Administrator access | VitalReach</PageTitle>
 <AdminPortalLayout ActiveSection="users">
@@ -8,7 +8,7 @@
         <div>
             <p class="eyebrow">Secure administration</p>
             <h1>Administrator access</h1>
-            <p>Google verifies identity; this list controls who may enter the portal.</p>
+            <p>Superadmins manage portal access. Clinical reviewer access is granted separately and allows viewing sensitive health records.</p>
         </div>
         <button class="btn btn-gold" @onclick="StartAdd">Add administrator</button>
     </header>
@@ -53,6 +53,7 @@
                 </span>
                 <span>
                     <i class="@(user.IsActive ? "published" : "draft")">@(user.IsActive ? "Active" : "Disabled")</i>
+                    <small>@(user.IsSuperAdmin ? "Superadmin" : "Administrator") · @(user.IsClinicalReviewer ? "Clinical reviewer" : "No clinical access")</small>
                 </span>
                 <span>
                     <small>@user.CreatedUtc.ToLocalTime().ToString("MMM d, yyyy")<br>by @user.CreatedBy</small>
@@ -60,6 +61,8 @@
                 <span class="access-actions">
                     <button @onclick="() => Toggle(user)">@(user.IsActive ? "Disable" : "Enable")</button>
                     <button class="delete" @onclick="() => Delete(user)">Remove</button>
+                    <button @onclick="() => ToggleRole(user, false)">@(user.IsClinicalReviewer ? "Revoke clinical access" : "Grant clinical access")</button>
+                    <button @onclick="() => ToggleRole(user, true)">@(user.IsSuperAdmin ? "Revoke superadmin" : "Grant superadmin")</button>
                 </span>
             </article>
         }

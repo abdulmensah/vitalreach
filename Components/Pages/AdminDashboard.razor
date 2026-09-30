@@ -23,11 +23,11 @@
             <strong>@UnreadMessageCount</strong>
             <small>@MessageCount total messages</small>
         </a>
-        <a href="/admin/users">
+        <AuthorizeView Policy="SuperAdmin"><a href="/admin/users">
             <span>Administrators</span>
             <strong>@ActiveAdminCount</strong>
             <small>Active accounts</small>
-        </a>
+        </a></AuthorizeView>
         <a href="/admin/headquarters">
             <span>Headquarters</span>
             <strong class="status-word">@HeadquartersStatus</strong>
@@ -45,6 +45,7 @@
                 <span>Add products, upload images, set prices, and control publishing.</span>
                 <em>Manage products →</em>
             </a>
+            <AuthorizeView Policy="ClinicalReviewer"><a href="/admin/consultations"><b>Clinical intake</b><span>Review consultation forms and screening flags; download the reception QR code.</span><em>Open clinical inbox →</em></a></AuthorizeView>
             <a href="/admin/contacts">
                 <b>Customer messages</b>
                 <span>Read and respond to enquiries from the public contact form.</span>
@@ -55,11 +56,11 @@
                 <span>Update the headquarters details shown across the website.</span>
                 <em>Edit location →</em>
             </a>
-            <a href="/admin/users">
+            <AuthorizeView Policy="SuperAdmin"><a href="/admin/users">
                 <b>Portal access</b>
                 <span>Choose which Google-authenticated users can administer the site.</span>
                 <em>Manage access →</em>
-            </a>
+            </a></AuthorizeView>
         </div>
     </section>
 </AdminPortalLayout>
