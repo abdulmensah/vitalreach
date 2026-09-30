@@ -1,0 +1,52 @@
+@page "/admin/consultations"
+@rendermode InteractiveServer
+@attribute [Authorize(Policy = "ClinicalReviewer")]
+
+<PageTitle>Clinical intake | VitalReach</PageTitle>
+<AdminPortalLayout ActiveSection="consultations">
+    <header class="admin-title"><div><p class="eyebrow">Authorized clinical reviewers</p><h1>Consultation intake</h1><p>Review patient-reported information and document your assessment. Automated flags are decision support, not diagnoses.</p></div></header>
+    <section class="intake-card"><h2>Visitor QR code</h2><p>Print or download this code for reception. It opens the blank intake form and contains no patient information.</p>
+        @if (Intake.PublicUrl is { } url)
+        { <img class="intake-qr" src="/admin/consultations/qr.svg" alt="Scan to open the VitalReach consultation intake" /><p><a href="@url">@url</a></p><a href="/admin/consultations/qr.svg" download="vitalreach-consultation-qr.svg">Download printable QR code</a> }
+        else { <p>Set Intake:PublicUrl to the center's HTTPS website address to generate the QR code.</p> }
+        @if (!Intake.Enabled) { <p><strong>Public submissions are disabled.</strong> Configure reviewer access and enable intake after clinical and privacy review.</p> }
+    </section>
+    @if (Message.Length > 0) { <div class="intake-alert" role="status">@Message</div> }
+    <section class="intake-card"><div class="intake-toolbar"><label>Status<select @bind="Status" @bind:after="ResetPageAsync"><option>Awaiting review</option><option>In review</option><option>Reviewed</option><option>All</option></select></label><button @onclick="LoadAsync" disabled="@Busy">Refresh</button></div>
+        <p>Sorted by urgency, then newest first. Times shown in UTC. Staff must actively monitor this list; it does not send emergency notifications.</p>
+        @if (Rows.Count == 0) { <p>No submissions in this view.</p> }
+        @foreach (var row in Rows)
+        { <article class="intake-list-row"><div><strong>@IntakeScreening.PriorityLabel(row.Priority)</strong><p>@row.CreatedUtc.ToString("yyyy-MM-dd HH:mm") UTC · @row.Status</p><small>@row.Id</small></div><button @onclick="() => OpenAsync(row.Id)" disabled="@Busy">Review</button></article> }
+        <div class="intake-toolbar"><button disabled="@(Page == 0 || Busy)" @onclick="PreviousAsync">Previous</button><span>Page @(Page + 1)</span><button disabled="@(Rows.Count < 25 || Busy)" @onclick="NextAsync">Next</button></div>
+    </section>
+    @if (Selected is { } selected)
+    {
+        var entry = selected.Content.Entry;
+        <section class="intake-card"><div class="intake-toolbar"><h2>@entry.Name</h2><button @onclick="Close">Close record</button></div>
+            <p>Age @entry.Age · @entry.Sex · Pregnancy / postpartum: @entry.Pregnancy</p><p>Contact: @(entry.Contact.Length > 0 ? entry.Contact : "Not supplied")</p>
+            <p>Received @selected.Record.CreatedUtc.ToString("u") · Reference @selected.Record.Id</p>
+            <h3>Screening flags</h3>
+            @foreach (var flag in selected.Content.Flags)
+            { <article class="intake-flag priority-@flag.Priority"><strong>@IntakeScreening.PriorityLabel(flag.Priority): @flag.Title</strong><p>@flag.Evidence</p><small>Rule: @flag.Rule</small>@if (flag.Source.Length > 0) { <p><a href="@flag.Source" target="_blank" rel="noopener noreferrer">Clinical reference ↗</a></p> }</article> }
+            <h3>Safety responses</h3>
+            <dl class="intake-responses">@foreach (var q in IntakeCatalog.Safety) { <dt>@q.Label</dt><dd>@entry.Answers.GetValueOrDefault(q.Id, "Unknown")</dd> }</dl>
+            @foreach (var form in IntakeCatalog.Forms.Where(f => entry.Forms.Contains(f.Id)))
+            { <details><summary>@form.Title — @form.SourceId</summary>@foreach (var section in form.Sections) { <h3>@section.Title</h3><dl class="intake-responses">@foreach (var q in section.Questions) { <dt>@q.Label</dt><dd>@entry.Answers.GetValueOrDefault(q.Id, "Unknown")</dd> }</dl> }</details> }
+            <details><summary>Recorded measurements and medicines</summary>
+                <h3>Blood pressure</h3>@foreach (var bp in entry.BloodPressure.Where(b => b.Systolic.HasValue)) { <p>@bp.Date?.ToString("yyyy-MM-dd"): @bp.Systolic / @bp.Diastolic mmHg</p> }
+                <h3>Glucose</h3>@foreach (var g in entry.Glucose.Where(g => g.Value.HasValue)) { <p>@g.Date?.ToString("yyyy-MM-dd"): @g.Value @g.Unit (@g.Type)</p> }
+                <p>HbA1c: @(entry.Hba1c?.ToString() ?? "Unknown") % — @entry.Hba1cDate?.ToString("yyyy-MM-dd")</p>
+                <p>eGFR: @(entry.Egfr?.ToString() ?? "Unknown") mL/min/1.73 m² — @entry.EgfrDate?.ToString("yyyy-MM-dd")</p>
+                <p>uACR: @(entry.Uacr?.ToString() ?? "Unknown") mg/g — @entry.UacrDate?.ToString("yyyy-MM-dd")</p>
+                @foreach (var m in entry.Medications) { <p><strong>@m.Name</strong>: @m.Using · Dose / frequency: @m.Dose · Duration: @m.Duration · Source: @m.Source</p> }
+            </details>
+            <h3>Visitor notes</h3><p class="intake-preserve">@(entry.Notes.Length > 0 ? entry.Notes : "None supplied")</p>
+            <p class="intake-muted">Consent @selected.Content.ConsentedUtc.ToString("u") · consent version @selected.Content.ConsentVersion · form version @selected.Content.FormVersion · rules version @selected.Content.RuleVersion</p>
+            @if (selected.Review is { } review) { <p>Last reviewed by @review.Reviewer at @review.ReviewedUtc.ToString("u")</p> }
+            <h3>Clinical assessment and plan</h3><p>Document examination findings, interpretation, referral urgency, follow-up, and facility/unit as appropriate. Screening outcomes are determined by the clinician.</p>
+            <label>Review status<select @bind="ReviewStatus"><option>In review</option><option>Reviewed</option></select></label>
+            <label>Assessment and action taken<textarea @bind="ReviewNotes" maxlength="4000" rows="6"></textarea></label>
+            <button class="btn btn-gold" @onclick="SaveAsync" disabled="@Busy">Save clinical review</button>
+        </section>
+    }
+</AdminPortalLayout>

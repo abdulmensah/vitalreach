@@ -27,6 +27,8 @@ builder.Services.AddScoped<CartSession>();
 builder.Services.AddScoped<CommerceService>();
 builder.Services.AddScoped<PaymentService>();
 builder.Services.AddScoped<TaxQuoteService>();
+builder.Services.AddScoped<IntakeService>();
+builder.Services.AddSingleton<IntakeSubmissionLimiter>();
 builder.Services.AddHttpClient("payments", client => client.Timeout = TimeSpan.FromSeconds(30));
 var googleClientId = builder.Configuration["Authentication:Google:ClientId"];
 var googleClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
@@ -56,6 +58,12 @@ if (googleConfigured)
     });
 }
 builder.Services.AddScoped<IAuthorizationHandler, DatabaseAdminAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, ClinicalReviewerAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, SuperAdminAuthorizationHandler>();
+builder.Services.AddAuthorizationBuilder().AddPolicy("SuperAdmin", policy =>
+    policy.RequireAuthenticatedUser().AddRequirements(new SuperAdminRequirement()));
+builder.Services.AddAuthorizationBuilder().AddPolicy("ClinicalReviewer", policy =>
+    policy.RequireAuthenticatedUser().AddRequirements(new ClinicalReviewerRequirement()));
 builder.Services.AddAuthorizationBuilder().AddPolicy("Admin", policy =>
     policy.RequireAuthenticatedUser().AddRequirements(new DatabaseAdminRequirement()));
 
@@ -66,6 +74,16 @@ app.UseForwardedHeaders();
 if (!app.Environment.IsDevelopment()) { app.UseExceptionHandler("/Error", createScopeForErrors: true); app.UseHsts(); }
 
 app.UseHttpsRedirection();
+app.Use(async (context, next) =>
+{
+    if (context.Request.Path.StartsWithSegments("/consultation-intake") || context.Request.Path.StartsWithSegments("/admin/consultations"))
+    {
+        context.Response.Headers.CacheControl = "no-store";
+        context.Response.Headers["Referrer-Policy"] = "no-referrer";
+        context.Response.Headers["X-Robots-Tag"] = "noindex, nofollow";
+    }
+    await next(context);
+});
 app.Use(async (context, next) =>
 {
     var protection = context.RequestServices.GetRequiredService<IDataProtectionProvider>();
@@ -109,6 +127,14 @@ app.MapGet("/auth/logout", () => Results.SignOut(
     new Microsoft.AspNetCore.Authentication.AuthenticationProperties { RedirectUri = "/" },
     [CookieAuthenticationDefaults.AuthenticationScheme]));
 app.MapGet("/health", () => Results.Ok(new { status = "healthy", service = "vitalreach-qa" }));
+app.MapGet("/admin/consultations/qr.svg", (IntakeService intake) =>
+{
+    if (intake.PublicUrl is not { } url) return Results.Problem("Configure Intake:PublicUrl with the center's HTTPS website address.", statusCode: 503);
+    using var generator = new QRCoder.QRCodeGenerator();
+    using var data = generator.CreateQrCode(url, QRCoder.QRCodeGenerator.ECCLevel.Q);
+    using var qr = new QRCoder.SvgQRCode(data);
+    return Results.Text(qr.GetGraphic(10), "image/svg+xml");
+}).RequireAuthorization("ClinicalReviewer");
 app.MapPost("/payments/{provider}/webhook", async (string provider, HttpRequest request, PaymentService payments) =>
 {
     if (provider is not ("stripe" or "paystack")) return Results.NotFound();

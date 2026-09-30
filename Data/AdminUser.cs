@@ -9,6 +9,8 @@ public sealed class AdminUser
     [Required, MaxLength(254)] public string NormalizedEmail { get; set; } = "";
     [MaxLength(120)] public string DisplayName { get; set; } = "";
     public bool IsActive { get; set; } = true;
+    public bool IsClinicalReviewer { get; set; }
+    public bool IsSuperAdmin { get; set; }
     public DateTimeOffset CreatedUtc { get; set; } = DateTimeOffset.UtcNow;
     [MaxLength(254)] public string CreatedBy { get; set; } = "";
     public DateTimeOffset UpdatedUtc { get; set; } = DateTimeOffset.UtcNow;

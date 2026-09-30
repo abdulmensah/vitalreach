@@ -1,0 +1,105 @@
+@page "/consultation-intake"
+@rendermode InteractiveServer
+
+<PageTitle>Consultation intake | VitalReach</PageTitle>
+<StorefrontHeader />
+<main class="intake-page">
+    <header><p class="eyebrow">VitalReach wellness center</p><h1>Prepare for your consultation</h1>
+        <p>Choose the checklists your practitioner requested. Answer what you know and leave anything uncertain as “Unknown.” This adult intake supports a conversation with a clinician; it does not diagnose disease.</p></header>
+    <aside class="intake-alert" role="note"><strong>Need urgent help?</strong> Chest pain now, severe breathing difficulty, sudden stroke symptoms, confusion or immediate danger of self-harm need help now. Tell staff or call local emergency services. Do not wait for this form or an inbox response.</aside>
+    @if (!Intake.Enabled)
+    {
+        <section class="intake-card"><h2>Online intake is not open yet</h2><p>Please speak to wellness center staff to arrange your assessment.</p></section>
+    }
+    else if (Reference is not null)
+    {
+        <section class="intake-card" role="status"><h2>Your intake has been received</h2><p>Tell the receptionist that you have submitted your forms. A clinical reviewer will assess them during your consultation.</p><p>Reference: <strong>@Reference</strong></p><p>No diagnosis has been made. This inbox is not an emergency service.</p></section>
+        @foreach (var flag in SubmittedFlags.Where(f => f.Priority >= 2))
+        { <aside class="intake-alert"><strong>@flag.Title</strong></aside> }
+        <a class="btn btn-gold" href="/wellness-center" data-enhance-nav="false">Return to the wellness center</a>
+    }
+    else
+    {
+        <EditForm EditContext="FormContext" OnSubmit="SubmitAsync" FormName="consultation-intake">
+            <fieldset disabled="@Busy">
+                <section class="intake-card"><h2>First, your safety</h2><p>These questions concern symptoms happening <strong>now</strong>.</p>
+                    <IntakeQuestions Entry="Entry" Questions="IntakeCatalog.Safety" Changed="RefreshSafety" />
+                    @foreach (var flag in ImmediateFlags)
+                    { <div class="intake-alert" role="alert"><strong>@flag.Title</strong></div> }
+                </section>
+                <section class="intake-card"><h2>Your details</h2><div class="intake-grid">
+                    <label>Full name *<InputText @bind-Value="Entry.Name" maxlength="120" autocomplete="name" /></label>
+                    <label>Age (18+) *<InputNumber @bind-Value="Entry.Age" min="18" max="120" /></label>
+                    <label>Sex<InputSelect @bind-Value="Entry.Sex"><option>Prefer not to say</option><option>Female</option><option>Male</option><option>Other</option></InputSelect></label>
+                    <label>Pregnant or recently postpartum?<InputSelect @bind-Value="Entry.Pregnancy"><option>Unknown / prefer not to say</option><option>No / not applicable</option><option>Yes</option></InputSelect></label>
+                    <label>Phone or email (optional)<InputText @bind-Value="Entry.Contact" maxlength="100" /></label>
+                </div><p>Visitors under 18: ask staff for an assisted assessment. Pregnancy and postpartum readings need individual clinical interpretation.</p></section>
+                <section class="intake-card"><h2>Choose your checklists *</h2><p>Select those requested by your practitioner. You can choose more than one.</p>
+                    @foreach (var form in IntakeCatalog.Forms)
+                    { <label class="intake-check"><input type="checkbox" checked="@Entry.Forms.Contains(form.Id)" @onchange="e => SelectForm(form.Id, e)" /> @form.Title</label> }
+                </section>
+                @foreach (var form in IntakeCatalog.Forms.Where(f => Entry.Forms.Contains(f.Id)))
+                {
+                    <section class="intake-card" @key="form.Id"><h2>@form.Title</h2><p class="intake-muted">Adapted from @form.SourceId. Questions describe your history; “Yes” does not mean you have the condition.</p>
+                        @foreach (var section in form.Sections)
+                        { <details open><summary>@section.Title</summary><IntakeQuestions Entry="Entry" Questions="section.Questions" Changed="RefreshSafety" /></details> }
+                    </section>
+                }
+                @if (Entry.Forms.Any(f => f is "bp" or "cardio" or "kidney" or "diabetes"))
+                {
+                    <section class="intake-card"><h2>Blood pressure readings, if known</h2><p>Use actual recorded measurements. Leave all fields blank for readings you do not have. Units: mmHg.</p>
+                        @for (int i = 0; i < Entry.BloodPressure.Count; i++)
+                        {
+                            var reading = Entry.BloodPressure[i];
+                            <div class="intake-measurement"><strong>Reading @(i + 1)</strong><div class="intake-grid">
+                                <label>Date<InputDate @bind-Value="reading.Date" /></label><label>Systolic (top)<InputNumber @bind-Value="reading.Systolic" /></label><label>Diastolic (bottom)<InputNumber @bind-Value="reading.Diastolic" /></label>
+                            </div></div>
+                        }
+                    </section>
+                }
+                @if (Entry.Forms.Contains("diabetes"))
+                {
+                    <section class="intake-card"><h2>Blood glucose results, if known</h2><p>Fasting means no food or caloric drinks for at least 8 hours. Use the unit shown on your result.</p>
+                        @for (int i = 0; i < Entry.Glucose.Count; i++)
+                        {
+                            var reading = Entry.Glucose[i];
+                            <div class="intake-measurement"><strong>Result @(i + 1)</strong><div class="intake-grid">
+                                <label>Date<InputDate @bind-Value="reading.Date" /></label><label>Value<InputNumber @bind-Value="reading.Value" step="any" /></label>
+                                <label>Unit<InputSelect @bind-Value="reading.Unit"><option>mg/dL</option><option>mmol/L</option></InputSelect></label>
+                                <label>Type<InputSelect @bind-Value="reading.Type"><option>Unknown</option><option>Fasting</option><option>Random</option></InputSelect></label>
+                            </div></div>
+                        }
+                        <div class="intake-grid"><label>HbA1c (%)<InputNumber @bind-Value="Entry.Hba1c" step="any" /></label><label>HbA1c result date<InputDate @bind-Value="Entry.Hba1cDate" /></label></div>
+                    </section>
+                }
+                @if (Entry.Forms.Contains("kidney"))
+                {
+                    <section class="intake-card"><h2>Kidney results, if known</h2><p>Copy from a lab report; do not estimate. Leave blank if unavailable.</p><div class="intake-grid">
+                        <label>eGFR (mL/min/1.73 m²)<InputNumber @bind-Value="Entry.Egfr" step="any" /></label><label>eGFR result date<InputDate @bind-Value="Entry.EgfrDate" /></label>
+                        <label>Urine albumin-to-creatinine ratio (mg/g)<InputNumber @bind-Value="Entry.Uacr" step="any" /></label><label>Urine result date<InputDate @bind-Value="Entry.UacrDate" /></label>
+                    </div><p>If your urine result uses mg/mmol, ask staff to enter the converted result.</p></section>
+                }
+                @if (Entry.Forms.Any(f => f is "bp" or "liver"))
+                {
+                    <section class="intake-card"><h2>Pain medicines and other remedies</h2><p>Include prescribed, over-the-counter, and herbal products. Do not change or stop medicines because of this questionnaire.</p>
+                        @foreach (var medicine in Entry.Medications)
+                        {
+                            <div class="intake-measurement"><h3>@medicine.Name</h3><div class="intake-grid">
+                                <label>Currently using?<InputSelect @bind-Value="medicine.Using">@foreach (var choice in IntakeCatalog.Choices) { <option>@choice</option> }</InputSelect></label>
+                                <label>Dose and frequency<InputText @bind-Value="medicine.Dose" maxlength="120" /></label><label>How long?<InputText @bind-Value="medicine.Duration" maxlength="120" /></label>
+                                <label>Source<InputSelect @bind-Value="medicine.Source"><option>Unknown</option><option>Prescription</option><option>Over the counter</option><option>Other</option></InputSelect></label>
+                            </div></div>
+                        }
+                    </section>
+                }
+                <section class="intake-card"><h2>Notes and consent</h2><label>Anything else your clinician should know? Include symptom onset times if relevant.<InputTextArea @bind-Value="Entry.Notes" maxlength="2000" rows="4" /></label>
+                    <p>Your answers and screening flags will be stored for your consultation and accessed by authorized clinical reviewers. They are not used for marketing. Automated flags may be incomplete or incorrect and require clinical review. Ask center staff about access, correction, or deletion of your information.</p>
+                    <label class="intake-check"><InputCheckbox @bind-Value="Entry.Consent" /> I agree to the collection and clinical review of my health information for this consultation, including automated screening flags. *</label>
+                    @if (Errors.Count > 0) { <div class="intake-alert" role="alert"><ul>@foreach (var error in Errors) { <li>@error</li> }</ul></div> }
+                    <ValidationSummary />
+                    <button class="btn btn-gold" type="submit" disabled="@Busy">@(Busy ? "Sending…" : "Submit for clinical review")</button>
+                </section>
+            </fieldset>
+        </EditForm>
+    }
+</main>

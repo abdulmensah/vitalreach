@@ -48,6 +48,8 @@ public partial class WellnessCenter
     ];
 
     [Inject] private IDbContextFactory<CatalogDbContext> DbFactory { get; set; } = default!;
+    [Inject] private IConfiguration Configuration { get; set; } = default!;
+    private bool IntakeEnabled => Configuration.GetValue<bool>("Intake:Enabled");
     private HeadquartersSettings? Headquarters;
     private string MapEmbedUrl => Headquarters is null
         ? "about:blank"
