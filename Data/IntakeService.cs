@@ -42,7 +42,8 @@ public sealed class IntakeService(IDbContextFactory<CatalogDbContext> factory, I
         db.ConsultationSubmissions.Add(new ConsultationSubmission
         {
             Id = entry.SubmissionId, CreatedUtc = now, Priority = flags.Max(f => f.Priority),
-            ProtectedContent = protector.Protect(JsonSerializer.Serialize(new IntakeEnvelope(entry, flags, now)))
+            ProtectedContent = protector.Protect(JsonSerializer.Serialize(new IntakeEnvelope(entry, flags, now,
+                ConsentVersion: LegalPolicyVersion.Current, PrivacyVersion: LegalPolicyVersion.Current, TermsVersion: LegalPolicyVersion.Current)))
         });
         try { await db.SaveChangesAsync(); }
         catch (DbUpdateException)
@@ -66,7 +67,7 @@ public sealed class IntakeService(IDbContextFactory<CatalogDbContext> factory, I
         var reviewer = await RequireReviewerAsync();
         await using var db = await factory.CreateDbContextAsync();
         var query = db.ConsultationSubmissions.AsNoTracking();
-        if (status is "Awaiting review" or "In review" or "Reviewed") query = query.Where(x => x.Status == status);
+        if (status == "Awaiting review" || IntakePresentation.ReviewStatuses.Contains(status)) query = query.Where(x => x.Status == status);
         // Project metadata only. Full answers are decrypted only after a separately authorized, audited detail read.
         var result = await query.OrderByDescending(x => x.Priority).ThenByDescending(x => x.CreatedUtc).ThenBy(x => x.Id)
             .Skip(Math.Max(0, page) * 25).Take(25).Select(x => new ConsultationSubmission
@@ -91,7 +92,7 @@ public sealed class IntakeService(IDbContextFactory<CatalogDbContext> factory, I
     public async Task ReviewAsync(Guid id, Guid version, string status, string notes)
     {
         var reviewer = await RequireReviewerAsync();
-        if (status is not ("In review" or "Reviewed") || notes.Length > 4000 || string.IsNullOrWhiteSpace(notes)) throw new InvalidOperationException("Choose a review status and enter a clinical assessment / action note (up to 4,000 characters).");
+        if (!IntakePresentation.ReviewStatuses.Contains(status) || notes.Length > 4000 || string.IsNullOrWhiteSpace(notes)) throw new InvalidOperationException("Choose a review status and enter a clinical assessment / action note (up to 4,000 characters).");
         await using var db = await factory.CreateDbContextAsync();
         var item = await db.ConsultationSubmissions.SingleAsync(x => x.Id == id);
         if (item.Version != version) throw new InvalidOperationException("Another reviewer changed this entry. Reopen it before saving.");

@@ -13,6 +13,7 @@ namespace VitalReach.Web.Components.Pages
         [Inject] IDbContextFactory<CatalogDbContext> DbFactory { get; set; } = default!;
         [Inject] AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
         [Inject] IAuthorizationService Authorization { get; set; } = default!;
+        [Inject] private AdminConfirmation Confirmation { get; set; } = default!;
 
         private List<AdminUser> Users = [];
         private AdminUser NewUser = new();
@@ -43,7 +44,9 @@ namespace VitalReach.Web.Components.Pages
         private void CancelAdd()
         { Adding = false; Message = null; }
 
-        private async Task AddUser()
+        private Task AddUser() => Confirmation.RunAsync($"Grant administrator access to {NewUser.Email}? Clinical and superadmin permissions are granted separately.", AddUserCore);
+
+        private async Task AddUserCore()
         {
             if (!await CanManage()) return;
             await using var db = await DbFactory.CreateDbContextAsync();
@@ -61,7 +64,9 @@ namespace VitalReach.Web.Components.Pages
             await Load();
         }
 
-        private async Task Toggle(AdminUser selected)
+        private Task Toggle(AdminUser selected) => Confirmation.RunAsync($"{(selected.IsActive ? "Disable" : "Enable")} administrator {selected.Email}? This affects their portal access and assigned permissions.", () => ToggleCore(selected));
+
+        private async Task ToggleCore(AdminUser selected)
         {
             if (!await CanManage()) return;
             await using var db = await DbFactory.CreateDbContextAsync();
@@ -74,14 +79,16 @@ namespace VitalReach.Web.Components.Pages
                 Error("At least one active administrator is required.");
                 return;
             }
-            user.IsActive = !user.IsActive;
+            user.IsActive = !selected.IsActive;
             user.UpdatedBy = CurrentEmail;
             user.UpdatedUtc = DateTimeOffset.UtcNow;
             await db.SaveChangesAsync(); Success($"Administrator “{user.Email}” has been {(user.IsActive ? "enabled" : "disabled")} successfully.");
             await Load();
         }
 
-        private async Task Delete(AdminUser selected)
+        private Task Delete(AdminUser selected) => Confirmation.RunAsync($"Remove administrator {selected.Email} and all their portal permissions? Access must be granted again to restore this account.", () => DeleteCore(selected));
+
+        private async Task DeleteCore(AdminUser selected)
         {
             if (!await CanManage()) return;
             await using var db = await DbFactory.CreateDbContextAsync();
@@ -107,15 +114,19 @@ namespace VitalReach.Web.Components.Pages
             Users = []; Adding = false; Error("Active superadmin access is required."); return false;
         }
 
-        private async Task ToggleRole(AdminUser selected, bool superadmin)
+        private Task ToggleRole(AdminUser selected, bool superadmin) => Confirmation.RunAsync(
+            $"{((superadmin ? selected.IsSuperAdmin : selected.IsClinicalReviewer) ? "Revoke" : "Grant")} {(superadmin ? "superadmin" : "clinical reviewer")} access for {selected.Email}? " +
+            (superadmin ? "Superadmins can manage other users and permissions." : "Clinical reviewers can access sensitive consultation records."), () => ToggleRoleCore(selected, superadmin));
+
+        private async Task ToggleRoleCore(AdminUser selected, bool superadmin)
         {
             if (!await CanManage()) return;
             await using var db = await DbFactory.CreateDbContextAsync();
             var user = await db.AdminUsers.FindAsync(selected.Id);
             if (user is null) return;
             if (superadmin && user.NormalizedEmail == CurrentEmail.ToUpperInvariant()) { Error("You cannot revoke your own superadmin role."); return; }
-            if (superadmin) user.IsSuperAdmin = !user.IsSuperAdmin;
-            else user.IsClinicalReviewer = !user.IsClinicalReviewer;
+            if (superadmin) user.IsSuperAdmin = !selected.IsSuperAdmin;
+            else user.IsClinicalReviewer = !selected.IsClinicalReviewer;
             user.UpdatedBy = CurrentEmail; user.UpdatedUtc = DateTimeOffset.UtcNow;
             db.ConsultationAudits.Add(new ConsultationAudit { Reviewer = CurrentEmail, CreatedUtc = DateTime.UtcNow,
                 Action = $"Access: {user.Email}; clinical={user.IsClinicalReviewer}; superadmin={user.IsSuperAdmin}" });

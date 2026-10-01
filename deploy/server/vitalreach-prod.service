@@ -1,0 +1,32 @@
+[Unit]
+Description=VitalReach production Blazor application
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=vitalreach-prod
+Group=vitalreach-prod
+WorkingDirectory=/opt/vitalreach/prod/current
+ExecStart=/usr/bin/dotnet /opt/vitalreach/prod/current/VitalReach.Web.dll
+Restart=always
+RestartSec=5
+KillSignal=SIGINT
+SyslogIdentifier=vitalreach-prod
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=ASPNETCORE_URLS=http://127.0.0.1:5089
+Environment="ConnectionStrings__Catalog=Data Source=/opt/vitalreach/prod/shared/vitalreach.db"
+Environment=DataProtection__Path=/opt/vitalreach/prod/shared/keys
+Environment=DataProtection__ApplicationName=VitalReach.Production
+Environment=ProductImages__Path=/opt/vitalreach/prod/shared/uploads/products
+EnvironmentFile=/etc/vitalreach/prod.env
+Environment=DOTNET_NOLOGO=true
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/vitalreach/prod/shared
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

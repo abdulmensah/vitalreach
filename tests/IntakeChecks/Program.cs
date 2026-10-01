@@ -15,6 +15,8 @@ async Task Denied(Func<Task> action, string message)
 { try { await action(); } catch (UnauthorizedAccessException) { checks++; return; } throw new Exception(message); }
 IntakeEntry Entry() => new() { Name = "Synthetic Patient Only", Age = 45, Pregnancy = "No / not applicable", Consent = true, Forms = ["diabetes", "kidney", "bp", "cardio", "liver", "mental"] };
 var today = DateTime.UtcNow.Date;
+Check(IntakePresentation.Color(0) == "blue" && IntakePresentation.Color(1) == "yellow" && IntakePresentation.Color(2) == "orange" && IntakePresentation.Color(3) == "red", "urgency palette");
+Check(IntakePresentation.StatusColor("Reviewed") == "blue" && IntakePresentation.StatusColor(IntakePresentation.ClearedStatus) == "green", "green requires explicit clinical clearance");
 bool Rule(IntakeEntry e, string rule) => IntakeScreening.Analyze(e, today).Any(f => f.Rule == rule);
 var e = Entry();
 Check(IntakeValidation.Errors(e, today).Count == 0, "valid minimal entry");
@@ -106,9 +108,21 @@ try
     var list = await service.ListAsync("All", 0); Check(list.Count == 1 && list[0].ProtectedContent == "", "list metadata only");
     var detail = (await service.ReadAsync(id))!; Check(detail.Content.Entry.Name == entry.Name, "authorized decryption");
     Check(detail.Content.FormVersion == "1" && detail.Content.ConsentedUtc <= DateTime.UtcNow, "versioned consent");
+    Check(detail.Content.PrivacyVersion == LegalPolicyVersion.Current && detail.Content.TermsVersion == LegalPolicyVersion.Current,
+        "submitted envelope records policies shown");
+    var historicalJson = System.Text.Json.JsonSerializer.SerializeToNode(detail.Content)!.AsObject();
+    historicalJson.Remove("PrivacyVersion"); historicalJson.Remove("TermsVersion");
+    var historical = System.Text.Json.JsonSerializer.Deserialize<IntakeEnvelope>(historicalJson.ToJsonString())!;
+    Check(string.IsNullOrEmpty(historical.PrivacyVersion) && string.IsNullOrEmpty(historical.TermsVersion),
+        "historical envelopes do not claim new policy versions");
     await service.ReviewAsync(id, detail.Record.Version, "Reviewed", "Synthetic clinical plan");
     try { await service.ReviewAsync(id, detail.Record.Version, "Reviewed", "stale"); throw new Exception("stale update accepted"); } catch (InvalidOperationException) { checks++; }
     Check((await service.ReadAsync(id))!.Review!.Notes == "Synthetic clinical plan", "review stored");
+    var reviewed = (await service.ReadAsync(id))!;
+    await service.ReviewAsync(id, reviewed.Record.Version, IntakePresentation.ClearedStatus, "Clinician confirms no outstanding action after assessment.");
+    var cleared = (await service.ReadAsync(id))!;
+    Check(cleared.Record.Priority == reviewed.Record.Priority && cleared.Content.Flags.SequenceEqual(reviewed.Content.Flags), "clearance preserves original flags");
+    Check((await service.ListAsync(IntakePresentation.ClearedStatus, 0)).Count == 1, "clearance status filter");
     await using (var db = await factory.CreateDbContextAsync())
     {
         Check(await db.ConsultationAudits.CountAsync() >= 4, "reads and writes audited");

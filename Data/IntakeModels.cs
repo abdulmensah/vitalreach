@@ -69,6 +69,7 @@ public sealed class MedicationEntry
 }
 public sealed record ScreeningFlag(string Rule, int Priority, string Title, string Evidence, string Source);
 public sealed record IntakeEnvelope(IntakeEntry Entry, List<ScreeningFlag> Flags, DateTime ConsentedUtc,
-    string ConsentVersion = "2026-09-30", string FormVersion = "1", string RuleVersion = "1");
+    string ConsentVersion = "2026-09-30", string FormVersion = "1", string RuleVersion = "1",
+    string PrivacyVersion = "", string TermsVersion = "");
 public sealed record ClinicalReview(string Disposition, string Notes, string Reviewer, DateTime ReviewedUtc);
 public sealed record IntakeDetail(ConsultationSubmission Record, IntakeEnvelope Content, ClinicalReview? Review);

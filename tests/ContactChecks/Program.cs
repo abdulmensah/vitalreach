@@ -1,5 +1,6 @@
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.JSInterop;
 using VitalReach.Web.Components.Pages;
 using VitalReach.Web.Data;
 
@@ -7,6 +8,8 @@ var file = Path.Combine(Path.GetTempPath(), $"vitalreach-contacts-{Guid.NewGuid(
 var options = new DbContextOptionsBuilder<CatalogDbContext>().UseSqlite($"Data Source={file};Pooling=False").Options;
 const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
 var page = new AdminContacts();
+var prompts = new ConfirmationRuntime();
+typeof(AdminContacts).GetProperty("Confirmation", flags)!.SetValue(page, new AdminConfirmation(prompts));
 typeof(AdminContacts).GetProperty("DbFactory", flags)!.SetValue(page, new Factory(options));
 Task Invoke(string name, params object[] arguments) => (Task)typeof(AdminContacts).GetMethod(name, flags)!.Invoke(page, arguments)!;
 List<ContactSubmission> Messages() => (List<ContactSubmission>)typeof(AdminContacts).GetField("Submissions", flags)!.GetValue(page)!;
@@ -29,6 +32,12 @@ try
     await Invoke("LoadAsync");
     Check(Messages().Select(x => x.Name).SequenceEqual(["Newer unread", "Older unread", "Newest read"]), "page loads SQLite messages with unread first and true chronological ordering across offsets");
     var selected = Messages()[0];
+    prompts.Accept = false;
+    await Invoke("ToggleReadAsync", selected);
+    await Invoke("DeleteAsync", selected);
+    await using (var db = new CatalogDbContext(options))
+        Check(await db.ContactSubmissions.CountAsync() == 3 && !(await db.ContactSubmissions.FindAsync(selected.Id))!.IsRead, "canceling update and delete leaves stored messages unchanged");
+    prompts.Accept = true;
     await Invoke("ToggleReadAsync", selected);
     Check(Messages().Select(x => x.Name).SequenceEqual(["Older unread", "Newest read", "Newer unread"]), "mark read saves and reloads in the correct order");
     await Invoke("ToggleReadAsync", Messages().Single(x => x.Id == selected.Id));
@@ -43,4 +52,11 @@ finally { File.Delete(file); }
 sealed class Factory(DbContextOptions<CatalogDbContext> options) : IDbContextFactory<CatalogDbContext>
 {
     public CatalogDbContext CreateDbContext() => new(options);
+}
+
+sealed class ConfirmationRuntime : IJSRuntime
+{
+    public bool Accept { get; set; } = true;
+    public ValueTask<TValue> InvokeAsync<TValue>(string identifier, object?[]? args) => ValueTask.FromResult((TValue)(object)Accept);
+    public ValueTask<TValue> InvokeAsync<TValue>(string identifier, CancellationToken cancellationToken, object?[]? args) => InvokeAsync<TValue>(identifier, args);
 }

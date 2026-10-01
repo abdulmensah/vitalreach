@@ -15,7 +15,7 @@
     {
         <section class="intake-card" role="status"><h2>Your intake has been received</h2><p>Tell the receptionist that you have submitted your forms. A clinical reviewer will assess them during your consultation.</p><p>Reference: <strong>@Reference</strong></p><p>No diagnosis has been made. This inbox is not an emergency service.</p></section>
         @foreach (var flag in SubmittedFlags.Where(f => f.Priority >= 2))
-        { <aside class="intake-alert"><strong>@flag.Title</strong></aside> }
+        { <aside class="intake-alert tone-@IntakePresentation.Color(flag.Priority)"><strong><span aria-hidden="true">@IntakePresentation.Icon(flag.Priority)</span> @flag.Title</strong></aside> }
         <a class="btn btn-gold" href="/wellness-center" data-enhance-nav="false">Return to the wellness center</a>
     }
     else
@@ -25,7 +25,7 @@
                 <section class="intake-card"><h2>First, your safety</h2><p>These questions concern symptoms happening <strong>now</strong>.</p>
                     <IntakeQuestions Entry="Entry" Questions="IntakeCatalog.Safety" Changed="RefreshSafety" />
                     @foreach (var flag in ImmediateFlags)
-                    { <div class="intake-alert" role="alert"><strong>@flag.Title</strong></div> }
+                    { <div class="intake-alert tone-@IntakePresentation.Color(flag.Priority)" role="alert"><strong><span aria-hidden="true">@IntakePresentation.Icon(flag.Priority)</span> @flag.Title</strong></div> }
                 </section>
                 <section class="intake-card"><h2>Your details</h2><div class="intake-grid">
                     <label>Full name *<InputText @bind-Value="Entry.Name" maxlength="120" autocomplete="name" /></label>
@@ -94,6 +94,7 @@
                 }
                 <section class="intake-card"><h2>Notes and consent</h2><label>Anything else your clinician should know? Include symptom onset times if relevant.<InputTextArea @bind-Value="Entry.Notes" maxlength="2000" rows="4" /></label>
                     <p>Your answers and screening flags will be stored for your consultation and accessed by authorized clinical reviewers. They are not used for marketing. Automated flags may be incomplete or incorrect and require clinical review. Ask center staff about access, correction, or deletion of your information.</p>
+                    <p>Read our <a href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and <a href="/terms#consultation" target="_blank" rel="noopener noreferrer">consultation terms</a> (version @LegalPolicyVersion.Current). These links open a new tab so you can keep your form open.</p>
                     <label class="intake-check"><InputCheckbox @bind-Value="Entry.Consent" /> I agree to the collection and clinical review of my health information for this consultation, including automated screening flags. *</label>
                     @if (Errors.Count > 0) { <div class="intake-alert" role="alert"><ul>@foreach (var error in Errors) { <li>@error</li> }</ul></div> }
                     <ValidationSummary />

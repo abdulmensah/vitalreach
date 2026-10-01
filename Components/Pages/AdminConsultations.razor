@@ -12,11 +12,18 @@
         @if (!Intake.Enabled) { <p><strong>Public submissions are disabled.</strong> Configure reviewer access and enable intake after clinical and privacy review.</p> }
     </section>
     @if (Message.Length > 0) { <div class="intake-alert" role="status">@Message</div> }
-    <section class="intake-card"><div class="intake-toolbar"><label>Status<select @bind="Status" @bind:after="ResetPageAsync"><option>Awaiting review</option><option>In review</option><option>Reviewed</option><option>All</option></select></label><button @onclick="LoadAsync" disabled="@Busy">Refresh</button></div>
+    <section class="intake-card"><h2>Flag guide</h2><div class="intake-legend">
+        <span class="intake-badge tone-blue">ⓘ Information / awaiting review</span>
+        <span class="intake-badge tone-green">✓ Clinician: no outstanding action</span>
+        <span class="intake-badge tone-yellow">△ Clinical review</span>
+        <span class="intake-badge tone-orange">▲ Prompt assessment</span>
+        <span class="intake-badge tone-red">! Immediate help</span>
+    </div><p>Green records a clinician's decision. Original screening flags retain their urgency and color after review.</p></section>
+    <section class="intake-card"><div class="intake-toolbar"><label>Status<select @bind="Status" @bind:after="ResetPageAsync"><option>Awaiting review</option>@foreach (var status in IntakePresentation.ReviewStatuses) { <option>@status</option> }<option>All</option></select></label><button @onclick="LoadAsync" disabled="@Busy">Refresh</button></div>
         <p>Sorted by urgency, then newest first. Times shown in UTC. Staff must actively monitor this list; it does not send emergency notifications.</p>
         @if (Rows.Count == 0) { <p>No submissions in this view.</p> }
         @foreach (var row in Rows)
-        { <article class="intake-list-row"><div><strong>@IntakeScreening.PriorityLabel(row.Priority)</strong><p>@row.CreatedUtc.ToString("yyyy-MM-dd HH:mm") UTC · @row.Status</p><small>@row.Id</small></div><button @onclick="() => OpenAsync(row.Id)" disabled="@Busy">Review</button></article> }
+        { <article class="intake-list-row"><div><strong class="intake-badge tone-@IntakePresentation.Color(row.Priority)"><span aria-hidden="true">@IntakePresentation.Icon(row.Priority)</span> @IntakeScreening.PriorityLabel(row.Priority)</strong><p>@row.CreatedUtc.ToString("yyyy-MM-dd HH:mm") UTC · <span class="intake-badge tone-@IntakePresentation.StatusColor(row.Status)">@row.Status</span></p><small>@row.Id</small></div><button @onclick="() => OpenAsync(row.Id)" disabled="@Busy">Review</button></article> }
         <div class="intake-toolbar"><button disabled="@(Page == 0 || Busy)" @onclick="PreviousAsync">Previous</button><span>Page @(Page + 1)</span><button disabled="@(Rows.Count < 25 || Busy)" @onclick="NextAsync">Next</button></div>
     </section>
     @if (Selected is { } selected)
@@ -27,7 +34,7 @@
             <p>Received @selected.Record.CreatedUtc.ToString("u") · Reference @selected.Record.Id</p>
             <h3>Screening flags</h3>
             @foreach (var flag in selected.Content.Flags)
-            { <article class="intake-flag priority-@flag.Priority"><strong>@IntakeScreening.PriorityLabel(flag.Priority): @flag.Title</strong><p>@flag.Evidence</p><small>Rule: @flag.Rule</small>@if (flag.Source.Length > 0) { <p><a href="@flag.Source" target="_blank" rel="noopener noreferrer">Clinical reference ↗</a></p> }</article> }
+            { <article class="intake-flag tone-@IntakePresentation.Color(flag.Priority)"><strong><span aria-hidden="true">@IntakePresentation.Icon(flag.Priority)</span> @IntakeScreening.PriorityLabel(flag.Priority): @flag.Title</strong><p>@flag.Evidence</p><small>Rule: @flag.Rule</small>@if (flag.Source.Length > 0) { <p><a href="@flag.Source" target="_blank" rel="noopener noreferrer">Clinical reference ↗</a></p> }</article> }
             <h3>Safety responses</h3>
             <dl class="intake-responses">@foreach (var q in IntakeCatalog.Safety) { <dt>@q.Label</dt><dd>@entry.Answers.GetValueOrDefault(q.Id, "Unknown")</dd> }</dl>
             @foreach (var form in IntakeCatalog.Forms.Where(f => entry.Forms.Contains(f.Id)))
@@ -42,9 +49,11 @@
             </details>
             <h3>Visitor notes</h3><p class="intake-preserve">@(entry.Notes.Length > 0 ? entry.Notes : "None supplied")</p>
             <p class="intake-muted">Consent @selected.Content.ConsentedUtc.ToString("u") · consent version @selected.Content.ConsentVersion · form version @selected.Content.FormVersion · rules version @selected.Content.RuleVersion</p>
+            <p class="intake-muted">Policies shown: privacy @(string.IsNullOrWhiteSpace(selected.Content.PrivacyVersion) ? "not recorded" : selected.Content.PrivacyVersion) · terms @(string.IsNullOrWhiteSpace(selected.Content.TermsVersion) ? "not recorded" : selected.Content.TermsVersion)</p>
             @if (selected.Review is { } review) { <p>Last reviewed by @review.Reviewer at @review.ReviewedUtc.ToString("u")</p> }
             <h3>Clinical assessment and plan</h3><p>Document examination findings, interpretation, referral urgency, follow-up, and facility/unit as appropriate. Screening outcomes are determined by the clinician.</p>
-            <label>Review status<select @bind="ReviewStatus"><option>In review</option><option>Reviewed</option></select></label>
+            <label>Review status<select @bind="ReviewStatus">@foreach (var status in IntakePresentation.ReviewStatuses) { <option>@status</option> }</select></label>
+            <p>Choose “no outstanding action” only after documenting your clinical decision. This does not remove the original screening flags.</p>
             <label>Assessment and action taken<textarea @bind="ReviewNotes" maxlength="4000" rows="6"></textarea></label>
             <button class="btn btn-gold" @onclick="SaveAsync" disabled="@Busy">Save clinical review</button>
         </section>
