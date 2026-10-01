@@ -2348,7 +2348,7 @@ footer {
     display: flex;
     align-items: center;
     color: #fff;
-    background: linear-gradient(90deg,rgba(2,35,33,.98) 0%,rgba(2,46,43,.88) 43%,rgba(2,46,43,.3) 72%),url(/images/vitalreach-kidney-education.png) center/cover
+    background: linear-gradient(90deg,rgba(2,35,33,.98) 0%,rgba(2,46,43,.88) 43%,rgba(2,46,43,.3) 72%),url(/images/vitalreach-guide-hero-black.jpg) center/cover
 }
 
     .health-guide-hero > div {
@@ -2634,7 +2634,7 @@ footer {
     .health-guide-hero {
         min-height: 650px;
         align-items: flex-end;
-        background-image: linear-gradient(0deg,rgba(2,35,33,.98),rgba(2,46,43,.72) 62%,rgba(2,46,43,.2)),url(/images/vitalreach-kidney-education.png)
+        background-image: linear-gradient(0deg,rgba(2,35,33,.98),rgba(2,46,43,.72) 62%,rgba(2,46,43,.2)),url(/images/vitalreach-guide-hero-black.jpg)
     }
 
     .health-guide-section > header .eyebrow {

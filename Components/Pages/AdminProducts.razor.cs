@@ -14,6 +14,7 @@ namespace VitalReach.Web.Components.Pages
         [Inject] IDbContextFactory<CatalogDbContext> DbFactory { get; set; } = default!;
         [Inject] AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
         [Inject] ProductImageStorage ImageStorage { get; set; } = default!;
+        [Inject] private AdminConfirmation Confirmation { get; set; } = default!;
 
         private List<ProductEntity> Products = [];
         private ProductEntity? Editing;
@@ -61,11 +62,13 @@ namespace VitalReach.Web.Components.Pages
             }
         }
         private void ResetFilters() { Search = CategoryFilter = StatusFilter = AvailabilityFilter = ""; Sort = "rank"; }
-        private void AddVariant()
+        private Task AddVariant() => Confirmation.RunAsync("Add a variant to this product draft? It will be stored when you save the product.", AddVariantCore);
+        private void AddVariantCore()
         {
             Editing?.Variants.Add(new ProductVariant { Sku = $"VR-{Guid.NewGuid():N}"[..15].ToUpperInvariant() });
         }
-        private void RemoveVariant(ProductVariant variant)
+        private Task RemoveVariant(ProductVariant variant) => Confirmation.RunAsync($"Remove variant {variant.Sku} from this product draft? Save the product to apply the removal.", () => RemoveVariantCore(variant));
+        private void RemoveVariantCore(ProductVariant variant)
         {
             if (Editing?.Variants.Count > 1) Editing.Variants.Remove(variant);
         }
@@ -95,7 +98,7 @@ namespace VitalReach.Web.Components.Pages
             SelectedGalleryImage = null;
             GalleryImages = [];
             GalleryAltText = "";
-            AddVariant();
+            AddVariantCore();
         }
 
         private async Task Edit(ProductEntity product, bool clearMessage = true)
@@ -138,14 +141,16 @@ namespace VitalReach.Web.Components.Pages
             Message = null;
         }
 
-        private void RemoveImage()
+        private Task RemoveImage() => Confirmation.RunAsync("Remove the main image from this product draft? Save the product to apply this change.", RemoveImageCore);
+        private void RemoveImageCore()
         {
             if (Editing is null) return;
             Editing.ImageUrl = null;
             SelectedImage = null;
         }
 
-        private async Task Save()
+        private Task Save() => Confirmation.RunAsync($"{(Editing?.Id == 0 ? "Create" : "Save changes to")} product '{Editing?.Name}', including its variants, prices, stock and publication settings?", SaveCore);
+        private async Task SaveCore()
         {
             if (Editing is null) return;
             var validationError = VariantValidation.Validate(Editing.Variants);
@@ -228,7 +233,8 @@ namespace VitalReach.Web.Components.Pages
             finally { Saving = false; }
         }
 
-        private async Task Delete()
+        private Task Delete() => Confirmation.RunAsync($"Permanently delete product '{Editing?.Name}', its variants and gallery images? This cannot be undone.", DeleteCore);
+        private async Task DeleteCore()
         {
             if (Editing is null || Editing.Id == 0) return;
             await using var db = await DbFactory.CreateDbContextAsync();
@@ -252,7 +258,8 @@ namespace VitalReach.Web.Components.Pages
             await Load();
         }
 
-        private async Task MoveProduct(ProductEntity product, int direction)
+        private Task MoveProduct(ProductEntity product, int direction) => Confirmation.RunAsync($"Move product '{product.Name}' {(direction < 0 ? "up" : "down")} in the published product order?", () => MoveProductCore(product, direction));
+        private async Task MoveProductCore(ProductEntity product, int direction)
         {
             if (!CanRank || Ranking || direction is < -1 or > 1 || direction == 0) return;
             var currentIndex = Products.FindIndex(candidate => candidate.Id == product.Id);
@@ -313,7 +320,8 @@ namespace VitalReach.Web.Components.Pages
             IsError = false;
         }
 
-        private async Task AddGalleryImage()
+        private Task AddGalleryImage() => Confirmation.RunAsync($"Upload and add the selected gallery image to '{Editing?.Name}'? This is saved immediately.", AddGalleryImageCore);
+        private async Task AddGalleryImageCore()
         {
             if (Editing is null || Editing.Id == 0 || SelectedGalleryImage is null || SavingGalleryImage) return;
             SavingGalleryImage = true;
@@ -360,7 +368,8 @@ namespace VitalReach.Web.Components.Pages
             }
         }
 
-        private async Task MoveGalleryImage(ProductImage image, int direction)
+        private Task MoveGalleryImage(ProductImage image, int direction) => Confirmation.RunAsync($"Move this gallery image {(direction < 0 ? "left" : "right")}? The new order is saved immediately.", () => MoveGalleryImageCore(image, direction));
+        private async Task MoveGalleryImageCore(ProductImage image, int direction)
         {
             if (SavingGalleryImage || direction is < -1 or > 1 || direction == 0) return;
             var currentIndex = GalleryImages.FindIndex(candidate => candidate.Id == image.Id);
@@ -393,7 +402,8 @@ namespace VitalReach.Web.Components.Pages
             }
         }
 
-        private async Task RemoveGalleryImage(ProductImage image)
+        private Task RemoveGalleryImage(ProductImage image) => Confirmation.RunAsync("Permanently remove this gallery image? This is saved immediately and cannot be undone.", () => RemoveGalleryImageCore(image));
+        private async Task RemoveGalleryImageCore(ProductImage image)
         {
             if (SavingGalleryImage) return;
             SavingGalleryImage = true;

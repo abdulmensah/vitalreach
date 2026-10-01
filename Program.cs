@@ -17,7 +17,16 @@ builder.Services.AddDataProtection()
     .SetApplicationName(builder.Configuration["DataProtection:ApplicationName"] ?? "VitalReach.Local");
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto);
-builder.Services.AddRazorComponents().AddInteractiveServerComponents();
+builder.Services.AddRazorComponents().AddInteractiveServerComponents(options =>
+{
+    options.DisconnectedCircuitRetentionPeriod = TimeSpan.FromMinutes(10);
+    options.DisconnectedCircuitMaxRetained = 100;
+}).AddHubOptions(options =>
+{
+    options.ClientTimeoutInterval = TimeSpan.FromSeconds(60);
+    options.KeepAliveInterval = TimeSpan.FromSeconds(15);
+});
+builder.Services.AddScoped<Microsoft.AspNetCore.Components.Server.Circuits.CircuitHandler, ConnectionDiagnostics>();
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddDbContextFactory<CatalogDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("Catalog") ?? "Data Source=App_Data/vitalreach.db"));
@@ -28,6 +37,7 @@ builder.Services.AddScoped<CommerceService>();
 builder.Services.AddScoped<PaymentService>();
 builder.Services.AddScoped<TaxQuoteService>();
 builder.Services.AddScoped<IntakeService>();
+builder.Services.AddScoped<AdminConfirmation>();
 builder.Services.AddSingleton<IntakeSubmissionLimiter>();
 builder.Services.AddHttpClient("payments", client => client.Timeout = TimeSpan.FromSeconds(30));
 var googleClientId = builder.Configuration["Authentication:Google:ClientId"];
@@ -126,7 +136,7 @@ app.MapGet("/auth/denied", () => Results.Problem("This Google account is not aut
 app.MapGet("/auth/logout", () => Results.SignOut(
     new Microsoft.AspNetCore.Authentication.AuthenticationProperties { RedirectUri = "/" },
     [CookieAuthenticationDefaults.AuthenticationScheme]));
-app.MapGet("/health", () => Results.Ok(new { status = "healthy", service = "vitalreach-qa" }));
+app.MapGet("/health", () => Results.Ok(new { status = "healthy", service = "vitalreach" }));
 app.MapGet("/admin/consultations/qr.svg", (IntakeService intake) =>
 {
     if (intake.PublicUrl is not { } url) return Results.Problem("Configure Intake:PublicUrl with the center's HTTPS website address.", statusCode: 503);

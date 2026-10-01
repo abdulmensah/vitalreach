@@ -39,6 +39,8 @@ Routine adult numeric interpretation is suppressed when pregnancy/postpartum sta
 
 ## Storage and operational limits
 
+Flag colors are blue (information/incomplete), yellow (review), orange (prompt assessment), and red (immediate help). Green is reserved for the explicit clinician-selected “Reviewed — no outstanding action” status with a required assessment note. The original flag evidence and severity remain unchanged. Text and symbols accompany colors.
+
 `ConsultationSubmissions` stores encrypted JSON containing patient responses, consent timestamp/version, form version, and generated flag evidence/rule version. Reviewer notes are encrypted separately. Only reference, timestamps, priority, status, concurrency version and audit metadata are stored unencrypted. List queries retrieve metadata only. A separately authorized, audited read decrypts a record. Review writes check authorization and optimistic concurrency. Duplicate public submission IDs are idempotent and cannot read or overwrite prior records.
 
 Encryption uses ASP.NET Data Protection purpose `VitalReach.Consultation.v1`. Persist and protect `DataProtection__Path` across releases and backups; loss of the key ring makes records unreadable. Key files require OS/host encryption and restricted access: encrypting records does not protect against an attacker who can read both database and keys. Audit events record reviewer identity and access action, without patient answers. The latest review note replaces the prior note; this is an intake tool, not a complete longitudinal electronic health record.

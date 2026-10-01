@@ -23,8 +23,24 @@
 .intake-list-row p { margin: .3rem 0; }
 .intake-qr { width: 240px; height: 240px; max-width: 100%; }
 .intake-flag { border-left: 4px solid #69847a; padding: 1rem; background: #f4f8f6; margin: .75rem 0; }
-.intake-flag.priority-2, .intake-flag.priority-3 { border-color: #b95534; background: #fff3ea; }
+.intake-legend { display: flex; flex-wrap: wrap; gap: .65rem; }
+.intake-badge { display: inline-flex; align-items: center; gap: .4rem; border: 1px solid; border-radius: 6px; padding: .3rem .6rem; font-size: .85rem; font-weight: 700; }
+.tone-blue { background: #eaf3ff; color: #164579; border-color: #386fa5; }
+.tone-green { background: #e8f5ec; color: #175b31; border-color: #287845; }
+.tone-yellow { background: #fff8ce; color: #675000; border-color: #a78100; }
+.tone-orange { background: #fff0e1; color: #843700; border-color: #bf590c; }
+.tone-red { background: #ffeded; color: #941e26; border-color: #c62c37; }
 .intake-responses { display: grid; grid-template-columns: minmax(0, 1fr) 160px; gap: .75rem 1rem; }
 .intake-responses dd { margin: 0; font-weight: 700; }
 .intake-preserve { white-space: pre-wrap; }
+.connection-status { position: fixed; z-index: 10000; inset: auto 1rem 1rem; max-width: 650px; margin: auto; padding: 1.25rem; border: 2px solid #386fa5; border-radius: 12px; background: #eaf3ff; color: #164579; box-shadow: 0 5px 30px #0003; }
+.connection-status[hidden] { display: none; }
+.connection-status button { padding: .6rem .8rem; margin: .4rem .5rem 0 0; border: 1px solid #164579; border-radius: 6px; background: white; color: #164579; cursor: pointer; }
+.connection-status button:disabled { opacity: .55; cursor: default; }
+.admin-confirm-dialog { width: min(560px, calc(100vw - 2rem)); max-height: calc(100dvh - 2rem); box-sizing: border-box; padding: 1.75rem; border: 1px solid #afc3bb; border-radius: 16px; background: #fff; color: #063f3b; box-shadow: 0 20px 70px #0004; overflow-wrap: anywhere; }
+.admin-confirm-dialog::backdrop { background: #062a27aa; }
+.admin-confirm-dialog h2 { margin: .6rem 0 1rem; }
+.admin-confirm-dialog p { line-height: 1.6; white-space: pre-line; }
+.admin-confirm-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .8rem; margin-top: 1.5rem; }
+.admin-confirm-dialog button:focus-visible { outline: 3px solid #b58d2f; outline-offset: 3px; }
 @media (max-width: 560px) { .intake-question { grid-template-columns: 1fr; gap: .3rem !important; } .intake-responses { grid-template-columns: 1fr; } .intake-responses dd { margin-bottom: .8rem; } .intake-list-row { align-items: flex-start; flex-direction: column; } }

@@ -33,11 +33,25 @@ jobs:
       - name: Restore
         run: dotnet restore --configfile NuGet.Config
 
+      - name: Validate production deployment script
+        run: |
+          bash -n deploy/server/deploy-prod
+          python3 tests/deploy_prod_archive_checks.py
+
       - name: Build
         run: dotnet build --configuration Release --no-restore
 
       - name: Verify consultation intake
         run: dotnet run --project tests/IntakeChecks --configuration Release
+
+      - name: Verify reconnection behavior
+        run: node tests/connection-checks.cjs
+
+      - name: Verify admin confirmations
+        run: |
+          node tests/admin-confirm-dialog-checks.cjs
+          dotnet run --project tests/AdminActionChecks --configuration Release
+          dotnet run --project tests/ContactChecks --configuration Release
 
       - name: Publish
         run: dotnet publish --configuration Release --no-build --output publish

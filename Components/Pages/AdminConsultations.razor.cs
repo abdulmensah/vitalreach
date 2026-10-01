@@ -7,6 +7,7 @@ namespace VitalReach.Web.Components.Pages;
 public partial class AdminConsultations
 {
     [Inject] private IntakeService Intake { get; set; } = null!;
+    [Inject] private AdminConfirmation Confirmation { get; set; } = null!;
     private List<ConsultationSubmission> Rows = [];
     private IntakeDetail? Selected;
     private string Status = "Awaiting review", Message = "", ReviewStatus = "In review", ReviewNotes = "";
@@ -31,10 +32,12 @@ public partial class AdminConsultations
     {
         Close(); Selected = await Intake.ReadAsync(id);
         if (Selected is null) { Message = "The submission could not be found."; return; }
-        ReviewStatus = Selected.Record.Status == "Reviewed" ? "Reviewed" : "In review";
+        ReviewStatus = IntakePresentation.ReviewStatuses.Contains(Selected.Record.Status) ? Selected.Record.Status : "In review";
         ReviewNotes = Selected.Review?.Notes ?? "";
     });
-    private Task SaveAsync() => RunAsync(async () =>
+    private Task SaveAsync() => Confirmation.RunAsync(
+        $"Save this clinical assessment with status '{ReviewStatus}'? This updates the review note; the original screening flags remain unchanged.", SaveCoreAsync);
+    private Task SaveCoreAsync() => RunAsync(async () =>
     {
         if (Selected is null) return;
         await Intake.ReviewAsync(Selected.Record.Id, Selected.Record.Version, ReviewStatus, ReviewNotes);

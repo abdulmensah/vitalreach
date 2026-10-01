@@ -7,6 +7,7 @@ public partial class AdminOrders
 {
     [Inject] private CommerceService Commerce { get; set; } = default!;
     [Inject] private TaxQuoteService TaxQuotes { get; set; } = default!;
+    [Inject] private AdminConfirmation Confirmation { get; set; } = default!;
     private List<CommerceOrder> Items = [];
     private CommerceOrder? Selected;
     private string Search = "", Status = "", Reference = "", Instructions = "", TaxEvidence = "";
@@ -28,7 +29,9 @@ public partial class AdminOrders
         ExchangeRate = order.Country == "GH" && order.Status == OrderStatus.QuoteRequested ? 0 : order.ExchangeRate;
         Instructions = order.PaymentInstructions; TaxEvidence = order.TaxEvidence;
     }
-    private async Task CalculateTax()
+    private Task CalculateTax() => Confirmation.RunAsync($"Calculate tax for order {Selected?.Number} using the current shipping amount? The order's delivery details will be sent to the tax service.", CalculateTaxCore);
+
+    private async Task CalculateTaxCore()
     {
         if (Busy || Selected is null) return;
         Busy = true;
@@ -38,7 +41,16 @@ public partial class AdminOrders
         catch (TaskCanceledException) { Message = "Tax service timed out. Please try again."; }
         finally { Busy = false; }
     }
-    private async Task Act(string action)
+    private Task Act(string action) => Confirmation.RunAsync(action switch
+    {
+        "quote" => $"Confirm the quote for order {Selected?.Number} with shipping {Money(Shipping)} and tax {Money(Tax)}? This reserves stock and makes the quote available to the customer.",
+        "paid" => $"Record order {Selected?.Number} as paid using reference '{Reference}'? Continue only after independently verifying the offline payment.",
+        "ship" => $"Mark order {Selected?.Number} as shipped or collected? This records fulfillment.",
+        "cancel" => $"Cancel unpaid order {Selected?.Number} and release its reserved stock?",
+        _ => throw new ArgumentOutOfRangeException(nameof(action))
+    }, () => ActCore(action));
+
+    private async Task ActCore(string action)
     {
         if (Busy || Selected is null) return;
         Busy = true;

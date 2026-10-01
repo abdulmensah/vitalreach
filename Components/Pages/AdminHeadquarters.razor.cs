@@ -8,6 +8,7 @@ namespace VitalReach.Web.Components.Pages;
 public partial class AdminHeadquarters
 {
     [Inject] private IDbContextFactory<CatalogDbContext> DbFactory { get; set; } = default!;
+    [Inject] private AdminConfirmation Confirmation { get; set; } = default!;
 
     private HeadquartersSettings? Settings;
     private string? Message;
@@ -20,7 +21,9 @@ public partial class AdminHeadquarters
         Settings = await db.Headquarters.AsNoTracking().SingleAsync(x => x.Id == 1);
     }
 
-    private async Task SaveAsync()
+    private Task SaveAsync() => Confirmation.RunAsync("Save headquarters details? These contact and location details will appear on the website.", SaveCoreAsync);
+
+    private async Task SaveCoreAsync()
     {
         if (Settings is null) return;
         Saving = true;

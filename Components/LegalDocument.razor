@@ -1,0 +1,27 @@
+<header class="legal-header">
+    <a class="logo" href="/"><img src="images/vitalreach-logo.png" alt="VitalReach Wellness Hub" /></a>
+    <a href="/">Return to VitalReach</a>
+</header>
+<main class="legal-page legal-document" data-legal-document>
+    <header id="overview" tabindex="-1">
+        <p class="eyebrow">VitalReach Wellness Hub</p>
+        <h1>@Title</h1>
+        <p class="legal-date">Last updated: September 30, 2026 · Version @LegalPolicyVersion.Current</p>
+        <p>@Description</p>
+    </header>
+    <div class="legal-document-grid">
+        <aside class="legal-section-nav">
+            <details open>
+                <summary>On this page</summary>
+                <nav aria-label="@($"{Title} sections")">
+                    <a href="@(Path + "#overview")" data-enhance-nav="false">Overview</a>
+                    @foreach (var section in Sections)
+                    { <a href="@(Path + "#" + section.Id)" data-enhance-nav="false">@section.Title</a> }
+                </nav>
+            </details>
+            <a class="legal-related" href="@(Path == "/privacy" ? "/terms" : "/privacy")">@(Path == "/privacy" ? "Terms of Service →" : "Privacy Policy →")</a>
+        </aside>
+        <article class="legal-document-content">@ChildContent</article>
+    </div>
+</main>
+<footer class="legal-footer"><span>© 2026 VitalReach Wellness Hub</span><a href="/">Home</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a></footer>

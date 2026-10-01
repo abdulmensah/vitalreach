@@ -1,56 +1,65 @@
 @page "/terms"
 <PageTitle>Terms of Service | VitalReach Wellness Hub</PageTitle>
 
-<header class="legal-header">
-    <a class="logo" href="/">
-        <img src="images/vitalreach-logo.png" alt="VitalReach Wellness Hub" />
-    </a>
-    <a href="/">Return to VitalReach</a>
-</header>
-<main class="legal-page">
-    <header>
-        <p class="eyebrow">VitalReach Wellness Hub</p>
-        <h1>Terms of Service</h1>
-        <p class="legal-date">Last updated: September 23, 2026</p>
-        <p>These Terms of Service govern your use of the VitalReach Wellness Hub website, health-education materials, product catalog, purchase-inquiry features, and restricted administration portal.</p>
-    </header>
-
-    <section>
+<LegalDocument Title="Terms of Service" Path="/terms" Sections="Sections"
+    Description="Terms for website use, shopping, consultation intake, automated screening and authorized administration.">
+    <section id="acceptance" tabindex="-1">
         <h2>1. Acceptance of these terms</h2>
-        <p>By accessing or using this website, you agree to these terms and our <a href="/privacy">Privacy Policy</a>. If you do not agree, do not use the website. If you use the website on behalf of an organization, you represent that you have authority to accept these terms for that organization.</p>
+        <p>By accessing or using this website, you agree to these terms. Our <a href="/privacy">Privacy Policy</a> explains how we handle information. Using the website does not by itself provide consent to collect health information; consultation intake asks for that consent separately. If you do not agree, do not use the website. If you use the website on behalf of an organization, you represent that you have authority to accept these terms for that organization.</p>
     </section>
 
-    <section>
+    <section id="about" tabindex="-1">
         <h2>2. About VitalReach</h2>
         <p>VitalReach Wellness Hub is a Ghanaian-American wellness brand offering health education and information about wellness products. You may contact us through our <a href="/contact?message=Hello%20VitalReach%2C%0A%0AI%20would%20like%20to%20get%20in%20touch%20with%20your%20team.%0A%0AThank%20you.">contact form</a>, (410) 504-4449, or 24 Kusia Street, Kokomlemle, Accra, Ghana.</p>
     </section>
 
-    <section>
+    <section id="education" tabindex="-1">
         <h2>3. Educational—not medical—information</h2>
         <p>Content on this website is provided for general education and wellness information. It is not medical advice and does not replace professional diagnosis, treatment, prescribing, or individualized advice from a qualified healthcare professional.</p>
         <p>Do not delay or disregard professional care because of information on this website. Seek urgent medical assistance for a medical emergency. Statements about products, ingredients, or wellness benefits have not necessarily been evaluated by every applicable regulatory authority and are not intended to diagnose, treat, cure, or prevent disease.</p>
     </section>
 
-    <section>
-        <h2>4. Product information and availability</h2>
+    <section id="consultation" tabindex="-1">
+        <h2>4. Consultation intake and consent</h2>
+        <p>The online consultation forms are for adults aged 18 or older seeking consultation at the wellness center. Scanning a QR code opens the form; it does not book an appointment or create a clinician–patient relationship. Submitting a form requests review and does not guarantee acceptance, a diagnosis, treatment, or a response within a particular time.</p>
+        <p>Provide information about yourself honestly and as accurately as you can. Use available unknown or prefer-not-to-answer choices when appropriate. Do not invent measurements or laboratory results. Tell center staff about errors, changes in symptoms, and information you could not provide online. This online workflow does not support submissions for children or a separate guardian-consent process.</p>
+        <p>Before submitting, you must affirmatively consent to collecting and clinically reviewing your health information, including automated screening flags. You may choose not to submit and speak with staff about other consultation arrangements. Read the <a href="/privacy#consultation-consent">Privacy Policy</a> for access, correction, retention and consent choices. Do not put medical histories or sensitive records in the general contact form or order notes.</p>
+    </section>
+
+    <section id="screening" tabindex="-1">
+        <h2>5. Screening flags and clinical review</h2>
+        <p>Screening uses predefined rules applied to your answers. It is not a diagnosis, a validated estimate of your individual disease probability, or a replacement for assessment by a qualified clinician. Missing or inaccurate answers can affect the result; both false alarms and missed concerns are possible.</p>
+        <p>Blue indicates informational or incomplete-data flags, yellow indicates a follow-up concern, orange indicates a higher-priority concern, and red indicates an urgent concern. Labels and explanations accompany colors. Green is a reviewer-selected status meaning “Reviewed — no outstanding action”; it is not an automated declaration that you are disease-free. Original screening flags remain part of the submitted record.</p>
+        <p>Only an authorized clinical reviewer can interpret the results in context and decide what further assessment is appropriate. Do not start, stop, or change medication based on a flag. Ask staff for an explanation or correction if information appears wrong.</p>
+    </section>
+
+    <section id="emergencies" tabindex="-1">
+        <h2>6. Emergencies and service interruptions</h2>
+        <p>This website is not an emergency service and submissions are not monitored continuously. An urgent flag does not call an ambulance, alert emergency services, or guarantee immediate clinician contact. For severe or rapidly worsening symptoms, or immediate risk of harm, seek urgent local medical assistance rather than waiting for an online response.</p>
+        <p>A connection interruption may temporarily lock an interactive page while it reconnects. Unsubmitted answers may be recovered during a short reconnection window, but recovery is not guaranteed. Reloading, closing the page, or an expired session can discard an unfinished form. Only a successful submission confirmation means the form has been saved. If unsure whether a submission succeeded, ask center staff before entering it again.</p>
+    </section>
+
+    <section id="products" tabindex="-1">
+        <h2>7. Product information and availability</h2>
         <p>We aim to present product descriptions, images, prices, package sizes, and availability accurately, but information may change and errors may occur. Displaying an item does not guarantee that it is available, approved in your jurisdiction, or suitable for you.</p>
         <p>Consult a qualified healthcare professional before using a supplement, especially if you are pregnant, nursing, under 18, have a medical condition, or take medication. Follow final product labels and instructions.</p>
     </section>
 
-    <section>
-        <h2>5. Order requests, quotes, and payments</h2>
+    <section id="orders" tabindex="-1">
+        <h2>8. Order requests, quotes, and payments</h2>
         <p>Checkout submits an order request for review. No payment is collected at that step. A VitalReach representative confirms availability, shipping, applicable taxes, and the final total before payment becomes available. Review the confirmed quote and payment currency before paying through the hosted Stripe or Paystack checkout. Payment status is updated after verification with the provider. Contact us with your order number for questions about your order, cancellation, or a refund.</p>
         <p>Do not send card numbers, bank credentials, government identification numbers, or other sensitive financial information through ordinary email or website inquiry fields.</p>
     </section>
 
-    <section>
-        <h2>6. Administrator accounts</h2>
+    <section id="administrators" tabindex="-1">
+        <h2>9. Administrator accounts</h2>
         <p>The administration portal is limited to users approved in the VitalReach access database. Google authenticates administrator identity; VitalReach determines authorization. Administrators must use their own account, protect their Google account, and notify us promptly of suspected unauthorized access.</p>
         <p>We may disable or remove administrator access when needed to protect the website, data, users, or VitalReach operations. Administrators may only access and change information for authorized VitalReach purposes.</p>
+    <p>Clinical records require a separate clinical-reviewer permission in addition to an active administrator account. Superadministrator permission allows access management but does not itself grant clinical access. Clinical record access and review actions are audited. Reviewers must act within their professional qualifications, independently assess screening flags, protect confidentiality, and use records only for authorized care and operational purposes.</p>
     </section>
 
-    <section>
-        <h2>7. Acceptable use</h2>
+    <section id="acceptable-use" tabindex="-1">
+        <h2>10. Acceptable use</h2>
         <p>You agree not to:</p>
         <ul>
             <li>Break any applicable law or infringe another person’s rights.</li>
@@ -62,61 +71,56 @@
         </ul>
     </section>
 
-    <section>
-        <h2>8. Intellectual property</h2>
+    <section id="intellectual-property" tabindex="-1">
+        <h2>11. Intellectual property</h2>
         <p>The VitalReach name, logos, visual identity, website design, original text, graphics, and educational materials are owned by or licensed to VitalReach and are protected by applicable intellectual-property laws. These terms give you a limited, revocable, non-transferable right to use the website for personal or authorized business purposes. They do not transfer ownership.</p>
         <p>You may share links to publicly available educational pages. Other reproduction, modification, commercial use, or distribution requires prior written permission unless applicable law permits it.</p>
     </section>
 
-    <section>
-        <h2>9. Third-party services and links</h2>
-        <p>The website may link to or depend on third-party services, including Google authentication, hosting, email, and external health resources. We do not control independent third-party services and are not responsible for their content, availability, security, or privacy practices. Their own terms and policies apply.</p>
+    <section id="third-parties" tabindex="-1">
+        <h2>12. Third-party services and links</h2>
+        <p>The website may link to or depend on third-party services, including Google authentication, maps and fonts, hosting, email, Stripe, Paystack, and external health resources. We do not control independent third-party services and are not responsible for their content, availability, security, or privacy practices. Their own terms and policies apply.</p>
     </section>
 
-    <section>
-        <h2>10. Disclaimer of warranties</h2>
+    <section id="warranties" tabindex="-1">
+        <h2>13. Disclaimer of warranties</h2>
         <p>To the extent permitted by law, the website and its content are provided “as is” and “as available.” VitalReach disclaims implied warranties, including merchantability, fitness for a particular purpose, non-infringement, uninterrupted availability, and accuracy. Nothing in these terms excludes a warranty or consumer right that cannot legally be excluded.</p>
     </section>
 
-    <section>
-        <h2>11. Limitation of liability</h2>
+    <section id="liability" tabindex="-1">
+        <h2>14. Limitation of liability</h2>
         <p>To the extent permitted by law, VitalReach and its owners, personnel, and service providers will not be liable for indirect, incidental, special, consequential, exemplary, or punitive loss arising from use of—or inability to use—the website. This includes loss arising from reliance on educational content, third-party services, service interruption, or unauthorized access beyond our reasonable control.</p>
         <p>These limitations do not apply where liability cannot be excluded or limited under applicable law.</p>
     </section>
 
-    <section>
-        <h2>12. Indemnification</h2>
+    <section id="indemnification" tabindex="-1">
+        <h2>15. Indemnification</h2>
         <p>To the extent permitted by law, you agree to be responsible for losses, claims, or reasonable costs resulting from your unlawful use of the website, violation of these terms, infringement of another person’s rights, or misuse of administrator access.</p>
     </section>
 
-    <section>
-        <h2>13. Suspension and termination</h2>
+    <section id="suspension" tabindex="-1">
+        <h2>16. Suspension and termination</h2>
         <p>We may restrict or terminate access to all or part of the website when reasonably necessary for security, maintenance, legal compliance, investigation of misuse, or protection of VitalReach and its users. Provisions that by their nature should continue after termination will survive.</p>
     </section>
 
-    <section>
-        <h2>14. Applicable law and disputes</h2>
+    <section id="applicable-law" tabindex="-1">
+        <h2>17. Applicable law and disputes</h2>
         <p>These terms are governed by the laws applicable to the VitalReach operation providing the relevant service, without overriding mandatory consumer protections that apply where you live. Before starting formal proceedings, please contact us and allow a reasonable opportunity to resolve the concern informally. A court or authority with lawful jurisdiction may hear disputes that cannot be resolved.</p>
     </section>
 
-    <section>
-        <h2>15. Changes to the website or terms</h2>
+    <section id="changes" tabindex="-1">
+        <h2>18. Changes to the website or terms</h2>
         <p>We may update the website, products, or these terms. Revised terms will be posted here with a new “Last updated” date. Continued use after an update means you accept the revised terms, to the extent permitted by law.</p>
+    <p>Changes do not retroactively authorize new uses of previously submitted health information. Where a new use requires consent or another notice under applicable law, we will obtain that consent or provide that notice separately.</p>
     </section>
 
-    <section>
-        <h2>16. General provisions</h2>
-        <p>If one provision is unenforceable, the remaining provisions remain effective. Failure to enforce a provision is not a waiver. You may not transfer your rights under these terms without our consent. These terms and the Privacy Policy are the current agreement regarding use of the website.</p>
+    <section id="general" tabindex="-1">
+        <h2>19. General provisions</h2>
+        <p>If one provision is unenforceable, the remaining provisions remain effective. Failure to enforce a provision is not a waiver. You may not transfer your rights under these terms without our consent. These terms govern website use; the Privacy Policy explains information handling. Separate consultation consent and any specific service or order terms also apply where provided. Nothing here waives mandatory privacy, patient, or consumer rights.</p>
     </section>
 
-    <section>
-        <h2>17. Contact</h2>
+    <section id="contact" tabindex="-1">
+        <h2>20. Contact</h2>
         <p>Questions about these terms may be sent through our <a href="/contact?message=Hello%20VitalReach%2C%0A%0AI%20have%20a%20question%20about%20the%20VitalReach%20Terms%20of%20Service.%0A%0AThank%20you.">contact form</a> or mailed to VitalReach Wellness Hub, 24 Kusia Street, Kokomlemle, Accra, Ghana.</p>
     </section>
-</main>
-<footer class="legal-footer">
-    <span>© 2026 VitalReach Wellness Hub</span>
-    <a href="/">Home</a>
-    <a href="/privacy">Privacy</a>
-    <a href="/terms">Terms</a>
-</footer>
+</LegalDocument>

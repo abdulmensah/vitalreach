@@ -8,6 +8,7 @@ namespace VitalReach.Web.Components.Pages;
 public partial class AdminContacts
 {
     [Inject] private IDbContextFactory<CatalogDbContext> DbFactory { get; set; } = default!;
+    [Inject] private AdminConfirmation Confirmation { get; set; } = default!;
 
     private List<ContactSubmission> Submissions = [];
     private string? StatusMessage;
@@ -24,19 +25,25 @@ public partial class AdminContacts
         Submissions = submissions.OrderBy(x => x.IsRead).ThenByDescending(x => x.CreatedUtc).ThenByDescending(x => x.Id).ToList();
     }
 
-    private async Task ToggleReadAsync(ContactSubmission selected)
+    private Task ToggleReadAsync(ContactSubmission selected) => Confirmation.RunAsync(
+        $"Mark the message from {selected.Name} as {(selected.IsRead ? "unread" : "read")}?", () => ToggleReadCoreAsync(selected));
+
+    private async Task ToggleReadCoreAsync(ContactSubmission selected)
     {
         await using var db = await DbFactory.CreateDbContextAsync();
         var submission = await db.ContactSubmissions.FindAsync(selected.Id);
         if (submission is null) return;
-        submission.IsRead = !submission.IsRead;
+        submission.IsRead = !selected.IsRead;
         await db.SaveChangesAsync();
         IsError = false;
         StatusMessage = $"Message from {submission.Name} has been marked as {(submission.IsRead ? "read" : "unread")} successfully.";
         await LoadAsync();
     }
 
-    private async Task DeleteAsync(ContactSubmission selected)
+    private Task DeleteAsync(ContactSubmission selected) => Confirmation.RunAsync(
+        $"Permanently delete the message from {selected.Name}? This cannot be undone.", () => DeleteCoreAsync(selected));
+
+    private async Task DeleteCoreAsync(ContactSubmission selected)
     {
         await using var db = await DbFactory.CreateDbContextAsync();
         var submission = await db.ContactSubmissions.FindAsync(selected.Id);
