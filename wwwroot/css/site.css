@@ -465,7 +465,12 @@ button {
     font: 500 21px/1.2 "Playfair Display",serif;
     color: var(--teal);
     margin: 0 8px;
-    min-height: 51px
+}
+
+@media (min-width: 980px) {
+    .product h3 {
+     min-height: 51px
+    }
 }
 
 .benefit {
@@ -851,7 +856,6 @@ footer {
 
     footer img {
         width: 225px;
-        background: white;
         padding: 6px
     }
 
@@ -1319,7 +1323,16 @@ footer {
             }
 
     .product-art {
-        height: 350px
+        height: 250px
+    }
+
+    .product h3 {
+        font-size: 17px;
+        min-height: 0;
+    }
+
+    .benefit {
+        font-size: 13px;
     }
 
     .story-copy, .guide, .contact {
@@ -3680,6 +3693,7 @@ footer {
 }
 
 .pdp-thumbnails {
+    min-height: 96px;
     display: flex;
     gap: 12px;
     padding-top: 14px;
@@ -3687,9 +3701,9 @@ footer {
 }
 
     .pdp-thumbnails button {
-        width: 82px;
-        height: 82px;
-        flex: 0 0 82px;
+        width: 74px;
+        height: 74px;
+        flex: 0 0 74px;
         padding: 3px;
         border: 1px solid #d4ded9;
         background: #fff;

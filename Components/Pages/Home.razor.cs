@@ -8,7 +8,6 @@ public partial class Home
     [Inject] private IDbContextFactory<CatalogDbContext> DbFactory { get; set; } = default!;
     [Inject] private CommerceService Commerce { get; set; } = default!;
     [Inject] private NavigationManager Navigation { get; set; } = default!;
-    private bool MenuOpen;
     private List<ProductEntity> Products = [];
     private HeadquartersSettings? Headquarters;
     private string? CartMessage;
@@ -25,6 +24,4 @@ public partial class Home
         catch (InvalidOperationException ex) { CartMessage = ex.Message; }
         catch (DbUpdateException) { CartMessage = "The bag changed in another session. Please try again."; }
     }
-    private void ToggleMenu() => MenuOpen = !MenuOpen;
-    private void CloseMenu() => MenuOpen = false;
 }

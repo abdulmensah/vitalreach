@@ -1,0 +1,180 @@
+/* Shared public design system. Clinical status colors and admin controls retain their meaning. */
+.public-refresh, .storefront-header, .storefront-footer { --page-space: clamp(22px, 4vw, 72px); }
+.public-refresh { background: #faf8f2; }
+.guide-editorial-image { margin: 28px 0 0; }
+.guide-editorial-image img { display: block; width: 100%; height: auto; }
+.guide-editorial-image figcaption { padding: 12px 0; border-bottom: 1px solid #b8c9bb; font: 13px/1.6 'DM Sans',sans-serif; color: #53645a; }
+.health-tests .guide-editorial-image figcaption { color: #ead1a0; border-color: #47736e; }
+.public-refresh .guide-protection { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.1fr); gap: 32px; align-items: stretch; }
+.public-refresh .guide-illustrated-heading { display: block; max-width: none; margin: 0; }
+.guide-illustrated-heading .guide-editorial-image { margin: 0; }
+.guide-image-overlay { position: relative; isolation: isolate; display: grid; min-height: 520px; overflow: hidden; background: #063f3b; }
+.guide-image-overlay > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; z-index: -2; }
+.guide-image-overlay::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, #022e2bf5 0%, #022e2bb3 35%, #022e2b00 75%); z-index: -1; }
+.guide-image-heading { align-self: end; padding: 28px; }
+.public-refresh .guide-image-heading .eyebrow { color: #ead1a0; margin-bottom: 12px; }
+.public-refresh .guide-image-heading h2 { color: #fffdf5; font-size: clamp(30px,3vw,44px); line-height: 1.14; margin: 0; }
+.public-refresh .guide-protection > .guide-illustrated-heading > p { color: #63736f; font: 15px/1.8 'DM Sans',sans-serif; margin-top: 16px; }
+.guide-protection .health-action-grid { grid-template-columns: repeat(2,minmax(0,1fr)); grid-auto-rows: 1fr; gap: 16px; background: transparent; border: 0; }
+.guide-protection .health-action-grid article { padding: 20px 24px; background: #e9ede3; border: 1px solid #d8dfd3; }
+.guide-protection .health-action-grid h3 { font-size: 24px; line-height: 1.2; margin-block: 10px; }
+.guide-protection .health-action-grid p { font-size: 14px; margin-top: 0; }
+@media (min-width: 1200px) {
+    .guide-protection .health-action-grid h3 { font-size: 28px; margin-top: 20px; }
+    .guide-protection .health-action-grid p { font-size: 18px; margin-top: 30px; }
+}
+/* Give the 2x2 cards the full row before the desktop columns become cramped. */
+@media (max-width: 1199px) {
+    .public-refresh .guide-protection { grid-template-columns: minmax(0,1fr); }
+    .guide-protection .health-action-grid { grid-auto-rows: auto; }
+}
+@media (max-width: 980px) { .guide-image-overlay { min-height: 460px; } }
+@media (max-width: 600px) { .guide-image-overlay { min-height: 400px; } .guide-image-heading { padding: 24px; } .guide-protection .health-action-grid { grid-template-columns: minmax(0,1fr); } .guide-protection .health-action-grid article { aspect-ratio: auto; } }
+.storefront-announcement { height: auto; padding: 7px 16px; font-size: 10px; letter-spacing: .12em; }
+.site-header.storefront-header { height: 90px; padding-inline: var(--page-space); background: #faf8f2; }
+.storefront-header .logo img { width: 185px; height: 74px; }
+.storefront-header .desktop-nav { gap: 26px; font-size: 12px; }
+.storefront-header .cart-trigger { padding: 10px 20px; font-size: 12px; }
+.site-header.storefront-header .cart-icon { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; color: #063f3b; }
+.storefront-header .cart-icon:hover { background: #e9ede3; }
+.storefront-mobile-menu { inset: 0; padding-top: 145px; overflow-y: auto; }
+.storefront-mobile-menu > div { padding-top: 24px; }
+.storefront-header .menu-trigger:focus-visible { outline: 3px solid #b48634; outline-offset: 4px; }
+.legal-document .legal-section-nav { top: 110px; max-height: calc(100dvh - 130px); }
+.legal-document > header { scroll-margin-top: 110px; }
+@media (max-width: 600px) { .storefront-mobile-menu { padding-top: 125px; } }
+@media (min-width: 981px) { .storefront-mobile-menu { display: none; } }
+@media (prefers-reduced-motion: reduce) { .storefront-mobile-menu { animation: none; } .storefront-header .menu-trigger span { transition: none; } }
+@media print { .storefront-header, .storefront-announcement, .storefront-mobile-menu { display: none; } }
+.public-refresh .eyebrow { font-size: 11px; letter-spacing: .18em; color: #806129; }
+.public-refresh .eyebrow.light { color: #ead1a0; }
+.public-refresh .btn { border-radius: 0; min-height: 46px; padding: 15px 23px; font-size: 12px; letter-spacing: .1em; line-height: 1.5; }
+.public-refresh .btn-gold { background: #e5c383; color: #17332f; }
+.public-refresh .btn-gold:hover { background: #f1d7a9; }
+.public-refresh :is(h1,h2,h3) { text-wrap: pretty; }
+.public-refresh :is(input,select,textarea) { border-radius: 0; }
+.public-refresh :is(a,button,input,select,textarea,summary):focus-visible,
+.storefront-header :is(a,summary):focus-visible { outline: 3px solid #b48634; outline-offset: 4px; }
+.public-refresh section[id] { scroll-margin-top: 110px; }
+.public-refresh :is(.shop-hero,.contact-page-hero) { padding: 48px var(--page-space); }
+.public-refresh :is(.shop-hero,.contact-page-hero,.center-hero,.health-guide-hero) h1 { font-size: clamp(44px,5.5vw,76px); line-height: 1.08; letter-spacing: -.03em; }
+.public-refresh :is(.shop-hero,.contact-page-hero,.center-hero,.health-guide-hero) h1 em { color: #ead1a0; }
+.public-refresh :is(.shop-hero,.contact-page-hero) > p:last-child,
+.public-refresh :is(.center-hero,.health-guide-hero) > div > p:not(.eyebrow) { font: 15px/1.8 'DM Sans',sans-serif; max-width: 610px; }
+.public-refresh .shop-browser { padding: 40px var(--page-space) 56px; gap: 32px; grid-template-columns: 200px minmax(0,1fr); background: #faf8f2; }
+.public-refresh .catalog-filters { border-radius: 0; padding: 20px; background: #e9ede3; }
+.public-refresh .products { gap: 24px; }
+.public-refresh .product { padding: 0 0 16px; /*background: transparent;*/ border: 0; border-radius: 0; box-shadow: none; }
+.public-refresh .product-art { border-radius: 0; }
+.public-refresh .add-cart { border-radius: 0; min-height: 44px; font-size: 12px; letter-spacing: .08em; }
+.public-refresh .shop-search input { min-width: 0; width: 100%; }
+.public-refresh .breadcrumbs { padding: 24px var(--page-space); flex-wrap: wrap; font-size: 13px; }
+.public-refresh .pdp-main { padding: 16px var(--page-space) 48px; gap: 4vw; }
+.public-refresh .pdp-art { min-height: 440px; }
+.public-refresh .pdp-art > img { width: 100%; height: 500px; }
+.public-refresh .pdp-copy h1 { font-size: clamp(36px,4vw,58px); line-height: 1.12; }
+.public-refresh .pdp-copy > p { font-size: 15px; }
+.public-refresh .pdp-pagination { padding: 28px var(--page-space); background: #e9ede3; }
+.public-refresh .pdp-pagination small { font-size: 11px; }
+.public-refresh :is(.center-hero,.health-guide-hero) { min-height: 480px; padding: 56px var(--page-space); }
+.public-refresh :is(.center-intro,.center-experience,.center-visit,.center-location,.health-guide-intro,.health-guide-section,.health-tests,.health-medication,.health-guide-sources) { padding: 48px var(--page-space); }
+.public-refresh :is(.center-intro,.health-guide-intro) { gap: 4vw; }
+.public-refresh :is(.center-intro,.center-experience,.center-location,.health-guide-intro,.health-guide-section,.health-tests,.health-medication) h2 { font-size: clamp(32px,3.6vw,50px); line-height: 1.15; }
+.public-refresh .center-intro > div:last-child,
+.public-refresh .center-experience > header > p:last-child { font: 15px/1.8 'DM Sans',sans-serif; }
+.public-refresh .center-services { padding: 0 var(--page-space) 48px; background: #faf8f2; }
+.public-refresh .center-services article { padding: 28px; background: #e9ede3; }
+.public-refresh .center-services p { min-height: 0; }
+.public-refresh .center-services a { font-size: 12px; }
+.public-refresh .center-experience { background: #f1eee3; }
+.public-refresh .center-experience > header { margin-bottom: 30px; column-gap: 4vw; }
+.public-refresh .center-experience-grid { gap: 0; }
+.public-refresh .center-experience-grid article { background: #faf8f2; }
+.public-refresh .center-experience-grid article:nth-child(even) { background: #e9ede3; }
+.public-refresh .center-experience-grid img { min-height: 400px; }
+.public-refresh .center-experience-grid article > div { padding: 32px; }
+.public-refresh .center-location { border-top: 1px solid #d8dfd3; background: #e9ede3; }
+.health-guide-hero-photo { display: none; }
+@media (min-width: 801px) {
+ .public-refresh .health-guide-hero { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.35fr); padding: 0; min-height: 0; background: #063f3b; }
+ .public-refresh .health-guide-hero > div { padding: 40px var(--page-space); }
+ .public-refresh .health-guide-hero h1 { font-size: clamp(38px, 3.8vw, 64px); }
+ .public-refresh .health-guide-hero-photo { display: block; width: 100%; height: auto; }
+}
+@media (min-width: 801px) and (max-width: 1199px) {
+ .public-refresh .health-guide-hero > div { padding: 32px 24px; }
+ .public-refresh .health-guide-hero h1 { font-size: clamp(28px, 3.125vw, 37.5px); line-height: 1.16; letter-spacing: -.02em; text-wrap: balance; }
+}
+.public-refresh .health-guide-nav { padding-inline: var(--page-space); background: #063f3b; color: #fffdf5; }
+.public-refresh .health-guide-nav a { color: inherit; transition: background-color .18s ease, box-shadow .18s ease; }
+.public-refresh .health-guide-nav a span { color: #ead1a0; }
+.public-refresh .health-guide-nav a:hover,
+.public-refresh .health-guide-nav a:focus-visible { background: #16564f; box-shadow: inset 0 -3px #e5c383; }
+.public-refresh .health-guide-nav a:focus-visible { outline: 2px solid #e5c383; outline-offset: -4px; }
+.public-refresh .health-guide-nav a[aria-current="location"] { background: #e5c383; color: #063f3b; box-shadow: inset 0 -3px #fffdf5; }
+.public-refresh .health-guide-nav a[aria-current="location"] span { color: #063f3b; }
+.public-refresh .health-guide-nav { display: block; position: sticky; top: 90px; z-index: 60; border-top: 1px solid #47736e; box-shadow: 0 8px 24px #063f3b15; }
+.health-guide-nav-toggle { display: none; }
+.public-refresh .health-guide-nav-toggle > span { color: inherit; font: inherit; }
+.health-guide-nav-links { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); }
+.public-refresh .health-guide-nav-links a { align-items: center; min-height: 64px; padding: 16px 20px; }
+.health-guide-page.public-refresh section[id] { scroll-margin-top: 185px; }
+@media (max-width: 600px) {
+ .public-refresh .health-guide-nav { top: 80px; }
+ .health-guide-nav.is-ready .health-guide-nav-toggle { display: flex; width: 100%; min-height: 54px; align-items: center; justify-content: space-between; padding: 0; border: 0; color: #fffdf5; background: transparent; font: 600 13px 'DM Sans',sans-serif; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; }
+ .health-guide-nav-icon { position: relative; width: 16px; height: 16px; }
+ .health-guide-nav-icon::before, .health-guide-nav-icon::after { position: absolute; top: 50%; left: 50%; width: 14px; height: 2px; background: #ead1a0; content: ''; transform: translate(-50%,-50%); transition: transform .3s ease; }
+ .health-guide-nav-icon::after { transform: translate(-50%,-50%) rotate(90deg); }
+ .health-guide-nav.is-expanded .health-guide-nav-icon::after { transform: translate(-50%,-50%) rotate(0deg); }
+ .health-guide-nav.is-ready .health-guide-nav-panel { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .45s cubic-bezier(.22,1,.36,1), opacity .25s ease; }
+ .health-guide-nav.is-ready.is-expanded .health-guide-nav-panel { grid-template-rows: 1fr; opacity: 1; }
+ .health-guide-nav-links { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+ .public-refresh .health-guide-nav-links a { min-height: 48px; padding: 0; border: 0; border-top: 1px solid #47736e; }
+ .health-guide-page.public-refresh section[id] { scroll-margin-top: 150px; }
+}
+@media (prefers-reduced-motion: reduce) {
+ .health-guide-nav.is-ready .health-guide-nav-panel, .health-guide-nav-icon::before, .health-guide-nav-icon::after { transition: none; }
+}
+@media (prefers-reduced-motion: reduce) { .public-refresh .health-guide-nav a { transition: none; } }
+.public-refresh .contact-page-content { padding: 40px var(--page-space) 56px; gap: 28px; background: #faf8f2; }
+.public-refresh .contact-form-panel { padding: 30px; }
+.public-refresh .contact-form-grid label { font-size: 12px; }
+.public-refresh .contact-details { box-shadow: none; width: auto; }
+.public-refresh.commerce-page { max-width: 1200px; padding: 40px var(--page-space) 56px; }
+.public-refresh.commerce-page h1 { margin-top: 0; color: #063f3b; }
+.public-refresh .commerce-order { border-radius: 0; background: #fff; }
+.public-refresh.commerce-page .form-grid { padding: 24px; border: 1px solid #d8dfd3; background: #fff; }
+.public-refresh.legal-document { background: #faf8f2; padding-top: 40px; }
+.public-refresh .legal-section-nav { border-radius: 0; background: #e9ede3; }
+.public-refresh.intake-page { background: #faf8f2; }
+.public-refresh .intake-card { border-radius: 0; box-shadow: none; }
+.storefront-footer { padding: 40px var(--page-space); border-top: 1px solid #b8c9bb; }
+.storefront-footer .footer-identity address b { font-size: 11px; letter-spacing: .14em; }
+@media (max-width: 1050px) {
+ .public-refresh .center-experience-grid img { min-height: 0; }
+}
+@media (max-width: 800px) {
+ .public-refresh .shop-browser { grid-template-columns: minmax(0,1fr); gap: 24px; }
+ .public-refresh .shop-facets details > summary { min-height: 80px; padding: 16px; background: #e9ede3; box-shadow: none; }
+ .public-refresh .shop-facet-summary-copy > small { font-size: 11px; }
+ .public-refresh .contact-page-content { grid-template-columns: minmax(0,1fr); }
+ .public-refresh .pdp-main { grid-template-columns: minmax(0,1fr); gap: 28px; }
+ .public-refresh .pdp-art { min-height: 0; }
+ .public-refresh .pdp-art > img { height: auto; max-height: 500px; }
+}
+@keyframes menu-reveal { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) {
+}
+@media (max-width: 600px) {
+ .site-header.storefront-header { height: 80px; }
+ .storefront-header .logo img { width: 155px; height: 65px; }
+ .storefront-header .header-actions { gap: 4px; }
+ .storefront-header .cart-trigger { padding: 10px; }
+ .storefront-announcement { font-size: 9px; letter-spacing: .04em; }
+ .public-refresh :is(.center-hero,.health-guide-hero) { min-height: 420px; padding-block: 36px; }
+ .public-refresh :is(.shop-hero,.contact-page-hero,.center-intro,.center-experience,.center-visit,.center-location,.health-guide-intro,.health-guide-section,.health-tests,.health-medication,.health-guide-sources) { padding-block: 34px; }
+ .public-refresh .center-experience-grid article > div { padding: 24px; }
+ .public-refresh .contact-form-panel { padding: 22px; }
+ .public-refresh.commerce-page .form-grid { padding: 18px; }
+ .public-refresh .products { gap: 16px; }
+}

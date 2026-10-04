@@ -1,0 +1,122 @@
+/* Reina-inspired homepage POC: scoped to Home, with existing application flows. */
+.home-refresh { --home-space: clamp(22px, 4vw, 72px); background: #faf8f2; }
+.home-refresh .announcement { height: auto; padding: 7px 16px; font-size: 10px; letter-spacing: .12em; }
+.home-refresh .site-header { height: 90px; padding-inline: var(--home-space); background: #faf8f2; }
+.home-refresh .logo img { width: 185px; height: 74px; }
+.home-refresh .desktop-nav { gap: 26px; font-size: 12px; }
+.home-refresh .cart-trigger { padding: 10px 20px; font-size: 12px; }
+.home-refresh .hero { position: relative; isolation: isolate; display: flex; align-items: center; min-height: 560px; margin: 0; background: #063f3b; overflow: hidden; }
+.home-refresh .hero-visual { position: absolute; inset: 0; z-index: -2; background: none; min-height: 0; }
+.home-refresh .hero-photo { display: block; height: 100%; width: 100%; object-fit: cover; object-position: 62% center; }
+.home-refresh .hero::after { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, #063f3b 0%, #063f3bf5 22%, #063f3ba6 45%, #063f3b15 72%); }
+.home-refresh .hero-copy { padding: 56px clamp(28px, 5vw, 76px); width: 62%; align-items: start; text-align: left; }
+.home-refresh .eyebrow { font-size: 10px; letter-spacing: .18em; color: #806129; margin-bottom: 16px; }
+.home-refresh .hero .eyebrow, .home-refresh .eyebrow.light { color: #ead1a0; }
+.home-refresh .hero h1 { font-size: clamp(54px, 5.9vw, 88px); line-height: 1.06; color: #fffdf5; letter-spacing: -.035em; }
+.home-refresh .hero h1 em { color: #ead1a0; }
+.home-refresh .lead { font: 15px/1.85 'DM Sans', sans-serif; color: #f0f2e9; max-width: 410px; margin: 24px 0 28px; }
+.home-refresh .actions { gap: 22px; flex-wrap: wrap; }
+.home-refresh .btn { border-radius: 0; min-height: 46px; padding: 15px 23px; font-size: 11px; letter-spacing: .1em; gap: 15px; align-items: center; justify-content: center; line-height: 1.5; }
+.home-refresh .btn-gold { background: #e5c383; color: #17332f; }
+.home-refresh .btn-gold:hover { background: #f1d7a9; }
+.home-refresh .underlink { color: #fffdf5; border-color: #bbcfc4; font-size: 11px; letter-spacing: .05em; }
+.home-refresh .trust { margin-top: 26px; font-size: 10px; letter-spacing: .01em; color: #e0e9df; gap: 14px; flex-wrap: wrap; text-transform: none; }
+.home-refresh .trust span:before { color: #ead1a0; }
+.home-refresh .wellness-paths { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0 var(--home-space); border-bottom: 1px solid #d8dfd3; }
+.home-refresh .wellness-paths > a { padding: 30px; border-right: 1px solid #d8dfd3; }
+.home-refresh .wellness-paths > a:last-child { border: 0; }
+.home-refresh .wellness-paths > a:nth-child(2) { background: #eef0e6; }
+.home-refresh .path-number { font-size: 10px; text-transform: uppercase; letter-spacing: .12em; color: #806129; }
+.home-refresh .wellness-paths h2 { font: 500 clamp(22px, 2.2vw, 31px)/1.2 'Playfair Display', serif; margin: 12px 0; color: #063f3b; }
+.home-refresh .wellness-paths p { font-size: 13px; color: #55675c; margin: 0 0 18px; }
+.home-refresh .path-link { font-size: 10px; text-transform: uppercase; letter-spacing: .1em; border-bottom: 1px solid #b8c9bb; padding-bottom: 4px; }
+.home-refresh .wellness-paths > a:hover { background: #e5eadf; }
+.home-refresh .mission { padding: 44px var(--home-space); grid-template-columns: 72px minmax(0, 1fr); gap: 18px 26px; background: #faf8f2; }
+.home-refresh .mission-badge { width: 68px; height: 68px; box-shadow: none; border-color: #b8c9bb; }
+.home-refresh .mission-badge b { font-size: 25px; color: #547162; }
+.home-refresh .mission .eyebrow { margin-bottom: 8px; }
+.home-refresh .mission > div > span { font-size: 12px; color: #5c7062; }
+.home-refresh .mission h2 { font-size: clamp(28px, 3vw, 40px); line-height: 1.2; margin-top: 6px; }
+.home-refresh .mission h2 em { color: #806129; }
+.home-refresh .mission > div > p:not(.eyebrow) { font: 14px/1.8 'DM Sans', sans-serif; max-width: 880px; color: #53645a; }
+.home-refresh .mission strong { font-size: 11px; }
+.home-refresh .mission > a { grid-column: 2; justify-self: start; width: auto; }
+.home-refresh .ticker { padding: 12px var(--home-space); min-height: 45px; height: auto; background: #e9ede3; color: #425c4c; font-size: 10px; letter-spacing: .12em; gap: 15px; flex-wrap: wrap; }
+.home-refresh .section { padding: 48px var(--home-space); }
+.home-refresh .section-heading { gap: 32px; margin-bottom: 28px; }
+.home-refresh .section h2, .home-refresh .story h2, .home-refresh .contact h2 { font-size: clamp(36px, 4vw, 56px); line-height: 1.12; }
+.home-refresh .section h2 em, .home-refresh .health-preview-copy h2 em { color: #806129; }
+.home-refresh .section-heading > p { font: 14px/1.8 'DM Sans', sans-serif; max-width: 370px; }
+.home-refresh .products { gap: 24px; }
+.home-refresh .product { padding: 0 0 12px; background: transparent; border: 0; border-radius: 0; box-shadow: none; }
+.home-refresh .product-art { border-radius: 0; }
+.home-refresh .product h3 { line-height: 1.35; }
+.home-refresh .add-cart { font-size: 11px; letter-spacing: .08em; min-height: 44px; border-radius: 0; }
+.home-refresh .disclaimer { font-size: 11px; }
+.home-refresh .center-callout { padding: 36px var(--home-space); margin: 0; gap: 30px; align-items: center; background: #e9ede3; color: #17332f; }
+.home-refresh .center-callout .eyebrow { color: #806129; }
+.home-refresh .center-callout h2 { font: 500 clamp(32px, 3.5vw, 46px)/1.15 'Playfair Display', serif; color: #063f3b; }
+.home-refresh .center-callout h2 em { color: #806129; }
+.home-refresh .center-callout p:not(.eyebrow) { font: 14px/1.8 'DM Sans', sans-serif; color: #53645a; }
+.home-refresh .story { min-height: 0; grid-template-columns: 1fr 1fr; background: #063f3b; }
+.home-refresh .story-art { display: flex; min-height: 0; padding: 0; background: #e9ede3; }
+.home-refresh .story-founder-photo { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 52% center; }
+.home-refresh .story-copy { padding: 44px clamp(26px, 4vw, 62px); align-self: center; }
+.home-refresh .story-copy > p:not(.eyebrow) { font: 14px/1.85 'DM Sans', sans-serif; }
+.home-refresh .story-values-inline { padding: 16px 0; margin: 20px 0 0; list-style: none; display: flex; gap: 12px; flex-wrap: wrap; border-block: 1px solid #ffffff30; color: #ead1a0; font-size: 10px; }
+.home-refresh .founder { margin-top: 22px; padding-top: 0; border: 0; }
+.home-refresh .founder small { font-size: 10px; }
+.home-refresh .health-preview { min-height: 0; margin: 0; background: #f1eee3; }
+.home-refresh .health-preview-visual { min-height: 460px; order: 2; }
+.home-refresh .health-preview-copy { padding: 44px var(--home-space); }
+.home-refresh .health-preview-copy h2 { font-size: clamp(34px, 3.7vw, 50px); line-height: 1.15; }
+.home-refresh .health-preview-copy > p:not(.eyebrow) { font: 14px/1.8 'DM Sans', sans-serif; }
+.home-refresh .health-preview-topics { margin-bottom: 24px; }
+.home-refresh .health-preview-topics span { font-size: 12px; padding-block: 10px; }
+.home-refresh .health-preview-copy > small { font-size: 11px; }
+.home-refresh .contact { padding: 40px var(--home-space); }
+.home-refresh section[id] { scroll-margin-top: 100px; }
+.home-refresh a:focus-visible, .home-refresh button:focus-visible, .home-refresh select:focus-visible { outline: 3px solid #b48634; outline-offset: 4px; }
+@media (min-width: 1600px) { .home-refresh { --home-space: max(64px, calc((100vw - 1600px) / 2)); } }
+@media (max-width: 980px) {
+ .home-refresh .hero { min-height: 530px; }
+ .home-refresh .hero-copy { width: 76%; }
+ .home-refresh .hero h1 { font-size: 62px; }
+ .home-refresh .wellness-paths > a { padding: 24px 20px; }
+ .home-refresh .center-callout { flex-direction: column; align-items: start; gap: 18px; }
+ .home-refresh .story, .home-refresh .health-preview { grid-template-columns: 1fr; }
+ .home-refresh .story-founder-photo { height: auto; max-height: 560px; object-fit: cover; }
+ .home-refresh .health-preview-visual { order: 0; min-height: 360px; }
+}
+@media (max-width: 600px) {
+ .home-refresh .site-header { height: 80px; }
+ .home-refresh .logo img { width: 155px; height: 65px; }
+ .home-refresh .announcement { font-size: 9px; letter-spacing: .04em; }
+ .home-refresh .announcement span { padding-inline: 5px; }
+ .home-refresh .hero { display: flex; flex-direction: column; align-items: stretch; margin: 0; min-height: 0; }
+ .home-refresh .hero::after { display: none; }
+ .home-refresh .hero-copy { width: 100%; padding: 34px 24px; }
+ .home-refresh .hero h1 { font-size: clamp(46px, 12vw, 64px); }
+ .home-refresh .hero-visual { position: static; height: auto; z-index: auto; }
+ .home-refresh .hero-photo { height: auto; aspect-ratio: 1672 / 941; object-fit: contain; }
+ .home-refresh .lead { margin-block: 20px; font-size: 14px; }
+ .home-refresh .actions { flex-direction: row; gap: 14px; }
+ .home-refresh .trust { justify-content: start; margin-top: 22px; }
+ .home-refresh .wellness-paths { margin: 0; grid-template-columns: 1fr; }
+ .home-refresh .wellness-paths > a { padding: 22px 24px; border: 0; border-bottom: 1px solid #d8dfd3; }
+ .home-refresh .wellness-paths h2 { font-size: 27px; margin-block: 8px; }
+ .home-refresh .wellness-paths p { margin-bottom: 12px; }
+ .home-refresh .mission { padding: 34px 24px; grid-template-columns: 1fr; gap: 18px; }
+ .home-refresh .mission > a { grid-column: 1; }
+ .home-refresh .ticker { justify-content: center; }
+ .home-refresh .ticker i { display: none; }
+ .home-refresh .section { padding: 36px 20px; }
+ .home-refresh .section-heading { display: block; margin-bottom: 24px; }
+ .home-refresh .section-heading > p { margin-top: 16px; }
+ .home-refresh .center-callout { padding: 30px 24px; }
+ .home-refresh .story-copy, .home-refresh .health-preview-copy { padding: 34px 24px; }
+ .home-refresh .story-founder-photo { max-height: none; }
+ .home-refresh .health-preview-visual { min-height: 280px; }
+ .home-refresh .contact { padding: 34px 24px; }
+}
+

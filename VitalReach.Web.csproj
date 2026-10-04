@@ -10,6 +10,8 @@
     <Compile Remove="tests\**\*.cs" />
     <Content Remove="tests\**" />
     <None Remove="tests\**" />
+    <Content Remove="artifacts\**;publish\**;App_Data\**;.env" />
+    <None Remove="artifacts\**;publish\**;App_Data\**;.env" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="10.0.11" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.11" />
     <PackageReference Include="QRCoder" Version="1.8.0" />

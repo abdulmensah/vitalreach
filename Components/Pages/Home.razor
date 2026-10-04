@@ -2,52 +2,8 @@
 @rendermode InteractiveServer
 <PageTitle>Wellness with purpose | VitalReach Wellness Hub</PageTitle>
 
-<div class="announcement">Proudly Ghanaian-American <span>✦</span> Wellness with purpose</div>
-<header class="site-header" id="top">
-    <a class="logo" href="/#top">
-        <img src="images/vitalreach-logo_header.png" alt="VitalReach Wellness Hub" />
-    </a>
-    <nav class="desktop-nav">
-        <a href="/shop">Shop</a>
-        <a href="/#ghana">Ghana Mission</a>
-        <a href="/health-guide">Health Guide</a>
-        <a href="/wellness-center">Wellness Center</a>
-        <a href="/contact">Contact</a>
-    </nav>
-    <div class="header-actions">
-        <button class="menu-trigger @(MenuOpen ? "open" : "")" @onclick="ToggleMenu" aria-label="Toggle navigation" aria-expanded="@MenuOpen">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
-        <a class="cart-trigger" href="/cart">Bag</a>
-    </div>
-</header>
-@if (MenuOpen)
-{
-    <nav class="mobile-menu" aria-label="Mobile navigation">
-        <p>Explore VitalReach</p>
-        <a href="/shop" @onclick="CloseMenu">
-            <span>01</span> Shop
-        </a>
-        <a href="/#ghana" @onclick="CloseMenu">
-            <span>02</span> Ghana Mission
-        </a>
-        <a href="/health-guide" @onclick="CloseMenu">
-            <span>03</span> Health Guide
-        </a>
-        <a href="/wellness-center" @onclick="CloseMenu">
-            <span>04</span> Wellness Center
-        </a>
-        <a href="/contact" @onclick="CloseMenu">
-            <span>05</span> Contact
-        </a>
-        <div>
-            <small>Wellness with purpose</small>
-            <b>Educating Ghana. Reaching the world.</b>
-        </div>
-    </nav>
-}
+<div class="home-refresh">
+<StorefrontHeader />
 <main>
     @if (CartMessage is not null) { <p class="admin-message error" role="alert">@CartMessage</p> }
     <section class="hero">
@@ -70,13 +26,15 @@
                 <span>Education led</span>
             </div>
         </div>
-        <div class="hero-visual" role="img" aria-label="VitalReach health education professional">
-            <div class="promise">
-                <small>The VitalReach promise</small>
-                <strong>Clear choices.<br>Purposeful wellness.</strong>
-            </div>
+        <div class="hero-visual">
+            <img class="hero-photo" src="/images/wellness-center/wellness-center-reception.png" alt="VitalReach wellness hub reception concept" width="1672" height="941" fetchpriority="high" />
         </div>
     </section>
+    <nav class="wellness-paths" aria-label="Discover VitalReach">
+        <a href="/shop"><span class="path-number">01 / The collection</span><h2>Everyday essentials</h2><p>Thoughtful choices for your daily wellness routine.</p><span class="path-link">Explore our products ↗</span></a>
+        <a href="/health-guide"><span class="path-number">02 / Health education</span><h2>Know your health</h2><p>Clear information. Better questions. Informed choices.</p><span class="path-link">Read the health guide ↗</span></a>
+        <a href="/wellness-center"><span class="path-number">03 / The wellness center</span><h2>A personal connection</h2><p>Discover our center and prepare for your visit.</p><span class="path-link">Meet us at the hub ↗</span></a>
+    </nav>
     <section class="mission" id="ghana">
         <div class="mission-badge">
             <b>GH</b>
@@ -153,33 +111,7 @@
     }
     <section class="story" id="about">
         <div class="story-art">
-            <div class="story-constellation">
-                <span class="story-orbit orbit-one" aria-hidden="true"></span>
-                <span class="story-orbit orbit-two" aria-hidden="true"></span>
-                <div class="story-logo-card">
-                    <img src="/images/vitalreach-logo_homepage.png" alt="VitalReach Wellness Hub" />
-                    <small>Reach your best. Live your best.</small>
-                </div>
-                <div class="story-value story-value-care">
-                    <span aria-hidden="true">✦</span>
-                    <b>Nurse-founded</b>
-                    <small>Care with purpose</small>
-                </div>
-                <div class="story-value story-value-roots">
-                    <span aria-hidden="true">◆</span>
-                    <b>Ghanaian-American</b>
-                    <small>Rooted locally.</small><small> Reaching globally.</small>
-                </div>
-                <div class="story-value story-value-wellness">
-                    <span aria-hidden="true">●</span>
-                    <b>Whole-person wellness</b>
-                    <small>Education, products</small><small> &amp; support</small>
-                </div>
-            </div>
-            <div class="seal">
-                FOUNDED WITH<br>
-                <b>CARE &amp; PURPOSE</b>
-            </div>
+            <img class="story-founder-photo" src="/images/vitalreach-hero-black-jacket.jpeg" alt="Masaouda N. Nartey, VitalReach founder, with the wellness collection" width="1500" height="1049" loading="lazy" />
         </div>
         <div class="story-copy">
             <p class="eyebrow light">Our story</p>
@@ -189,6 +121,7 @@
             </h2>
             <p>VitalReach Wellness Hub was founded by Masaouda N. Nartey, BSN, RN, with a vision to make health education clearer, wellness choices more thoughtful, and quality products more accessible.</p>
             <p>Rooted in nursing experience and proudly Ghanaian-American, VitalReach brings together practical education, culturally connected care, and a global standard of excellence.</p>
+            <ul class="story-values-inline"><li>Nurse-founded</li><li>Ghanaian-American</li><li>Whole-person wellness</li></ul>
             <div class="founder">
                 <span>MN</span>
                 <div>
@@ -236,8 +169,9 @@
 
             }
  *@
-            <a class="btn btn-gold" href="/contact?message=Hello%20VitalReach%2C%0A%0AI%20would%20like%20to%20get%20in%20touch%20with%20your%20team.%0A%0AThank%20you.#contact-content">Start a Converstation ↗</a>
+            <a class="btn btn-gold" href="/contact?message=Hello%20VitalReach%2C%0A%0AI%20would%20like%20to%20get%20in%20touch%20with%20your%20team.%0A%0AThank%20you.#contact-content">Start a conversation ↗</a>
         </div>
     </section>
 </main>
+</div>
 <StorefrontFooter Headquarters="Headquarters" />

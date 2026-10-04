@@ -5,7 +5,8 @@ import sys
 import tarfile
 import tempfile
 
-script = (pathlib.Path(__file__).resolve().parents[1] / "deploy/server/deploy-prod").read_text()
+script_path = pathlib.Path(__file__).resolve().parents[1] / (sys.argv[1] if len(sys.argv) > 1 else "deploy/server/deploy-prod")
+script = script_path.read_text()
 validator = compile(script.split("<<'PY'\n", 1)[1].split("\nPY", 1)[0], "deploy-prod-validator", "exec")
 cases = [("assets/site.css", False, False), ("../escape", False, True),
          ("/tmp/escape", False, True), ("link", True, True),
@@ -34,4 +35,4 @@ for name, link, reject in cases:
         finally:
             sys.argv = previous
         assert rejected == reject, name
-print(f"PASS: {len(cases)} production archive checks")
+print(f"PASS: {len(cases)} archive checks for {script_path.name}")

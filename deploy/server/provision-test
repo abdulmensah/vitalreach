@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+# Run from the uploaded directory containing the test deployment templates.
+[[ "$EUID" -eq 0 ]] || { echo "Run via sudo" >&2; exit 77; }
+cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
+for file in deploy-test vitalreach-test.service test.env.example test.vitalreachhub.com.nginx; do
+    [[ -f "$file" ]] || { echo "Missing $file" >&2; exit 66; }
+done
+for command in dotnet nginx python3 curl flock visudo; do command -v "$command" >/dev/null; done
+getent passwd vitalreach-test >/dev/null || useradd --system --home-dir /opt/vitalreach/test --shell /usr/sbin/nologin vitalreach-test
+install -d -o root -g root -m 0755 /opt/vitalreach/test /opt/vitalreach/test/releases /opt/vitalreach/bin /etc/vitalreach
+install -d -o vitalreach-test -g vitalreach-test -m 0700 /opt/vitalreach/test/shared /opt/vitalreach/test/shared/keys /opt/vitalreach/test/shared/uploads/products
+install -d -o root -g root -m 0700 /opt/vitalreach/test/backups
+install -o root -g root -m 0755 deploy-test /opt/vitalreach/bin/deploy-test
+install -o root -g root -m 0644 vitalreach-test.service /etc/systemd/system/vitalreach-test.service
+if [[ ! -e /etc/vitalreach/test.env ]]; then
+    install -o root -g root -m 0600 test.env.example /etc/vitalreach/test.env
+fi
+# Never overwrite an existing vhost: it may already have Certbot's TLS configuration.
+if [[ ! -e /etc/nginx/sites-available/test.vitalreachhub.com ]]; then
+    install -o root -g root -m 0644 test.vitalreachhub.com.nginx /etc/nginx/sites-available/test.vitalreachhub.com
+fi
+if [[ ! -e /etc/nginx/sites-enabled/test.vitalreachhub.com ]]; then
+    ln -s /etc/nginx/sites-available/test.vitalreachhub.com /etc/nginx/sites-enabled/test.vitalreachhub.com
+fi
+sudoers=$(mktemp)
+trap 'rm -f -- "$sudoers"' EXIT
+printf '%s\n' 'deployer ALL=(root) NOPASSWD: /opt/vitalreach/bin/deploy-test' > "$sudoers"
+visudo -cf "$sudoers"
+install -o root -g root -m 0440 "$sudoers" /etc/sudoers.d/vitalreach-test
+systemctl daemon-reload
+systemctl enable vitalreach-test.service
+nginx -t
+systemctl reload nginx
+echo "Test environment provisioned. Deploy an archive, then configure HTTPS. Existing test.env and TLS vhost preserved."

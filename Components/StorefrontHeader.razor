@@ -1,9 +1,10 @@
-<div class="announcement">Proudly Ghanaian-American <span>✦</span> Wellness with purpose</div>
-<header class="site-header">
-    <a class="logo" href="/">
-        <img src="/images/vitalreach-logo.png" alt="VitalReach Wellness Hub" />
+@rendermode InteractiveServer
+<div class="announcement storefront-announcement">Proudly Ghanaian-American <span>✦</span> Wellness with purpose</div>
+<header class="site-header storefront-header" id="top">
+    <a class="logo" href="/#top">
+        <img src="images/vitalreach-logo_header.png" alt="VitalReach Wellness Hub" />
     </a>
-    <nav class="desktop-nav">
+    <nav class="desktop-nav" aria-label="Main navigation">
         <a href="/shop">Shop</a>
         <a href="/#ghana">Ghana Mission</a>
         <a href="/health-guide">Health Guide</a>
@@ -11,6 +12,42 @@
         <a href="/contact">Contact</a>
     </nav>
     <div class="header-actions">
-        <a class="cart-trigger" href="/cart">Bag</a>
+        <button class="menu-trigger @(MenuOpen ? "open" : "")" @onclick="ToggleMenu" type="button" aria-label="Toggle navigation" aria-controls="storefront-mobile-navigation" aria-expanded="@MenuOpen">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <a class="cart-trigger cart-icon" href="/cart" aria-label="View shopping cart" title="Shopping cart">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <path d="M3 3h2l2.4 12h11.2l2-8H6" />
+                <circle cx="9" cy="20" r="1" />
+                <circle cx="18" cy="20" r="1" />
+            </svg>
+        </a>
     </div>
 </header>
+@if (MenuOpen)
+{
+    <nav id="storefront-mobile-navigation" class="mobile-menu storefront-mobile-menu" aria-label="Mobile navigation">
+        <p>Explore VitalReach</p>
+        <a href="/shop" @onclick="CloseMenu">
+            <span>01</span> Shop
+        </a>
+        <a href="/#ghana" @onclick="CloseMenu">
+            <span>02</span> Ghana Mission
+        </a>
+        <a href="/health-guide" @onclick="CloseMenu">
+            <span>03</span> Health Guide
+        </a>
+        <a href="/wellness-center" @onclick="CloseMenu">
+            <span>04</span> Wellness Center
+        </a>
+        <a href="/contact" @onclick="CloseMenu">
+            <span>05</span> Contact
+        </a>
+        <div>
+            <small>Wellness with purpose</small>
+            <b>Educating Ghana. Reaching the world.</b>
+        </div>
+    </nav>
+}

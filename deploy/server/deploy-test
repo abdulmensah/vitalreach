@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# Installed root-owned at /opt/vitalreach/bin/deploy-test.
+# The deployer may invoke only this script via sudo; application runs as vitalreach-test.
+[[ $# -eq 1 && "$1" =~ ^[0-9a-f]{40}$ ]] || { echo "Usage: deploy-test <40-character commit SHA>" >&2; exit 64; }
+[[ "$EUID" -eq 0 ]] || { echo "Run via sudo" >&2; exit 77; }
+release_id="$1"
+root=/opt/vitalreach/test
+release="$root/releases/$release_id"
+archive="/tmp/vitalreach-test-$release_id.tar.gz"
+[[ -f "$archive" && ! -L "$archive" ]] || { echo "Missing release archive" >&2; exit 66; }
+[[ -f /etc/vitalreach/test.env ]] || { echo "Test environment file is required" >&2; exit 78; }
+[[ -d "$root/shared" ]] || { echo "Provision test shared storage first" >&2; exit 78; }
+exec 9>/run/lock/vitalreach-test-deploy.lock
+flock -n 9 || { echo "Another test deployment is running" >&2; exit 75; }
+[[ ! -e "$release" ]] || { echo "Release already exists; use the documented rollback/retry procedure" >&2; exit 65; }
+
+work=$(mktemp -d /opt/vitalreach/test/.deploy.XXXXXXXX)
+trap 'rm -rf -- "$work"' EXIT
+cp -- "$archive" "$work/release.tar.gz"
+mkdir "$work/app"
+# Extract only regular files/directories, never links or device files. Validate before writing.
+python3 - "$work/release.tar.gz" "$work/app" <<'PY'
+import pathlib, sys, tarfile
+target = pathlib.Path(sys.argv[2]).resolve()
+with tarfile.open(sys.argv[1], "r:gz") as archive:
+    members = archive.getmembers()
+    if sum(m.size for m in members) > 1024 * 1024 * 1024:
+        raise SystemExit("Release exceeds 1 GiB extracted size")
+    for member in members:
+        dest = (target / member.name).resolve()
+        if not dest.is_relative_to(target) or not (member.isfile() or member.isdir()):
+            raise SystemExit("Unsafe archive entry")
+        if ".env" in pathlib.PurePosixPath(member.name).parts or "App_Data" in pathlib.PurePosixPath(member.name).parts:
+            raise SystemExit("Release contains local configuration or mutable application data")
+    archive.extractall(target, members=members, filter="data")
+if not (target / "VitalReach.Web.dll").is_file():
+    raise SystemExit("Application DLL missing")
+PY
+
+previous=""
+if [[ -L "$root/current" ]]; then
+    previous=$(readlink -f "$root/current")
+elif [[ -e "$root/current" ]]; then
+    echo "Current must be a release symlink" >&2; exit 65
+fi
+if [[ -n "$previous" && "$previous" != "$root/releases/"* ]]; then
+    echo "Unexpected current release path" >&2; exit 65
+fi
+install -d -m 0755 "$root/releases"
+mv -- "$work/app" "$release"
+chown -R root:vitalreach-test "$release"
+chmod -R u=rwX,g=rX,o= "$release"
+# Startup creates App_Data even with absolute DB paths; keep that directory in writable shared storage.
+ln -s "$root/shared" "$release/App_Data"
+
+systemctl stop vitalreach-test.service
+backup="$root/backups/$(date -u +%Y%m%dT%H%M%SZ)-$release_id"
+recover() {
+    trap - ERR
+    echo "Deployment failed. Restoring previous code; database is NOT automatically restored." >&2
+    systemctl stop vitalreach-test.service || true
+    if [[ -n "$previous" ]]; then
+        ln -sfn "$previous" "$root/current.rollback"
+        mv -Tf "$root/current.rollback" "$root/current"
+        systemctl start vitalreach-test.service || true
+    fi
+    echo "Review migration compatibility and backup at $backup before restoring data." >&2
+    exit 1
+}
+trap recover ERR
+install -d -m 0700 "$backup"
+tar -czf "$backup/shared.tar.gz" -C "$root" shared
+printf '%s\n' "$previous" > "$backup/previous-release"
+cp /etc/vitalreach/test.env "$backup/test.env"
+ln -s "$release" "$root/current.next"
+mv -Tf "$root/current.next" "$root/current"
+systemctl start vitalreach-test.service
+for attempt in {1..20}; do
+    if curl --fail --silent --max-time 3 http://127.0.0.1:5090/health >/dev/null; then
+        trap - ERR
+        echo "Test release $release_id is healthy; backup: $backup"
+        exit 0
+    fi
+    sleep 2
+done
+
+echo "Health check failed" >&2
+recover

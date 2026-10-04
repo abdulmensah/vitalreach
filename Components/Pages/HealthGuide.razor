@@ -2,7 +2,7 @@
 
 <PageTitle>Kidney Health Guide | VitalReach Wellness Hub</PageTitle>
 <StorefrontHeader />
-<main class="health-guide-page">
+<main class="public-refresh health-guide-page">
     <section class="health-guide-hero">
         <div>
             <p class="eyebrow light">VitalReach Kidney Health Ghana</p>
@@ -10,15 +10,23 @@
             <p>Clear, practical information to help individuals and families understand kidney risk, screening, everyday prevention, and the questions to take to a qualified healthcare professional.</p>
             <a class="btn btn-gold" href="/health-guide#start">Start the guide →</a>
         </div>
+        <img class="health-guide-hero-photo" src="/images/vitalreach-guide-hero-black.jpg" alt="VitalReach founder presenting kidney health education to visitors" width="1672" height="941" fetchpriority="high" />
     </section>
 
-    <nav class="health-guide-nav" aria-label="Health guide topics">
-        @foreach (var topic in GuideTopics)
-        {
-            <a href="@topic.Href"><span>@topic.Number</span>@topic.Label</a>
-        }
+    <nav class="health-guide-nav" aria-label="Health guide topics" data-health-guide-nav>
+        <button class="health-guide-nav-toggle" type="button" aria-expanded="false" aria-controls="health-guide-links">
+            <span>Explore this page</span>
+            <span class="health-guide-nav-icon" aria-hidden="true"></span>
+        </button>
+        <div class="health-guide-nav-panel" id="health-guide-links">
+            <div class="health-guide-nav-links">
+                @foreach (var topic in GuideTopics)
+                {
+                    <a href="@topic.Href"><span>@topic.Number</span>@topic.Label</a>
+                }
+            </div>
+        </div>
     </nav>
-
     <section class="health-guide-intro" id="start">
         <div>
             <p class="eyebrow">Why kidney health matters</p>
@@ -54,6 +62,10 @@
             <p class="eyebrow light">02 · Screening</p>
             <h2>Know the two tests<br />that tell a bigger story.</h2>
             <p>A healthcare professional interprets these results alongside your health history. One result alone may not establish a diagnosis, and repeat testing may be needed.</p>
+            <figure class="guide-editorial-image">
+                <img src="/images/health-guide/screening-conversation.jpg" alt="Illustration of a clinician and visitor discussing a report together" width="1536" height="1024" loading="lazy" />
+                <figcaption>Make space for questions. Understand your results with your care team.</figcaption>
+            </figure>
         </header>
         <div>
             @foreach (var test in ScreeningTests)
@@ -70,10 +82,18 @@
         </div>
     </section>
 
-    <section class="health-guide-section" id="protect">
-        <header>
-            <p class="eyebrow">03 · Everyday protection</p>
-            <h2>Small choices support the bigger picture.</h2>
+    <section class="health-guide-section guide-protection" id="protect">
+        <header class="guide-illustrated-heading">
+            <figure class="guide-editorial-image">
+                <div class="guide-image-overlay">
+                <img src="/images/health-guide/everyday-movement.jpg" alt="Illustration of a couple enjoying a relaxed walk along a leafy park path" width="1536" height="1024" loading="lazy" />
+                    <div class="guide-image-heading">
+                        <p class="eyebrow">03 · Everyday protection</p>
+                        <h2>Small choices support the bigger picture.</h2>
+                    </div>
+                </div>
+                <figcaption>Everyday movement, at a pace that works for you.</figcaption>
+            </figure>
             <p>Your personal plan depends on your health, medicines, and test results. These principles can help you begin a useful conversation with your care team.</p>
         </header>
         <div class="health-action-grid">
