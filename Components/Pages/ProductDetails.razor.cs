@@ -26,7 +26,7 @@ public partial class ProductDetails
     private ProductEntity? Product;
     private ProductEntity? Previous;
     private ProductEntity? Next;
-    private HeadquartersSettings? Headquarters;
+
     private List<GalleryImage> GalleryImages = [];
     private string? SelectedImageUrl;
     private string SelectedImageAlt = "";
@@ -67,7 +67,7 @@ public partial class ProductDetails
         VariantChanged();
         Previous = index > 0 ? products[index - 1] : null;
         Next = index >= 0 && index < products.Count - 1 ? products[index + 1] : null;
-        Headquarters = await db.Headquarters.AsNoTracking().SingleAsync(x => x.Id == 1);
+
     }
 
     private void SelectImage(GalleryImage? image)

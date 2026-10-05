@@ -1,0 +1,40 @@
+@page "/admin/social"
+@rendermode InteractiveServer
+@attribute [Authorize(Policy = "Admin")]
+<PageTitle>Social media administration | VitalReach</PageTitle>
+<AdminPortalLayout ActiveSection="social">
+    <header class="admin-title">
+        <div><p class="eyebrow">Secure administration</p><h1>Social media</h1><p>Add profiles, choose their icons and control which links appear in the footer. Lower ranks appear first. Choose Other for additional networks.</p></div>
+        <button class="admin-icon-button btn btn-gold" type="button" @onclick="NewAsync" disabled="@Saving" title="Add social profile" aria-label="Add social profile"><AdminActionIcon Name="add" /></button>
+    </header>
+    @if (!string.IsNullOrWhiteSpace(Message))
+    { <div class="admin-message @(IsError ? "error" : "")" role="status">@Message</div> }
+    <section class="admin-editor">
+        <h2>Social profiles</h2>
+        @if (Links.Count == 0) { <p>No profiles yet. Use the + button to add one.</p> }
+        @foreach (var link in Links)
+        {
+            <article class="admin-location-row" @key="link.Id">
+                <div><strong>@link.Label</strong><p>@link.Platform · @(link.IsPublished ? "Published" : "Hidden") · Rank @link.Rank</p></div>
+                <button class="admin-icon-button btn btn-outline" type="button" @onclick="() => EditAsync(link)" disabled="@Saving" title="Edit @link.Label" aria-label="Edit @link.Label"><AdminActionIcon Name="edit" /></button>
+            </article>
+        }
+    </section>
+    @if (Draft is not null)
+    {
+        <section class="admin-editor settings-editor">
+            <h2>@(Draft.Id == 0 ? "New social profile" : "Edit social profile")</h2>
+            <EditForm Model="Draft" OnValidSubmit="SaveAsync" @key="Draft">
+                <DataAnnotationsValidator /><ValidationSummary />
+                <div class="form-grid">
+                    <label>Platform / icon<InputSelect @bind-Value="Draft.Platform" @bind-Value:after="PlatformChanged">@foreach (var platform in Enum.GetValues<SocialPlatform>()) { <option value="@platform">@platform</option> }</InputSelect></label>
+                    <label>Display name<InputText @bind-Value="Draft.Label" maxlength="80" /></label>
+                    <label class="wide">Profile URL<InputText @bind-Value="Draft.Url" maxlength="500" placeholder="Enter the full HTTPS profile URL" /></label>
+                    <label>Display rank (lowest first)<InputNumber @bind-Value="Draft.Rank" min="0" max="100000" /></label>
+                    <label class="check"><InputCheckbox @bind-Value="Draft.IsPublished" />Published in the footer</label>
+                </div>
+                <div class="form-actions"><button class="admin-icon-button btn btn-gold" type="submit" disabled="@Saving" title="Save social profile" aria-label="Save social profile"><AdminActionIcon Name="save" /></button></div>
+            </EditForm>
+        </section>
+    }
+</AdminPortalLayout>

@@ -10,7 +10,7 @@
             <h1>Product catalog</h1>
             <p>Manage the products shown on the VitalReach storefront.</p>
         </div>
-        <button class="btn btn-gold" @onclick="NewProduct">Add product</button>
+        <button class="admin-icon-button btn btn-gold" @onclick="NewProduct" type="button" title="Add product" aria-label="Add product"><AdminActionIcon Name="add" /></button>
     </header>
     @if (!string.IsNullOrEmpty(Message))
     {
@@ -28,7 +28,7 @@
                 <label>Status<select @bind="StatusFilter"><option value="">All statuses</option><option value="published">Published</option><option value="hidden">Hidden</option></select></label>
                 <label>Availability<select @bind="AvailabilityFilter"><option value="">All availability</option><option value="available">Available variants</option><option value="unavailable">No available variants</option></select></label>
                 <label>Sort by<select @bind="Sort"><option value="rank">Storefront rank</option><option value="name">Name A–Z</option><option value="name-desc">Name Z–A</option><option value="price">Price low–high</option><option value="price-desc">Price high–low</option><option value="updated">Recently updated</option></select></label>
-                <button type="button" class="btn btn-outline" @onclick="ResetFilters">Reset filters</button>
+                <button type="button" class="admin-icon-button btn btn-outline" @onclick="ResetFilters" title="Reset filters" aria-label="Reset filters"><AdminActionIcon Name="refresh" /></button>
                 @if (!CanRank) { <small>Reset filters and sort by storefront rank to reorder products.</small> }
             </div>
             @if (VisibleProducts.Count == 0) { <p class="admin-gallery-empty">No products match these filters.</p> }
@@ -44,8 +44,8 @@
                         <i class="@(product.IsPublished ? "published" : "draft")">@(product.IsPublished ? "Published" : "Hidden")</i>
                     </button>
                     <div class="admin-rank-actions" aria-label="Change rank for @product.Name">
-                        <button type="button" title="Move up" aria-label="Move @product.Name up" disabled="@(!CanRank || Ranking || Products.IndexOf(product) == 0)" @onclick="() => MoveProduct(product, -1)">↑</button>
-                        <button type="button" title="Move down" aria-label="Move @product.Name down" disabled="@(!CanRank || Ranking || Products.IndexOf(product) == Products.Count - 1)" @onclick="() => MoveProduct(product, 1)">↓</button>
+                        <button type="button" disabled="@(!CanRank || Ranking || Products.IndexOf(product) == 0)" @onclick="() => MoveProduct(product, -1)" class="admin-icon-button" title="Move up" aria-label="Move up"><AdminActionIcon Name="up" /></button>
+                        <button type="button" disabled="@(!CanRank || Ranking || Products.IndexOf(product) == Products.Count - 1)" @onclick="() => MoveProduct(product, 1)" class="admin-icon-button" title="Move down" aria-label="Move down"><AdminActionIcon Name="down" /></button>
                     </div>
                 </div>
             }
@@ -109,10 +109,10 @@
                                         <label class="wide">Variant image URL (optional)<InputText @bind-Value="variant.ImageUrl" /><small>Leave empty to use the product image.</small></label>
                                         <label class="check"><InputCheckbox @bind-Value="variant.IsAvailable" /> Available for enquiries</label>
                                     </div>
-                                    <button type="button" class="danger-button" disabled="@(Editing.Variants.Count == 1 || Saving)" @onclick="() => RemoveVariant(variant)">Remove variant</button>
+                                    <button type="button" class="admin-icon-button danger-button" disabled="@(Editing.Variants.Count == 1 || Saving)" @onclick="() => RemoveVariant(variant)" title="Remove variant" aria-label="Remove variant"><AdminActionIcon Name="delete" /></button>
                                 </fieldset>
                             }
-                            <button type="button" class="btn btn-outline" disabled="@Saving" @onclick="AddVariant">Add variant</button>
+                            <button type="button" class="admin-icon-button btn btn-outline" disabled="@Saving" @onclick="AddVariant" title="Add variant" aria-label="Add variant"><AdminActionIcon Name="add" /></button>
                         </section>
                         <label class="wide">
                             Product image<InputFile OnChange="SelectImage" accept="image/jpeg,image/png,image/webp" />
@@ -128,7 +128,7 @@
                         {
                             <div class="admin-image-preview wide">
                                 <img src="@Editing.ImageUrl" alt="Product image preview for @Editing.Name" />
-                                <button class="danger-button" type="button" @onclick="RemoveImage">Remove image</button>
+                                <button class="admin-icon-button danger-button" type="button" @onclick="RemoveImage" title="Remove image" aria-label="Remove image"><AdminActionIcon Name="delete" /></button>
                             </div>
                         }
                         @if (Editing.Id != 0)
@@ -149,9 +149,7 @@
                                         Gallery image
                                         <InputFile OnChange="SelectGalleryImage" accept="image/jpeg,image/png,image/webp" />
                                     </label>
-                                    <button class="btn btn-outline" type="button" disabled="@(SelectedGalleryImage is null || SavingGalleryImage)" @onclick="AddGalleryImage">
-                                        @(SavingGalleryImage ? "Uploading…" : "Add to gallery")
-                                    </button>
+                                    <button class="admin-icon-button btn btn-outline" type="button" disabled="@(SelectedGalleryImage is null || SavingGalleryImage)" @onclick="AddGalleryImage" title="@(SavingGalleryImage ? "Uploading…" : "Add to gallery")" aria-label="@(SavingGalleryImage ? "Uploading…" : "Add to gallery")"><AdminActionIcon Name="upload" /></button>
                                 </div>
                                 @if (SelectedGalleryImage is not null)
                                 {
@@ -173,9 +171,9 @@
                                                     <small>Gallery rank @(GalleryImages.IndexOf(image) + 1)</small>
                                                 </div>
                                                 <div class="admin-gallery-actions">
-                                                    <button type="button" title="Move image left" disabled="@(SavingGalleryImage || GalleryImages.IndexOf(image) == 0)" @onclick="() => MoveGalleryImage(image, -1)">←</button>
-                                                    <button type="button" title="Move image right" disabled="@(SavingGalleryImage || GalleryImages.IndexOf(image) == GalleryImages.Count - 1)" @onclick="() => MoveGalleryImage(image, 1)">→</button>
-                                                    <button class="remove" type="button" disabled="@SavingGalleryImage" @onclick="() => RemoveGalleryImage(image)">Remove</button>
+                                                    <button type="button" disabled="@(SavingGalleryImage || GalleryImages.IndexOf(image) == 0)" @onclick="() => MoveGalleryImage(image, -1)" class="admin-icon-button" title="Move image left" aria-label="Move image left"><AdminActionIcon Name="left" /></button>
+                                                    <button type="button" disabled="@(SavingGalleryImage || GalleryImages.IndexOf(image) == GalleryImages.Count - 1)" @onclick="() => MoveGalleryImage(image, 1)" class="admin-icon-button" title="Move image right" aria-label="Move image right"><AdminActionIcon Name="right" /></button>
+                                                    <button class="admin-icon-button remove" type="button" disabled="@SavingGalleryImage" @onclick="() => RemoveGalleryImage(image)" title="Remove" aria-label="Remove"><AdminActionIcon Name="delete" /></button>
                                                 </div>
                                             </article>
                                         }
@@ -209,10 +207,10 @@
                     </label>
                 </div>
                 <div class="form-actions">
-                    <button class="btn btn-gold" type="submit" disabled="@Saving">@(Saving ? "Saving…" : "Save product")</button>
+                    <button class="admin-icon-button btn btn-gold" type="submit" disabled="@Saving" title="@(Saving ? "Saving…" : "Save product")" aria-label="@(Saving ? "Saving…" : "Save product")"><AdminActionIcon Name="save" /></button>
                     @if (Editing.Id != 0)
                     {
-                        <button class="danger-button" type="button" @onclick="Delete">Delete product</button>
+                        <button class="admin-icon-button danger-button" type="button" @onclick="Delete" title="Delete product" aria-label="Delete product"><AdminActionIcon Name="delete" /></button>
                     }
                 </div>
             </EditForm>

@@ -10,7 +10,7 @@
             <h1>Administrator access</h1>
             <p>Superadmins manage portal access. Clinical reviewer access is granted separately and allows viewing sensitive health records.</p>
         </div>
-        <button class="btn btn-gold" @onclick="StartAdd">Add administrator</button>
+        <button class="admin-icon-button btn btn-gold" @onclick="StartAdd" type="button" title="Add administrator" aria-label="Add administrator"><AdminActionIcon Name="add" /></button>
     </header>
     @if (!string.IsNullOrEmpty(Message))
     {
@@ -31,8 +31,8 @@
                     </label>
                 </div>
                 <div class="form-actions">
-                    <button class="btn btn-gold" type="submit">Grant access</button>
-                    <button class="danger-button" type="button" @onclick="CancelAdd">Cancel</button>
+                    <button class="admin-icon-button btn btn-gold" type="submit" title="Grant access" aria-label="Grant access"><AdminActionIcon Name="shield" /></button>
+                    <button class="admin-icon-button danger-button" type="button" @onclick="CancelAdd" title="Cancel" aria-label="Cancel"><AdminActionIcon Name="close" /></button>
                 </div>
             </EditForm>
         </section>
@@ -59,10 +59,10 @@
                     <small>@user.CreatedUtc.ToLocalTime().ToString("MMM d, yyyy")<br>by @user.CreatedBy</small>
                 </span>
                 <span class="access-actions">
-                    <button @onclick="() => Toggle(user)">@(user.IsActive ? "Disable" : "Enable")</button>
-                    <button class="delete" @onclick="() => Delete(user)">Remove</button>
-                    <button @onclick="() => ToggleRole(user, false)">@(user.IsClinicalReviewer ? "Revoke clinical access" : "Grant clinical access")</button>
-                    <button @onclick="() => ToggleRole(user, true)">@(user.IsSuperAdmin ? "Revoke superadmin" : "Grant superadmin")</button>
+                    <button @onclick="() => Toggle(user)" class="admin-icon-button" type="button" title="@(user.IsActive ? "Disable" : "Enable")" aria-label="@(user.IsActive ? "Disable" : "Enable")"><AdminActionIcon Name="@(user.IsActive ? "disable" : "enable")" /></button>
+                    <button class="admin-icon-button delete" @onclick="() => Delete(user)" type="button" title="Remove" aria-label="Remove"><AdminActionIcon Name="delete" /></button>
+                    <button @onclick="() => ToggleRole(user, false)" class="admin-icon-button" type="button" title="@(user.IsClinicalReviewer ? "Revoke clinical access" : "Grant clinical access")" aria-label="@(user.IsClinicalReviewer ? "Revoke clinical access" : "Grant clinical access")"><AdminActionIcon Name="@(user.IsClinicalReviewer ? "clinical-off" : "clinical")" /></button>
+                    <button @onclick="() => ToggleRole(user, true)" class="admin-icon-button" type="button" title="@(user.IsSuperAdmin ? "Revoke superadmin" : "Grant superadmin")" aria-label="@(user.IsSuperAdmin ? "Revoke superadmin" : "Grant superadmin")"><AdminActionIcon Name="@(user.IsSuperAdmin ? "shield-off" : "shield")" /></button>
                 </span>
             </article>
         }

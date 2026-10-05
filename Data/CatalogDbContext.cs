@@ -4,6 +4,10 @@ namespace VitalReach.Web.Data;
 
 public sealed class CatalogDbContext(DbContextOptions<CatalogDbContext> options) : DbContext(options)
 {
+    public DbSet<SocialSettings> SocialSettings => Set<SocialSettings>();
+    public DbSet<SocialLink> SocialLinks => Set<SocialLink>();
+    public DbSet<Location> Locations => Set<Location>();
+    public DbSet<UsBranchSettings> UsBranches => Set<UsBranchSettings>();
     public DbSet<ConsultationSubmission> ConsultationSubmissions => Set<ConsultationSubmission>();
     public DbSet<ConsultationAudit> ConsultationAudits => Set<ConsultationAudit>();
     public DbSet<ProductEntity> Products => Set<ProductEntity>();
@@ -20,6 +24,9 @@ public sealed class CatalogDbContext(DbContextOptions<CatalogDbContext> options)
     public DbSet<PaymentAttempt> PaymentAttempts => Set<PaymentAttempt>();
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<SocialLink>().Property(x => x.Version).IsConcurrencyToken();
+        modelBuilder.Entity<Location>().Property(x => x.Version).IsConcurrencyToken();
+        modelBuilder.Entity<Location>().HasIndex(x => new { x.Status, x.Rank });
         modelBuilder.Entity<ConsultationSubmission>().Property(x => x.Version).IsConcurrencyToken();
         modelBuilder.Entity<ConsultationSubmission>().HasIndex(x => x.CreatedUtc);
         modelBuilder.Entity<ProductEntity>().HasIndex(x => x.Slug).IsUnique();

@@ -1,20 +1,17 @@
 <footer class="storefront-footer">
     <img src="/images/vitalreach-logo_footer.png" alt="VitalReach Wellness Hub" />
     <div class="footer-identity">
-        <p>Educating Ghana. Reaching the world.</p>@if (Headquarters is not null) {
-        <address>
-            <b>Headquarters</b>
-            <a href="@Headquarters.MapUrl" target="_blank" rel="noopener noreferrer">
-                @Headquarters.AddressLine1<br />
-                @if (!string.IsNullOrWhiteSpace(Headquarters.AddressLine2))
-                {
-                    @Headquarters.AddressLine2
-                    <br />
-                }
-                @Headquarters.CityRegion, @Headquarters.Country
-            </a>
-        </address>
-    }
+        <p>Educating Ghana. Reaching the world.</p>
+        @foreach (var location in Locations)
+        {
+            <address @key="location.Id">
+                <b>@location.CenterName</b>
+                <a href="@location.MapUrl" target="_blank" rel="noopener noreferrer">@location.AddressLine1<br />
+                    @if (!string.IsNullOrWhiteSpace(location.AddressLine2)) { @location.AddressLine2<br /> }
+                    @location.CityRegion @location.PostalCode, @location.Country</a>
+            </address>
+        }
+        <SocialLinks />
 </div>
 <div>
     <a href="/shop">Collection</a>

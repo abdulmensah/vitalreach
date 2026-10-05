@@ -27,7 +27,7 @@
             </div>
         </div>
         <div class="hero-visual">
-            <img class="hero-photo" src="/images/wellness-center/wellness-center-reception.png" alt="VitalReach wellness hub reception concept" width="1672" height="941" fetchpriority="high" />
+            <img class="hero-photo" src="/images/wellness-center/vitalreach-store-hero.jpeg" alt="VitalReach store interior with illuminated product shelves and a gold-accented reception desk" width="1536" height="1024" fetchpriority="high" />
         </div>
     </section>
     <nav class="wellness-paths" aria-label="Discover VitalReach">
@@ -35,11 +35,9 @@
         <a href="/health-guide"><span class="path-number">02 / Health education</span><h2>Know your health</h2><p>Clear information. Better questions. Informed choices.</p><span class="path-link">Read the health guide ↗</span></a>
         <a href="/wellness-center"><span class="path-number">03 / The wellness center</span><h2>A personal connection</h2><p>Discover our center and prepare for your visit.</p><span class="path-link">Meet us at the hub ↗</span></a>
     </nav>
-    <section class="mission" id="ghana">
-        <div class="mission-badge">
-            <b>GH</b>
-        </div>
-        <div>
+    <section class="mission mission-storefront" id="ghana">
+        <img class="mission-storefront-image" src="/images/wellness-center/storefront.jpeg" alt="VitalReach Wellness Hub storefront with teal and gold signage and an illuminated entrance" width="1672" height="941" loading="lazy" decoding="async" />
+        <div class="mission-copy">
             <p class="eyebrow">Our commitment to Ghana</p>
             <span>Education that reaches home.</span>
 
@@ -48,8 +46,8 @@
             </h2>
             <p>Kidney disease can develop quietly. VitalReach Wellness Hub provides clear, practical education to help Ghanaians understand prevention, early screening, blood pressure, diabetes, medication safety, hydration and the kidney numbers that matter.</p>
             <strong>Educating Ghana. Reaching the world.</strong>
+            <a class="btn btn-outline" href="/wellness-center">Visit our Wellness Center →</a>
         </div>
-        <a class="btn btn-outline" href="/health-guide">Explore Kidney Health Ghana →</a>
     </section>
     <nav class="ticker" aria-label="VitalReach values">
         <a href="/#shop">Premium quality</a>
@@ -95,20 +93,6 @@
         <p class="disclaimer">Product descriptions are for general information. Final labels and claims remain subject to formulation, testing, and regulatory review.</p>
         <a class="shop-all-link" href="/shop">Shop all products →</a>
     </section>
-    @if (Headquarters is not null)
-    {
-        <section class="center-callout">
-            <div>
-                <p class="eyebrow light">Now at VitalReach headquarters</p>
-                <h2>
-                    Discover our Shopping &amp;<br />
-                    <em>Wellness Center.</em>
-                </h2>
-                <p>Explore products, practical wellness support, and health education at @Headquarters.AddressLine1 in @Headquarters.City, @Headquarters.Country.</p>
-            </div>
-            <a class="btn btn-gold" href="/wellness-center">Learn more &amp; plan your visit →</a>
-        </section>
-    }
     <section class="story" id="about">
         <div class="story-art">
             <img class="story-founder-photo" src="/images/vitalreach-hero-black-jacket.jpeg" alt="Masaouda N. Nartey, VitalReach founder, with the wellness collection" width="1500" height="1049" loading="lazy" />
@@ -148,6 +132,7 @@
             <small>Educational information—not medical advice, diagnosis, or treatment.</small>
         </div>
     </section>
+
     <section class="contact" id="contact">
         <div>
             <p class="eyebrow light">Begin your VitalReach journey</p>
@@ -174,4 +159,4 @@
     </section>
 </main>
 </div>
-<StorefrontFooter Headquarters="Headquarters" />
+<StorefrontFooter />

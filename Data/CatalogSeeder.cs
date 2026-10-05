@@ -62,6 +62,9 @@ public static class CatalogSeeder
             );
             """);
         await AdminAccessSchema.EnsureAsync(db);
+        await SocialSettings.EnsureAsync(db);
+        await SocialLink.EnsureAsync(db);
+        await UsBranchSettings.EnsureAsync(db);
         if (!await db.Products.AnyAsync()) db.Products.AddRange(
             New("energy", "Ultra Energy Shot™", 24m, "Founder's Collection", "Caffeine-free focus & vitality", "30 servings", "gold-product", "30 mL", "Ultra Energy", "Shot", 10),
             New("magnesium", "Magnesium Glycinate Complex+", 29m, "Daily Wellness", "Everyday calm & muscle support", "60 capsules", "teal-product", "COMPLEX+", "Magnesium", "Complex+", 20),
@@ -79,6 +82,7 @@ public static class CatalogSeeder
         if (!await db.Headquarters.AnyAsync()) db.Headquarters.Add(new HeadquartersSettings());
         await db.SaveChangesAsync();
         await SeedProductGalleryImagesOnceAsync(db);
+        await LocationSchema.EnsureAsync(db);
         await VariantSchema.EnsureAsync(db);
         await CommerceSchema.EnsureAsync(db);
         await IntakeSchema.EnsureAsync(db);

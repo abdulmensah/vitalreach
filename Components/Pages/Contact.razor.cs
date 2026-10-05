@@ -12,19 +12,19 @@ public partial class Contact
     [Parameter, SupplyParameterFromQuery(Name = "message")] public string? PresetMessage { get; set; }
 
     private ContactInput Input = new();
-    private HeadquartersSettings? Headquarters;
+    private Location? Headquarters;
     private string? StatusMessage;
     private string? AppliedPresetMessage;
     private bool IsError;
     private bool Submitting;
     private string MapEmbedUrl => Headquarters is null
         ? "about:blank"
-        : $"https://www.google.com/maps?q={Uri.EscapeDataString(string.Join(", ", new[] { Headquarters.AddressLine1, Headquarters.AddressLine2, Headquarters.City, Headquarters.Region, Headquarters.Country }.Where(value => !string.IsNullOrWhiteSpace(value))))}&output=embed";
+        : $"https://www.google.com/maps?q={Uri.EscapeDataString(string.Join(", ", new[] { Headquarters.AddressLine1, Headquarters.AddressLine2, Headquarters.City, Headquarters.Region, Headquarters.PostalCode, Headquarters.Country }.Where(value => !string.IsNullOrWhiteSpace(value))))}&output=embed";
 
     protected override async Task OnInitializedAsync()
     {
         await using var db = await DbFactory.CreateDbContextAsync();
-        Headquarters = await db.Headquarters.AsNoTracking().SingleAsync(x => x.Id == 1);
+        Headquarters = await LocationSchema.Published(db).FirstOrDefaultAsync();
     }
 
     protected override void OnParametersSet()

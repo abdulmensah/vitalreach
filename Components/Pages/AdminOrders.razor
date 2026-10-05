@@ -8,7 +8,7 @@
     <div class="catalog-filters">
         <label>Search<input @bind="Search" @bind:event="oninput" placeholder="Order, customer, email, SKU" /></label>
         <label>Status<select @bind="Status"><option value="">All statuses</option>@foreach (var status in Enum.GetValues<OrderStatus>()) { <option value="@status">@Orders.StatusLabel(status)</option> }</select></label>
-        <button class="btn btn-outline" disabled="@Busy" @onclick="Load">Refresh</button>
+        <button class="admin-icon-button btn btn-outline" disabled="@Busy" @onclick="Load" type="button" title="Refresh" aria-label="Refresh"><AdminActionIcon Name="refresh" /></button>
     </div>
     <div class="admin-grid">
         <section class="admin-list">
@@ -34,8 +34,8 @@
                         <label class="wide">Tax review / evidence<textarea @bind="TaxEvidence" maxlength="2000"></textarea></label>
                         <label class="wide">Customer quote instructions<textarea @bind="Instructions" maxlength="2000"></textarea></label>
                     </div>
-                    @if (Selected.Country == "US") { <button class="btn btn-outline" disabled="@Busy" @onclick="CalculateTax">Calculate US tax</button> }
-                    <button class="btn btn-gold" disabled="@Busy" @onclick='() => Act("quote")'>Confirm quote &amp; reserve stock</button>
+                    @if (Selected.Country == "US") { <button class="admin-icon-button btn btn-outline" disabled="@Busy" @onclick="CalculateTax" type="button" title="Calculate US tax" aria-label="Calculate US tax"><AdminActionIcon Name="tax" /></button> }
+                    <button class="admin-icon-button btn btn-gold" disabled="@Busy" @onclick='() => Act("quote")' type="button" title="Confirm quote and reserve stock" aria-label="Confirm quote and reserve stock"><AdminActionIcon Name="quote" /></button>
                 }
                 else
                 {
@@ -46,11 +46,11 @@
                 @if (Selected.Status is OrderStatus.Paid or OrderStatus.AwaitingPayment)
                 {
                     <label class="variant-picker">@(Selected.Status == OrderStatus.Paid ? "Carrier/tracking or collection reference" : "Verified offline payment reference")<input @bind="Reference" maxlength="250" /></label>
-                    @if (Selected.Status == OrderStatus.Paid) { <button class="btn btn-gold" disabled="@Busy" @onclick='() => Act("ship")'>Mark shipped / collected</button> }
-                    else { <button class="btn btn-outline" disabled="@Busy" @onclick='() => Act("paid")'>Record verified offline payment</button> }
+                    @if (Selected.Status == OrderStatus.Paid) { <button class="admin-icon-button btn btn-gold" disabled="@Busy" @onclick='() => Act("ship")' type="button" title="Mark shipped / collected" aria-label="Mark shipped / collected"><AdminActionIcon Name="ship" /></button> }
+                    else { <button class="admin-icon-button btn btn-outline" disabled="@Busy" @onclick='() => Act("paid")' type="button" title="Record verified offline payment" aria-label="Record verified offline payment"><AdminActionIcon Name="payment" /></button> }
                 }
                 @if (Selected.Status is OrderStatus.QuoteRequested or OrderStatus.AwaitingPayment)
-                { <button class="danger-button" disabled="@Busy" @onclick='() => Act("cancel")'>Cancel unpaid order &amp; release stock</button> }
+                { <button class="admin-icon-button danger-button" disabled="@Busy" @onclick='() => Act("cancel")' type="button" title="Cancel unpaid order and release stock" aria-label="Cancel unpaid order and release stock"><AdminActionIcon Name="close" /></button> }
                 <h3>Order history</h3>
                 @foreach (var item in Selected.Events.OrderByDescending(x => x.CreatedUtc)) { <p>@item.CreatedUtc.ToString("u") · @item.Actor · @item.Description</p> }
             }

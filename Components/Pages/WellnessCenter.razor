@@ -2,17 +2,16 @@
 
 <PageTitle>Shopping &amp; Wellness Center | VitalReach</PageTitle>
 <StorefrontHeader />
-@if (Headquarters is not null)
-{
+
     <main class="public-refresh center-page">
         <section class="center-hero">
             <div class="center-hero-content">
-                <p class="eyebrow light">VitalReach headquarters</p>
+                <p class="eyebrow light">Our locations</p>
                 <h1>
                     A place to explore wellness<br />
                     <em>with confidence.</em>
                 </h1>
-                <p>Discover products in person, ask thoughtful questions, and find practical education for your everyday wellness journey—all in one welcoming destination in Accra.</p>
+                <p>Discover products in person, ask thoughtful questions, and find practical education for your everyday wellness journey—all in one welcoming destination.</p>
                 <div class="actions">
                     <a class="btn btn-gold" href="@PlanVisitUrl">Plan your visit →</a>
                     <a class="underlink light-link" href="/shop">Browse products ↗</a>
@@ -26,7 +25,7 @@
                 <h2>Welcome to the<br />VitalReach center.</h2>
             </div>
             <div>
-                <p>The @Headquarters.CenterName brings our product collection, people, and health-education mission together under one roof. It is designed for unhurried discovery: compare formats, read labels, understand product categories, and talk through the questions that matter to you.</p>
+                <p>VitalReach brings our product collection, people, and health-education mission together under one roof. It is designed for unhurried discovery: compare formats, read labels, understand product categories, and talk through the questions that matter to you.</p>
                 <p>Whether you are starting a routine, shopping for someone you care about, or simply looking for clearer information, our team will help you take the next step without pressure.</p>
             </div>
         </section>
@@ -68,11 +67,15 @@
                 }
             </div>
         </section>
-        <section class="center-visit">
+        <section class="center-visit center-visit-visual">
             <div class="center-visit-heading">
-                <p class="eyebrow light">Your visit, made simple</p>
-                <h2>Come curious.<br />Leave clearer.</h2>
+                <img class="center-visit-image" src="/images/wellness-center/wellness-center-reception.png" alt="VitalReach reception area with a welcome desk and illuminated wellness product displays" width="1672" height="941" loading="lazy" decoding="async" />
+                <div class="center-visit-caption">
+                    <p class="eyebrow light">Your visit, made simple</p>
+                    <h2>Come curious.<br />Leave clearer.</h2>
+                </div>
             </div>
+            <div class="center-visit-details">
             <ol>
                 @foreach (var step in VisitSteps)
                 {
@@ -86,22 +89,25 @@
                 }
             </ol>
             <p class="center-disclaimer">Our in-center guidance and product information are educational and are not a diagnosis, prescription, or substitute for advice from a qualified healthcare professional.</p>
+            </div>
         </section>
+        @if (Headquarters is not null)
+        {
         <section class="center-location">
             <div>
-                <p class="eyebrow">Visit our headquarters</p>
+                <p class="eyebrow">Visit our location</p>
                 <h2>@Headquarters.CenterName</h2>
                 <div class="center-location-contacts">
-                    <a href="@Headquarters.PhoneHref">@Headquarters.Phone</a>
-                    <a href="@CenterInformationUrl">@Headquarters.Email</a>
+                    @if (!string.IsNullOrWhiteSpace(Headquarters.Phone)) { <a href="@Headquarters.PhoneHref">@Headquarters.Phone</a> }
+                    @if (!string.IsNullOrWhiteSpace(Headquarters.Email)) { <a href="mailto:@Headquarters.Email">@Headquarters.Email</a> }
                 </div>
                 <p>@Headquarters.Hours</p>
             </div>
             <div class="center-location-map">
-                <iframe src="@MapEmbedUrl" title="Google map showing the VitalReach headquarters location" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+                <iframe src="@MapEmbedUrl" title="Map showing @Headquarters.CenterName" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
                 <a href="@Headquarters.MapUrl" target="_blank" rel="noopener noreferrer">Open in Google Maps ↗</a>
             </div>
         </section>
+        }
     </main>
-    <StorefrontFooter Headquarters="Headquarters" />
-}
+    <StorefrontFooter />

@@ -61,7 +61,7 @@
                         referrerpolicy="no-referrer-when-downgrade"
                         allowfullscreen></iframe>
                 <aside class="contact-details">
-                    <p class="eyebrow light">VitalReach headquarters</p>
+                    <p class="eyebrow light">Our locations</p>
                     <h2>@Headquarters.CenterName</h2>
                     <address>
                         <a href="@Headquarters.MapUrl" target="_blank" rel="noopener noreferrer">
@@ -71,12 +71,12 @@
                                 @Headquarters.AddressLine2
                                 <br />
                             }
-                            @Headquarters.CityRegion, @Headquarters.Country
+                            @Headquarters.CityRegion @Headquarters.PostalCode, @Headquarters.Country
                         </a>
                     </address>
                     <div class="contact-detail-links">
-                        <a href="@Headquarters.PhoneHref">@Headquarters.Phone</a>
-                        <a href="/contact?message=Hello%20VitalReach%2C%0A%0AI%20would%20like%20to%20get%20in%20touch%20with%20your%20team.%0A%0AThank%20you.">@Headquarters.Email</a>
+                        @if (!string.IsNullOrWhiteSpace(Headquarters.Phone)) { <a href="@Headquarters.PhoneHref">@Headquarters.Phone</a> }
+                        @if (!string.IsNullOrWhiteSpace(Headquarters.Email)) { <a href="mailto:@Headquarters.Email">@Headquarters.Email</a> }
                     </div>
                     <p>@Headquarters.Hours</p>
                     <a class="underlink light-link" href="/wellness-center">Explore the wellness center →</a>
@@ -84,5 +84,6 @@
             </div>
         }
     </section>
+    <BranchLocations ExcludeId="Headquarters?.Id" />
 </main>
-<StorefrontFooter Headquarters="Headquarters" />
+<StorefrontFooter />

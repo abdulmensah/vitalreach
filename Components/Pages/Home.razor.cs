@@ -9,14 +9,16 @@ public partial class Home
     [Inject] private CommerceService Commerce { get; set; } = default!;
     [Inject] private NavigationManager Navigation { get; set; } = default!;
     private List<ProductEntity> Products = [];
-    private HeadquartersSettings? Headquarters;
+    private Location? Headquarters;
+
     private string? CartMessage;
     protected override async Task OnInitializedAsync()
     {
         await using var db = await DbFactory.CreateDbContextAsync();
+        Headquarters = await LocationSchema.Published(db).FirstOrDefaultAsync();
         Products = await db.Products.AsNoTracking().Include(p => p.Variants).Where(p => p.IsPublished)
             .OrderBy(p => p.SortOrder).ThenBy(p => p.Name).Take(4).ToListAsync();
-        Headquarters = await db.Headquarters.AsNoTracking().SingleAsync(x => x.Id == 1);
+
     }
     private async Task AddToCart(ProductCard.VariantSelection selection)
     {

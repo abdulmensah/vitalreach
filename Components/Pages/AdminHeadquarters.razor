@@ -1,61 +1,49 @@
+@page "/admin/locations"
 @page "/admin/headquarters"
 @rendermode InteractiveServer
 @attribute [Authorize(Policy = "Admin")]
 
-<PageTitle>Headquarters administration | VitalReach</PageTitle>
+<PageTitle>Locations administration | VitalReach</PageTitle>
 <AdminPortalLayout ActiveSection="headquarters">
     <header class="admin-title">
-        <div>
-            <p class="eyebrow">Secure administration</p>
-            <h1>Headquarters</h1>
-            <p>This address appears in the storefront footer and on the Shopping &amp; Wellness Center page.</p>
-        </div>
+        <div><p class="eyebrow">Secure administration</p><h1>Locations</h1>
+            <p>Only Published locations appear on the website. Lower ranks appear first; the first published location is featured on Contact and Wellness Center. Equal ranks use creation order. Draft and Archived locations stay private.</p></div>
+        <button class="admin-icon-button btn btn-gold" type="button" @onclick="NewAsync" disabled="@Saving" title="Add location" aria-label="Add location"><AdminActionIcon Name="add" /></button>
     </header>
     @if (!string.IsNullOrWhiteSpace(Message))
-    {
-        <div class="admin-message @(IsError ? "error" : "")" role="status">@Message</div>
-    }
-    @if (Settings is not null)
+    { <div class="admin-message @(IsError ? "error" : "")" role="status">@Message</div> }
+    <section class="admin-editor">
+        <h2>All locations</h2>
+        @if (Locations.Count == 0) { <p>No locations yet. Add a location to get started.</p> }
+        @foreach (var location in Locations)
+        {
+            <article class="admin-location-row" @key="location.Id">
+                <div><strong>@location.CenterName</strong><p>@location.City, @location.Country · @location.Status · Rank @location.Rank</p></div>
+                <button class="admin-icon-button btn btn-outline" type="button" @onclick="() => EditAsync(location)" disabled="@Saving" title="Edit @location.CenterName" aria-label="Edit @location.CenterName"><AdminActionIcon Name="edit" /></button>
+            </article>
+        }
+    </section>
+    @if (Draft is not null)
     {
         <section class="admin-editor settings-editor">
-            <EditForm Model="Settings" OnValidSubmit="SaveAsync">
-                <DataAnnotationsValidator />
-                <ValidationSummary />
+            <h2>@(Draft.Id == 0 ? "New location" : "Edit location")</h2>
+            <EditForm Model="Draft" OnValidSubmit="SaveAsync" @key="Draft">
+                <DataAnnotationsValidator /><ValidationSummary />
                 <div class="form-grid">
-                    <label class="wide">
-                        Center name<InputText @bind-Value="Settings.CenterName" />
-                    </label>
-                    <label class="wide">
-                        Address line 1<InputText @bind-Value="Settings.AddressLine1" />
-                    </label>
-                    <label class="wide">
-                        Address line 2<InputText @bind-Value="Settings.AddressLine2" />
-                    </label>
-                    <label>
-                        City / locality<InputText @bind-Value="Settings.City" />
-                    </label>
-                    <label>
-                        Region / state<InputText @bind-Value="Settings.Region" />
-                    </label>
-                    <label>
-                        Postal code<InputText @bind-Value="Settings.PostalCode" />
-                    </label>
-                    <label>
-                        Country<InputText @bind-Value="Settings.Country" />
-                    </label>
-                    <label>
-                        Phone<InputText @bind-Value="Settings.Phone" />
-                    </label>
-                    <label>
-                        Email<InputText @bind-Value="Settings.Email" />
-                    </label>
-                    <label class="wide">
-                        Opening information<InputTextArea @bind-Value="Settings.Hours" />
-                    </label>
+                    <label class="wide">Location name<InputText @bind-Value="Draft.CenterName" /></label>
+                    <label>Status<InputSelect @bind-Value="Draft.Status"><option value="Draft">Draft</option><option value="Published">Published</option><option value="Archived">Archived</option></InputSelect></label>
+                    <label>Display rank (lowest first)<InputNumber @bind-Value="Draft.Rank" min="0" max="100000" /></label>
+                    <label class="wide">Address line 1<InputText @bind-Value="Draft.AddressLine1" /></label>
+                    <label class="wide">Address line 2<InputText @bind-Value="Draft.AddressLine2" /></label>
+                    <label>City / locality<InputText @bind-Value="Draft.City" /></label>
+                    <label>Region / state<InputText @bind-Value="Draft.Region" /></label>
+                    <label>Postal code<InputText @bind-Value="Draft.PostalCode" /></label>
+                    <label>Country<InputText @bind-Value="Draft.Country" /></label>
+                    <label>Phone (optional)<InputText @bind-Value="Draft.Phone" /></label>
+                    <label>Email (optional)<InputText @bind-Value="Draft.Email" /></label>
+                    <label class="wide">Opening information<InputTextArea @bind-Value="Draft.Hours" /></label>
                 </div>
-                <div class="form-actions">
-                    <button class="btn btn-gold" type="submit" disabled="@Saving">@(Saving ? "Saving…" : "Save headquarters")</button>
-                </div>
+                <div class="form-actions"><button class="admin-icon-button btn btn-gold" type="submit" disabled="@Saving" title="@(Saving ? "Saving…" : "Save location")" aria-label="@(Saving ? "Saving…" : "Save location")"><AdminActionIcon Name="save" /></button></div>
             </EditForm>
         </section>
     }

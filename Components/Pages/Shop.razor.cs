@@ -16,7 +16,7 @@ public partial class Shop
 
     private List<ProductEntity> Products = [];
     private List<CategoryFacet> Facets = [];
-    private HeadquartersSettings? Headquarters;
+
     private int TotalProducts;
     private int TotalAcrossCategories;
     private int TotalPages = 1;
@@ -54,7 +54,7 @@ public partial class Shop
             .Skip((PageNumber - 1) * PageSize)
             .Take(PageSize)
             .ToListAsync();
-        Headquarters = await db.Headquarters.AsNoTracking().SingleAsync(x => x.Id == 1);
+
     }
 
     private string BuildUrl(string? category, int page)

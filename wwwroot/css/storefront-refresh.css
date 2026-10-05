@@ -1,6 +1,17 @@
 /* Shared public design system. Clinical status colors and admin controls retain their meaning. */
 .public-refresh, .storefront-header, .storefront-footer { --page-space: clamp(22px, 4vw, 72px); }
 .public-refresh { background: #faf8f2; }
+.storefront-footer .footer-identity { display: block; }
+.storefront-footer .social-links { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 22px; }
+.storefront-footer .social-links a { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border: 1px solid #78978d; color: #ead1a0; }
+.social-links svg { width: 22px; height: 22px; fill: currentColor; }
+.storefront-footer .social-links a:hover { background: #16564f; color: #fffdf5; }
+.social-links a:focus-visible { outline: 3px solid #e5c383; outline-offset: 3px; }
+.us-branch { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 40px; align-items: center; padding: 48px var(--page-space); border-top: 1px solid #d8dfd3; background: #faf8f2; }
+.us-branch h2 { color: #063f3b; font: 500 clamp(32px,3.6vw,50px)/1.15 'Playfair Display',serif; margin: 0 0 22px; }
+.us-branch address { font-style: normal; color: #53645a; margin-bottom: 22px; }
+.us-branch iframe { width: 100%; height: 340px; border: 0; background: #e9ede3; }
+@media (max-width: 800px) { .us-branch { grid-template-columns: minmax(0,1fr); gap: 24px; padding-block: 34px; } }
 .guide-editorial-image { margin: 28px 0 0; }
 .guide-editorial-image img { display: block; width: 100%; height: auto; }
 .guide-editorial-image figcaption { padding: 12px 0; border-bottom: 1px solid #b8c9bb; font: 13px/1.6 'DM Sans',sans-serif; color: #53645a; }
@@ -177,4 +188,101 @@
  .public-refresh .contact-form-panel { padding: 22px; }
  .public-refresh.commerce-page .form-grid { padding: 18px; }
  .public-refresh .products { gap: 16px; }
+}
+.admin-location-row { display:flex; justify-content:space-between; align-items:center; gap:20px; padding:18px 0; border-bottom:1px solid #d8dfd3; }
+.admin-location-row p { margin:6px 0 0; }
+
+/* Compact actions retain native button semantics and keyboard-visible tooltips. */
+.admin-portal button.admin-icon-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 40px;
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+    padding: 9px;
+    gap: 0;
+    border: 1px solid #b8c8c0;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.admin-icon-button svg { width: 20px; height: 20px; flex: none; }
+.admin-portal button.admin-icon-button:focus-visible { outline: 3px solid #b68a35; outline-offset: 3px; }
+.admin-portal button.admin-icon-button:disabled { opacity: .45; cursor: not-allowed; }
+.admin-icon-button::after {
+    content: attr(aria-label);
+    position: absolute;
+    z-index: 30;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: max-content;
+    max-width: 220px;
+    white-space: normal;
+    padding: 7px 10px;
+    border-radius: 5px;
+    background: #063f3b;
+    color: white;
+    font: 500 12px/1.4 Inter, sans-serif;
+    text-transform: none;
+    letter-spacing: normal;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+}
+.admin-icon-button:hover::after, .admin-icon-button:focus-visible::after { opacity: 1; visibility: visible; }
+@media (pointer: coarse) { .admin-portal button.admin-icon-button { width: 44px; min-width: 44px; height: 44px; flex-basis: 44px; } }
+
+/* Storefront photography keeps the complete signage and entrance visible. */
+.center-callout.center-callout-visual { display: grid; grid-template-columns: minmax(0,1.2fr) minmax(0,1fr); align-items: center; gap: 0; padding: 0; }
+.center-callout-visual .center-callout-image { display: block; min-width: 0; }
+.center-callout-visual .center-callout-image img { display: block; width: 100%; height: auto; }
+.center-callout-visual .center-callout-copy { min-width: 0; padding: 32px clamp(24px,3vw,48px); }
+.center-callout-visual .center-callout-copy h2 { font-size: clamp(28px,3vw,44px); }
+.center-callout-visual .center-callout-copy .btn { margin-top: 20px; white-space: normal; }
+@media (max-width: 1000px) {
+    .center-callout.center-callout-visual { grid-template-columns: minmax(0,1fr); }
+    .center-callout-visual .center-callout-copy { padding: 28px var(--page-space); }
+}
+.public-refresh .center-hero {
+    min-height: 560px;
+    background: linear-gradient(90deg,rgba(2,35,33,.94) 0%,rgba(2,46,43,.78) 36%,rgba(2,46,43,.12) 75%), url('/images/wellness-center/storefront.jpeg') center top / cover;
+}
+.public-refresh .contact-page-hero {
+    min-height: 480px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: linear-gradient(90deg,rgba(2,35,33,.96) 0%,rgba(2,46,43,.8) 38%,rgba(2,46,43,.12) 85%), url('/images/wellness-center/wellness-center-reception.png') center / cover;
+}
+@media (max-width: 700px) {
+    .public-refresh .center-hero {
+        min-height: 640px;
+        align-items: flex-end;
+        background: linear-gradient(180deg,transparent 100px,#022e2b 260px), url('/images/wellness-center/storefront.jpeg') center top / 100% auto no-repeat #022e2b;
+    }
+    .public-refresh .contact-page-hero {
+        min-height: 520px;
+        justify-content: flex-end;
+        background: linear-gradient(0deg,rgba(2,35,33,.98) 0%,rgba(2,46,43,.86) 45%,rgba(2,46,43,.12) 100%), url('/images/wellness-center/wellness-center-reception.png') 62% center / cover;
+    }
+}
+
+.public-refresh .center-visit-visual { grid-template-columns: minmax(0,1fr) minmax(0,1fr); column-gap: 40px; row-gap: 24px; align-items: start; }
+.center-visit-visual .center-visit-heading { position: relative; display: grid; min-height: 390px; overflow: hidden; isolation: isolate; }
+.center-visit-image { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; z-index: -2; }
+.center-visit-visual .center-visit-heading::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg,rgba(2,35,33,.05) 20%,rgba(2,35,33,.55) 52%,rgba(2,35,33,.96) 100%); z-index: -1; }
+.center-visit-caption { align-self: end; padding: clamp(22px,3vw,40px); }
+.center-visit-caption .eyebrow { color: #ead1a0; }
+.center-visit-caption h2 { font-size: clamp(34px,3.5vw,52px); line-height: 1.1; }
+.center-visit-visual .center-disclaimer { margin: 24px 0 0; }
+.center-visit-details { min-width: 0; }
+@media (min-width: 901px) {
+    .center-visit-visual .center-visit-heading { min-height: 500px; }
+}
+@media (max-width: 900px) {
+    .public-refresh .center-visit-visual { grid-template-columns: minmax(0,1fr); }
+    .center-visit-visual .center-disclaimer { grid-column: 1; }
 }

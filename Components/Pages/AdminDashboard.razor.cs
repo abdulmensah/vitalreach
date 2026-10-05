@@ -24,6 +24,6 @@ public partial class AdminDashboard
         MessageCount = await db.ContactSubmissions.CountAsync();
         UnreadMessageCount = await db.ContactSubmissions.CountAsync(message => !message.IsRead);
         ActiveAdminCount = await db.AdminUsers.CountAsync(user => user.IsActive);
-        HeadquartersStatus = await db.Headquarters.AnyAsync() ? "Configured" : "Not set";
+        HeadquartersStatus = (await db.Locations.CountAsync(x => x.Status == LocationStatus.Published)).ToString();
     }
 }

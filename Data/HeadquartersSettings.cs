@@ -19,5 +19,5 @@ public sealed class HeadquartersSettings
 
     public string CityRegion => string.Join(", ", new[] { City, Region }.Where(x => !string.IsNullOrWhiteSpace(x)));
     public string PhoneHref => $"tel:{new string(Phone.Where(x => char.IsDigit(x) || x == '+').ToArray())}";
-    public string MapUrl => $"https://www.google.com/maps/search/?api=1&query={Uri.EscapeDataString(string.Join(", ", new[] { AddressLine1, AddressLine2, City, Region, Country }.Where(x => !string.IsNullOrWhiteSpace(x))))}";
+    public string MapUrl => $"https://www.google.com/maps/search/?api=1&query={Uri.EscapeDataString(string.Join(", ", new[] { AddressLine1, AddressLine2, City, Region, PostalCode, Country }.Where(x => !string.IsNullOrWhiteSpace(x))))}";
 }

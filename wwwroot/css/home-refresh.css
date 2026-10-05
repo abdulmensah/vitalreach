@@ -98,7 +98,7 @@
  .home-refresh .hero-copy { width: 100%; padding: 34px 24px; }
  .home-refresh .hero h1 { font-size: clamp(46px, 12vw, 64px); }
  .home-refresh .hero-visual { position: static; height: auto; z-index: auto; }
- .home-refresh .hero-photo { height: auto; aspect-ratio: 1672 / 941; object-fit: contain; }
+ .home-refresh .hero-photo { height: auto; aspect-ratio: 3 / 2; object-fit: contain; }
  .home-refresh .lead { margin-block: 20px; font-size: 14px; }
  .home-refresh .actions { flex-direction: row; gap: 14px; }
  .home-refresh .trust { justify-content: start; margin-top: 22px; }
@@ -120,3 +120,11 @@
  .home-refresh .contact { padding: 34px 24px; }
 }
 
+.home-refresh .mission.mission-storefront { grid-template-columns: minmax(0,1.1fr) minmax(0,1fr); align-items: center; gap: 40px; }
+.mission-storefront-image { display: block; width: 100%; height: auto; }
+.mission-copy { min-width: 0; }
+.home-refresh .mission-copy .btn { display: inline-flex; margin-top: 22px; white-space: normal; }
+.home-refresh .mission-copy strong { display: block; }
+@media (max-width: 1000px) {
+    .home-refresh .mission.mission-storefront { grid-template-columns: minmax(0,1fr); gap: 26px; }
+}

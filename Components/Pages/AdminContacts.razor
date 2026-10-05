@@ -42,8 +42,8 @@
                     </header>
                     <p>@submission.Message</p>
                     <div class="contact-submission-actions">
-                        <button @onclick="() => ToggleReadAsync(submission)">Mark as @(submission.IsRead ? "unread" : "read")</button>
-                        <button class="delete" @onclick="() => DeleteAsync(submission)">Delete</button>
+                        <button @onclick="() => ToggleReadAsync(submission)" class="admin-icon-button" type="button" title="Mark as @(submission.IsRead ? "unread" : "read")" aria-label="Mark as @(submission.IsRead ? "unread" : "read")"><AdminActionIcon Name="@(submission.IsRead ? "unread" : "read")" /></button>
+                        <button class="admin-icon-button delete" @onclick="() => DeleteAsync(submission)" type="button" title="Delete" aria-label="Delete"><AdminActionIcon Name="delete" /></button>
                     </div>
                 </article>
             }

@@ -50,15 +50,15 @@ public partial class WellnessCenter
     [Inject] private IDbContextFactory<CatalogDbContext> DbFactory { get; set; } = default!;
     [Inject] private IConfiguration Configuration { get; set; } = default!;
     private bool IntakeEnabled => Configuration.GetValue<bool>("Intake:Enabled");
-    private HeadquartersSettings? Headquarters;
+    private Location? Headquarters;
     private string MapEmbedUrl => Headquarters is null
         ? "about:blank"
-        : $"https://www.google.com/maps?q={Uri.EscapeDataString(string.Join(", ", new[] { Headquarters.AddressLine1, Headquarters.AddressLine2, Headquarters.City, Headquarters.Region, Headquarters.Country }.Where(value => !string.IsNullOrWhiteSpace(value))))}&output=embed";
+        : $"https://www.google.com/maps?q={Uri.EscapeDataString(string.Join(", ", new[] { Headquarters.AddressLine1, Headquarters.AddressLine2, Headquarters.City, Headquarters.Region, Headquarters.PostalCode, Headquarters.Country }.Where(value => !string.IsNullOrWhiteSpace(value))))}&output=embed";
 
     protected override async Task OnInitializedAsync()
     {
         await using var db = await DbFactory.CreateDbContextAsync();
-        Headquarters = await db.Headquarters.AsNoTracking().SingleAsync(x => x.Id == 1);
+        Headquarters = await LocationSchema.Published(db).FirstOrDefaultAsync();
     }
 
     private sealed record ServiceCard(string Number, string Title, string Description, string Href, string LinkText);

@@ -19,17 +19,17 @@
         <span class="intake-badge tone-orange">▲ Prompt assessment</span>
         <span class="intake-badge tone-red">! Immediate help</span>
     </div><p>Green records a clinician's decision. Original screening flags retain their urgency and color after review.</p></section>
-    <section class="intake-card"><div class="intake-toolbar"><label>Status<select @bind="Status" @bind:after="ResetPageAsync"><option>Awaiting review</option>@foreach (var status in IntakePresentation.ReviewStatuses) { <option>@status</option> }<option>All</option></select></label><button @onclick="LoadAsync" disabled="@Busy">Refresh</button></div>
+    <section class="intake-card"><div class="intake-toolbar"><label>Status<select @bind="Status" @bind:after="ResetPageAsync"><option>Awaiting review</option>@foreach (var status in IntakePresentation.ReviewStatuses) { <option>@status</option> }<option>All</option></select></label><button @onclick="LoadAsync" disabled="@Busy" class="admin-icon-button" type="button" title="Refresh" aria-label="Refresh"><AdminActionIcon Name="refresh" /></button></div>
         <p>Sorted by urgency, then newest first. Times shown in UTC. Staff must actively monitor this list; it does not send emergency notifications.</p>
         @if (Rows.Count == 0) { <p>No submissions in this view.</p> }
         @foreach (var row in Rows)
-        { <article class="intake-list-row"><div><strong class="intake-badge tone-@IntakePresentation.Color(row.Priority)"><span aria-hidden="true">@IntakePresentation.Icon(row.Priority)</span> @IntakeScreening.PriorityLabel(row.Priority)</strong><p>@row.CreatedUtc.ToString("yyyy-MM-dd HH:mm") UTC · <span class="intake-badge tone-@IntakePresentation.StatusColor(row.Status)">@row.Status</span></p><small>@row.Id</small></div><button @onclick="() => OpenAsync(row.Id)" disabled="@Busy">Review</button></article> }
-        <div class="intake-toolbar"><button disabled="@(Page == 0 || Busy)" @onclick="PreviousAsync">Previous</button><span>Page @(Page + 1)</span><button disabled="@(Rows.Count < 25 || Busy)" @onclick="NextAsync">Next</button></div>
+        { <article class="intake-list-row"><div><strong class="intake-badge tone-@IntakePresentation.Color(row.Priority)"><span aria-hidden="true">@IntakePresentation.Icon(row.Priority)</span> @IntakeScreening.PriorityLabel(row.Priority)</strong><p>@row.CreatedUtc.ToString("yyyy-MM-dd HH:mm") UTC · <span class="intake-badge tone-@IntakePresentation.StatusColor(row.Status)">@row.Status</span></p><small>@row.Id</small></div><button @onclick="() => OpenAsync(row.Id)" disabled="@Busy" class="admin-icon-button" type="button" title="Review" aria-label="Review"><AdminActionIcon Name="review" /></button></article> }
+        <div class="intake-toolbar"><button disabled="@(Page == 0 || Busy)" @onclick="PreviousAsync" class="admin-icon-button" type="button" title="Previous page" aria-label="Previous page"><AdminActionIcon Name="left" /></button><span>Page @(Page + 1)</span><button disabled="@(Rows.Count < 25 || Busy)" @onclick="NextAsync" class="admin-icon-button" type="button" title="Next page" aria-label="Next page"><AdminActionIcon Name="right" /></button></div>
     </section>
     @if (Selected is { } selected)
     {
         var entry = selected.Content.Entry;
-        <section class="intake-card"><div class="intake-toolbar"><h2>@entry.Name</h2><button @onclick="Close">Close record</button></div>
+        <section class="intake-card"><div class="intake-toolbar"><h2>@entry.Name</h2><button @onclick="Close" class="admin-icon-button" type="button" title="Close record" aria-label="Close record"><AdminActionIcon Name="close" /></button></div>
             <p>Age @entry.Age · @entry.Sex · Pregnancy / postpartum: @entry.Pregnancy</p><p>Contact: @(entry.Contact.Length > 0 ? entry.Contact : "Not supplied")</p>
             <p>Received @selected.Record.CreatedUtc.ToString("u") · Reference @selected.Record.Id</p>
             <h3>Screening flags</h3>
@@ -55,7 +55,7 @@
             <label>Review status<select @bind="ReviewStatus">@foreach (var status in IntakePresentation.ReviewStatuses) { <option>@status</option> }</select></label>
             <p>Choose “no outstanding action” only after documenting your clinical decision. This does not remove the original screening flags.</p>
             <label>Assessment and action taken<textarea @bind="ReviewNotes" maxlength="4000" rows="6"></textarea></label>
-            <button class="btn btn-gold" @onclick="SaveAsync" disabled="@Busy">Save clinical review</button>
+            <button class="admin-icon-button btn btn-gold" @onclick="SaveAsync" disabled="@Busy" type="button" title="Save clinical review" aria-label="Save clinical review"><AdminActionIcon Name="save" /></button>
         </section>
     }
 </AdminPortalLayout>
