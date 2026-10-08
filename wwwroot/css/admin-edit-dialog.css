@@ -1,0 +1,14 @@
+.admin-edit-dialog { width: min(900px, calc(100vw - 32px)); max-height: calc(100dvh - 48px); padding: 0; border: 1px solid #bacbc4; border-radius: 12px; background: #faf8f2; color: #063f3b; box-shadow: 0 24px 90px #001c2a55; overflow-y: auto; overscroll-behavior: contain; }
+.admin-edit-dialog::backdrop { background: #001d24a6; }
+.admin-edit-dialog-header { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 18px 24px; background: #faf8f2; border-bottom: 1px solid #d8dfd3; }
+.admin-edit-dialog-header h2 { margin: 0; font-size: 24px; }
+.admin-edit-dialog-body { padding: 24px; }
+.admin-edit-dialog > .admin-message { margin: 16px 24px 0; }
+.admin-edit-dialog .form-actions { position: sticky; bottom: -24px; background: #faf8f2; padding-block: 16px; border-top: 1px solid #d8dfd3; }
+.admin-edit-dialog .validation-summary-errors { scroll-margin-top: 90px; }
+@media (max-width: 600px) {
+    .admin-edit-dialog { width: calc(100vw - 16px); max-height: calc(100dvh - 16px); }
+    .admin-edit-dialog-header, .admin-edit-dialog-body { padding: 16px; }
+    .admin-edit-dialog .form-grid { grid-template-columns: minmax(0,1fr); }
+    .admin-edit-dialog .form-actions { bottom: -16px; }
+}

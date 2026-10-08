@@ -1,0 +1,35 @@
+@page "/ghana-mission/activities/{Id:int}"
+<PageTitle>@(Activity?.Title ?? "Activity unavailable") | VitalReach International</PageTitle>
+<StorefrontHeader />
+<main class="public-refresh ghana-mission-page">
+    <section class="mission-article">
+        <a class="underlink" href="/ghana-mission#mission-activities">← Ghana Mission activities</a>
+        @if (Activity is null)
+        {
+            <h1>Activity unavailable</h1>
+            <p>This story is not currently published.</p>
+        }
+        else
+        {
+            <p class="eyebrow">VitalReach International · Ghana Mission</p>
+            <h1>@Activity.Title</h1>
+            @if (Activity.IsPledged) { <p class="mission-pledge">Support pledged</p> }
+            <p>
+                @if (Activity.ActivityDate is DateTime date)
+                { <time datetime="@date.ToString("yyyy-MM-dd")">@date.ToString("MMMM d, yyyy")</time> }
+                else { <span>Date not recorded</span> }
+                @if (!string.IsNullOrWhiteSpace(Activity.Location)) { <span> · @Activity.Location</span> }
+            </p>
+            <p>@Activity.Summary</p>
+            @if (!string.IsNullOrEmpty(Activity.ImageUrl))
+            { <img class="mission-article-image" src="@Activity.ImageUrl" alt="@Activity.ImageAlt" /> }
+            <div class="mission-article-body">@Activity.Story</div>
+            @if (!string.IsNullOrEmpty(Activity.VideoUrl))
+            {
+                <p><a class="btn btn-outline" href="@Activity.VideoUrl" target="_blank" rel="noopener noreferrer">Watch activity video ↗</a></p>
+                <p>The video opens on YouTube or Vimeo in a new tab.</p>
+            }
+        }
+    </section>
+</main>
+<StorefrontFooter />

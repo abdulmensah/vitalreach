@@ -1,0 +1,8 @@
+.vs/
+bin/
+obj/
+artifacts/
+/App_Data/
+*.user
+*.suo
+.env

@@ -1,0 +1,9 @@
+<dialog @ref="Dialog" class="admin-edit-dialog" aria-labelledby="@TitleId" aria-busy="@Busy">
+    <header class="admin-edit-dialog-header">
+        <h2 id="@TitleId" tabindex="-1">@Title</h2>
+        <button type="button" class="admin-icon-button btn btn-outline" title="Close editor" aria-label="Close editor" disabled="@Busy" @onclick="RequestCloseAsync"><AdminActionIcon Name="close" /></button>
+    </header>
+    @if (!string.IsNullOrWhiteSpace(ErrorMessage))
+    { <div class="admin-message error" role="alert" tabindex="-1">@ErrorMessage</div> }
+    <div class="admin-edit-dialog-body">@ChildContent</div>
+</dialog>

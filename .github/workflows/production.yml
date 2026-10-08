@@ -1,0 +1,81 @@
+name: Promote QA release to production
+
+on:
+  workflow_dispatch:
+    inputs:
+      qa_run_id:
+        description: Successful main-branch QA workflow run ID to promote
+        required: true
+        type: string
+      qa_connection_verified:
+        description: I tested idle/resume and reconnection with unsaved synthetic form data on this QA release
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: vitalreach-production
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://vitalreachhub.com
+    steps:
+      - name: Validate successful QA run
+        id: qa
+        uses: actions/github-script@v8
+        env:
+          QA_RUN_ID: ${{ inputs.qa_run_id }}
+          QA_CONNECTION_VERIFIED: ${{ inputs.qa_connection_verified }}
+        with:
+          script: |
+            if (process.env.QA_CONNECTION_VERIFIED !== 'true') throw new Error('Complete the QA idle/reconnection check before promoting this release');
+            if (!/^\d+$/.test(process.env.QA_RUN_ID)) throw new Error('Invalid QA run ID');
+            const run_id = Number(process.env.QA_RUN_ID);
+            const {data: run} = await github.rest.actions.getWorkflowRun({...context.repo, run_id});
+            if (run.path !== '.github/workflows/qa.yml' || run.head_branch !== 'main' ||
+                run.head_repository?.full_name !== `${context.repo.owner}/${context.repo.repo}` ||
+                !['push', 'workflow_dispatch'].includes(run.event) || run.conclusion !== 'success' ||
+                !/^[0-9a-f]{40}$/.test(run.head_sha)) throw new Error('Select a successful main-branch QA deployment');
+            core.setOutput('sha', run.head_sha);
+            core.setOutput('run_id', String(run_id));
+            core.summary.addHeading('Production promotion').addRaw(`QA-tested commit: ${run.head_sha}\nQA run: ${run.html_url}`).write();
+
+      - name: Download the QA-tested artifact
+        uses: actions/download-artifact@v5
+        with:
+          name: vitalreach-${{ steps.qa.outputs.sha }}
+          run-id: ${{ steps.qa.outputs.run_id }}
+          github-token: ${{ github.token }}
+          path: release
+
+      - name: Configure production SSH
+        env:
+          SSH_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+          KNOWN_HOSTS: ${{ secrets.PROD_SSH_KNOWN_HOSTS }}
+        run: |
+          test -n "$SSH_KEY" && test -n "$KNOWN_HOSTS"
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/vitalreach_prod
+          chmod 600 ~/.ssh/vitalreach_prod
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      - name: Upload and activate production release
+        env:
+          RELEASE_SHA: ${{ steps.qa.outputs.sha }}
+          PROD_HOST: ${{ vars.PROD_HOST }}
+        run: |
+          [[ "$PROD_HOST" =~ ^[a-zA-Z0-9][a-zA-Z0-9.-]*$ ]]
+          scp -o BatchMode=yes -o StrictHostKeyChecking=yes -i ~/.ssh/vitalreach_prod "release/vitalreach-$RELEASE_SHA.tar.gz" "deployer@$PROD_HOST:/tmp/vitalreach-prod-$RELEASE_SHA.tar.gz"
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -i ~/.ssh/vitalreach_prod "deployer@$PROD_HOST" "sudo /opt/vitalreach/bin/deploy-prod '$RELEASE_SHA'"
+
+      - name: Verify public production endpoint
+        run: curl --fail --retry 5 --retry-delay 3 --retry-all-errors --max-time 15 https://vitalreachhub.com/health

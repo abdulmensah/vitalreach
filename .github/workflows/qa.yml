@@ -1,0 +1,93 @@
+name: CI and QA deployment
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vitalreach-qa
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build and verify
+    runs-on: ubuntu-latest
+    environment:
+      name: qa
+      url: https://qa.vitalreachhub.com
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v5
+
+      - name: Install .NET 10
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore
+        run: dotnet restore --configfile NuGet.Config
+
+      - name: Validate production deployment script
+        run: |
+          bash -n deploy/server/deploy-prod
+          python3 tests/deploy_prod_archive_checks.py
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Verify consultation intake
+        run: dotnet run --project tests/IntakeChecks --configuration Release
+
+      - name: Verify reconnection behavior
+        run: node tests/connection-checks.cjs
+
+      - name: Verify admin confirmations
+        run: |
+          node tests/admin-confirm-dialog-checks.cjs
+          dotnet run --project tests/AdminActionChecks --configuration Release
+          dotnet run --project tests/ContactChecks --configuration Release
+
+      - name: Publish
+        run: dotnet publish --configuration Release --no-build --output publish
+
+      - name: Package deployment
+        if: github.event_name != 'pull_request'
+        run: tar -C publish -czf vitalreach-${{ github.sha }}.tar.gz .
+
+      - name: Upload deployment artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v5
+        with:
+          name: vitalreach-${{ github.sha }}
+          path: vitalreach-${{ github.sha }}.tar.gz
+          retention-days: 14
+
+      - name: Prepare SSH
+        if: github.event_name != 'pull_request'
+        env:
+          QA_SSH_PRIVATE_KEY: ${{ secrets.QA_SSH_PRIVATE_KEY }}
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$QA_SSH_PRIVATE_KEY" > ~/.ssh/vitalreach_qa
+          chmod 600 ~/.ssh/vitalreach_qa
+          ssh-keyscan -H 162.35.104.81 >> ~/.ssh/known_hosts
+
+      - name: Upload release
+        if: github.event_name != 'pull_request'
+        run: scp -i ~/.ssh/vitalreach_qa vitalreach-${{ github.sha }}.tar.gz deployer@162.35.104.81:/tmp/
+
+      - name: Activate release
+        if: github.event_name != 'pull_request'
+        run: ssh -i ~/.ssh/vitalreach_qa deployer@162.35.104.81 "sudo /opt/vitalreach/bin/deploy-qa '${{ github.sha }}' '/tmp/vitalreach-${{ github.sha }}.tar.gz'"
+
+      - name: Verify QA
+        if: github.event_name != 'pull_request'
+        run: curl --fail --retry 8 --retry-delay 5 --retry-all-errors https://qa.vitalreachhub.com/health
+
+  

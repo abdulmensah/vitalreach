@@ -1,0 +1,70 @@
+@page "/admin/users"
+@rendermode InteractiveServer
+@attribute [Authorize(Policy = "SuperAdmin")]
+
+<PageTitle>Administrator access | VitalReach</PageTitle>
+<AdminPortalLayout ActiveSection="users">
+    <header class="admin-title">
+        <div>
+            <p class="eyebrow">Secure administration</p>
+            <h1>Administrator access</h1>
+            <p>Superadmins manage portal access. Clinical reviewer access is granted separately and allows viewing sensitive health records.</p>
+        </div>
+        <button class="admin-icon-button btn btn-gold" @onclick="StartAdd" type="button" title="Add administrator" aria-label="Add administrator"><AdminActionIcon Name="add" /></button>
+    </header>
+    @if (!string.IsNullOrEmpty(Message))
+    {
+        <div class="admin-message @(IsError ? "error" : "")">@Message</div>
+    }
+    @if (Adding)
+    {
+        <section class="access-add">
+            <EditForm Model="NewUser" OnValidSubmit="AddUser">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <div class="form-grid">
+                    <label>
+                        Google email<InputText @bind-Value="NewUser.Email" />
+                    </label>
+                    <label>
+                        Display name<InputText @bind-Value="NewUser.DisplayName" />
+                    </label>
+                </div>
+                <div class="form-actions">
+                    <button class="admin-icon-button btn btn-gold" type="submit" title="Grant access" aria-label="Grant access"><AdminActionIcon Name="shield" /></button>
+                    <button class="admin-icon-button danger-button" type="button" @onclick="CancelAdd" title="Cancel" aria-label="Cancel"><AdminActionIcon Name="close" /></button>
+                </div>
+            </EditForm>
+        </section>
+    }
+    <section class="access-table">
+        <header>
+            <span>User</span>
+            <span>Status</span>
+            <span>Added</span>
+            <span>Actions</span>
+        </header>
+        @foreach (var user in Users)
+        {
+            <article>
+                <span>
+                    <b>@user.DisplayName</b>
+                    <small>@user.Email</small>
+                </span>
+                <span>
+                    <i class="@(user.IsActive ? "published" : "draft")">@(user.IsActive ? "Active" : "Disabled")</i>
+                    <small>@(user.IsSuperAdmin ? "Superadmin" : "Administrator") · @(user.IsClinicalReviewer ? "Clinical reviewer" : "No clinical access")</small>
+                </span>
+                <span>
+                    <small>@user.CreatedUtc.ToLocalTime().ToString("MMM d, yyyy")<br>by @user.CreatedBy</small>
+                </span>
+                <span class="access-actions">
+                    <button @onclick="() => Toggle(user)" class="admin-icon-button" type="button" title="@(user.IsActive ? "Disable" : "Enable")" aria-label="@(user.IsActive ? "Disable" : "Enable")"><AdminActionIcon Name="@(user.IsActive ? "disable" : "enable")" /></button>
+                    <button class="admin-icon-button delete" @onclick="() => Delete(user)" type="button" title="Remove" aria-label="Remove"><AdminActionIcon Name="delete" /></button>
+                    <button @onclick="() => ToggleRole(user, false)" class="admin-icon-button" type="button" title="@(user.IsClinicalReviewer ? "Revoke clinical access" : "Grant clinical access")" aria-label="@(user.IsClinicalReviewer ? "Revoke clinical access" : "Grant clinical access")"><AdminActionIcon Name="@(user.IsClinicalReviewer ? "clinical-off" : "clinical")" /></button>
+                    <button @onclick="() => ToggleRole(user, true)" class="admin-icon-button" type="button" title="@(user.IsSuperAdmin ? "Revoke superadmin" : "Grant superadmin")" aria-label="@(user.IsSuperAdmin ? "Revoke superadmin" : "Grant superadmin")"><AdminActionIcon Name="@(user.IsSuperAdmin ? "shield-off" : "shield")" /></button>
+                </span>
+            </article>
+        }
+    </section>
+</AdminPortalLayout>

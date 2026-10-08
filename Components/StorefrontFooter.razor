@@ -1,0 +1,26 @@
+<footer class="storefront-footer">
+    <img src="/images/vitalreach-logo_footer.png" alt="VitalReach Wellness Hub" />
+    <div class="footer-identity">
+        <p>Educating Ghana. Reaching the world.</p>
+        @foreach (var location in Locations)
+        {
+            <address @key="location.Id">
+                <b>@location.CenterName</b>
+                <a href="@location.MapUrl" target="_blank" rel="noopener noreferrer">@location.AddressLine1<br />
+                    @if (!string.IsNullOrWhiteSpace(location.AddressLine2)) { @location.AddressLine2<br /> }
+                    @location.CityRegion @location.PostalCode, @location.Country</a>
+            </address>
+        }
+        <SocialLinks />
+</div>
+<div>
+    <a href="/shop">Collection</a>
+    <a href="/ghana-mission">Ghana Mission</a>
+    <a href="/health-guide">Kidney Guide</a>
+    <a href="/wellness-center">Wellness Center</a>
+    <a href="/contact">Contact</a>
+    <a href="/privacy">Privacy Policy</a>
+    <a href="/terms">Terms of Service</a>
+</div>
+<small>© @DateTime.UtcNow.Year VitalReach Wellness Hub. Educational content is not a substitute for professional medical advice.</small>
+</footer>

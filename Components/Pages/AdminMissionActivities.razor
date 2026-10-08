@@ -1,0 +1,52 @@
+@page "/admin/mission-activities"
+@rendermode InteractiveServer
+@attribute [Authorize(Policy = "Admin")]
+<PageTitle>Mission activities administration | VitalReach</PageTitle>
+<AdminPortalLayout ActiveSection="mission">
+    <header class="admin-title">
+        <div><p class="eyebrow">VitalReach International</p><h1>Mission activities</h1><p>Publish activity stories and select those shown on the Ghana Mission timeline, newest activity first.</p></div>
+        <button class="admin-icon-button btn btn-gold" type="button" @onclick="NewAsync" disabled="@Saving" title="Add activity" aria-label="Add activity"><AdminActionIcon Name="add" /></button>
+    </header>
+    @if (Message is not null) { <div class="admin-message @(IsError ? "error" : "")" role="status">@Message</div> }
+    <section class="admin-editor">
+        <h2>Activity articles</h2>
+        @if (Activities.Count == 0) { <p>No activities yet. Add your first story using the + button.</p> }
+        @foreach (var activity in Activities)
+        {
+            <article class="admin-location-row" @key="activity.Id">
+                <div><strong>@activity.Title</strong><p>@(activity.ActivityDate?.ToString("dd MMM yyyy") ?? "Date not recorded") · @(activity.IsPledged ? "Support pledged · " : "")@(activity.IsPublished ? "Published" : "Draft / hidden") · @(activity.IsShowcased ? "Selected for timeline" : "Not selected for timeline")</p></div>
+                <button class="admin-icon-button btn btn-outline" type="button" @onclick="() => EditAsync(activity.Id)" disabled="@Saving" title="Edit @activity.Title" aria-label="Edit @activity.Title"><AdminActionIcon Name="edit" /></button>
+            </article>
+        }
+    </section>
+    @if (Draft is not null)
+    {
+        <AdminEditDialog Title="@(Draft.Id == 0 ? "New activity" : "Edit activity")" Busy="Saving" ErrorMessage="@(IsError ? Message : null)" OnClose="CloseEditorAsync">
+
+            <EditForm Model="Draft" OnValidSubmit="SaveAsync" @key="Draft">
+                <DataAnnotationsValidator /><ValidationSummary />
+                <div class="form-grid">
+                    <label class="wide">Title<InputText @bind-Value="Draft.Title" maxlength="160" /></label>
+                    <label>Activity date (leave blank if unknown)<InputDate @bind-Value="Draft.ActivityDate" /></label>
+                    <label>Location (optional)<InputText @bind-Value="Draft.Location" maxlength="120" /></label>
+                    <label class="check"><InputCheckbox @bind-Value="Draft.IsPledged" />Support pledged (not a completed activity)</label>
+                    <label class="wide">Source notes (admin only)<InputTextArea @bind-Value="Draft.SourceNote" maxlength="2000" rows="3" /></label>
+                    <label class="wide">Summary<InputTextArea @bind-Value="Draft.Summary" maxlength="400" rows="3" /></label>
+                    <label class="wide">Full story (plain text)<InputTextArea @bind-Value="Draft.Story" maxlength="20000" rows="12" /></label>
+                    <label>Cover photo (JPG, PNG or WebP, up to 5 MB)<InputFile OnChange="SelectImage" accept="image/jpeg,image/png,image/webp" /></label>
+                    <label>Photo description<InputText @bind-Value="Draft.ImageAlt" maxlength="250" /></label>
+                    @if (Draft.ImageUrl.Length > 0)
+                    {
+                        <div class="wide"><img src="@Draft.ImageUrl" alt="@Draft.ImageAlt" style="max-width:240px;max-height:180px" /></div>
+                        <label class="check"><InputCheckbox @bind-Value="RemoveImage" />Remove existing photo when saved</label>
+                    }
+                    <label class="wide">Optional YouTube or Vimeo video URL<InputText @bind-Value="Draft.VideoUrl" maxlength="500" placeholder="https://..." /></label>
+                    <label class="check"><InputCheckbox @bind-Value="Draft.IsPublished" />Published (uncheck to hide the article)</label>
+                    <label class="check"><InputCheckbox @bind-Value="Draft.IsShowcased" />Show on the Ghana Mission timeline when published</label>
+                </div>
+                <p>Use photos and videos you have permission to publish. Uploaded photos are public files, including photos attached to drafts.</p>
+                <div class="form-actions"><button class="admin-icon-button btn btn-gold" type="submit" disabled="@Saving" title="Save activity" aria-label="Save activity"><AdminActionIcon Name="save" /></button></div>
+            </EditForm>
+        </AdminEditDialog>
+    }
+</AdminPortalLayout>

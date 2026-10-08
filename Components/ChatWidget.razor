@@ -1,0 +1,41 @@
+@rendermode InteractiveServer
+@if (Visible)
+{
+    <button class="chat-launcher" type="button" @onclick="Toggle" aria-expanded="@Open" aria-controls="vitalreach-chat" aria-label="@(Open ? "Close Vira chat" : "Ask Vira, VitalReach's AI assistant")">
+        <span class="vira-avatar"><ViraIcon /></span>
+        <span>@(Open ? "Close chat" : "Ask Vira")</span>
+    </button>
+    @if (Open)
+    {
+        <section class="chat-panel" id="vitalreach-chat" role="region" aria-label="Vira, VitalReach's AI assistant">
+            <header><div class="vira-identity"><span class="vira-avatar"><ViraIcon /></span><div><strong>Ask Vira</strong><small>Your VitalReach AI guide</small></div></div><button type="button" @onclick="End" disabled="@Busy" aria-label="End and clear chat" title="End and clear chat">×</button></header>
+            <div class="chat-body">
+                @if (!Chat.IsConfigured)
+                { <p>Chat is not available yet. Please <a href="/contact">contact our team</a>.</p> }
+                else if (!Chat.IsVerified)
+                {
+                    <p>Ask about the shop, visits or finding your way around. AI answers can be inaccurate; this is not medical advice.</p>
+                    <p>Your messages and recent chat history will be sent to OpenAI. Please don't share medical, payment or other sensitive personal information. <a href="/privacy#vira-chat" target="_blank" rel="noopener noreferrer">Privacy details</a> · <a href="/terms#vira" target="_blank" rel="noopener noreferrer">Vira terms</a>.</p>
+                    <label><input type="checkbox" @bind="Consent" /> I understand and want to start an AI chat.</label>
+                    <button class="btn btn-gold" type="button" @onclick="StartAsync" disabled="@(Busy || !Consent)">@(Busy ? "Verifying…" : "Start chat")</button>
+                }
+                else
+                {
+                    <div class="chat-messages" role="log" aria-live="polite" aria-label="Conversation">
+                        @if (Chat.Messages.Count == 0) { <p>Hi, I'm Vira. How can I help with the shop or your visit?</p> }
+                        @foreach (var message in Chat.Messages)
+                        { <div class="chat-message @message.Role"><b>@(message.Role == "user" ? "You" : "Vira · AI")</b><p>@message.Text</p></div> }
+                    </div>
+                    <form @onsubmit="SendAsync" @onsubmit:preventDefault>
+                        <label for="chat-message">Your message</label>
+                        <textarea id="chat-message" @bind="Text" maxlength="1000" rows="3" disabled="@Busy"></textarea>
+                        <button class="btn btn-gold" type="submit" disabled="@Busy">@(Busy ? "Thinking…" : "Send")</button>
+                    </form>
+                }
+                @if (Chat.IsConfigured) { <RecaptchaChallenge @ref="Challenge" /> }
+                @if (Error is not null) { <p role="status">@Error</p> }
+                <nav aria-label="Chat shortcuts"><a href="/shop">Shop</a><a href="/wellness-center">Visit</a><a href="/contact">Contact a person</a></nav>
+            </div>
+        </section>
+    }
+}

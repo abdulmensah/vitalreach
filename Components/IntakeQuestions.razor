@@ -1,0 +1,11 @@
+<div class="intake-questions">
+    @foreach (var question in Questions)
+    {
+        <label class="intake-question" for="@question.Id">
+            <span>@question.Label</span>
+            <select id="@question.Id" value="@Entry.Answers.GetValueOrDefault(question.Id, "Unknown")" @onchange="e => ChangeAsync(question.Id, e)">
+                @foreach (var choice in IntakeCatalog.Choices) { <option value="@choice">@choice</option> }
+            </select>
+        </label>
+    }
+</div>

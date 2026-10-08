@@ -1,0 +1,103 @@
+@page "/ghana-mission"
+
+<PageTitle>Ghana Mission | VitalReach International</PageTitle>
+<HeadContent>
+    <meta name="description" content="Discover the Ghana Mission of VitalReach International, continuing the charitable work of Rashias Foundation. Both are registered nonprofit organizations in Ghana." />
+</HeadContent>
+<StorefrontHeader />
+<main class="public-refresh ghana-mission-page">
+    <section class="center-hero mission-center-hero" aria-labelledby="mission-title">
+        <div class="center-hero-content">
+            <p class="eyebrow light">VitalReach International</p>
+            <h1 id="mission-title">Our Ghana Mission.<br /><em>Purpose in action.</em></h1>
+            <p>Supporting dignity, health and education through community work in Ghana.</p>
+            <div class="actions">
+                <a class="btn btn-gold" href="#mission-activities">Explore our activities ↓</a>
+                <a class="underlink light-link" href="/contact">Connect with us ↗</a>
+            </div>
+        </div>
+    </section>
+    <section class="ghana-mission-story" aria-labelledby="mission-story-title">
+        <div>
+            <p class="eyebrow">Our story</p>
+            <h2 id="mission-story-title">A continuing commitment<br /><em>to community.</em></h2>
+        </div>
+        <div>
+            <p>VitalReach International continues the charitable and community work previously carried out by Rashias Foundation. Both are registered nonprofit organizations in Ghana. The Ghana Mission represents this continuing commitment to communities in Ghana.</p>
+            <p>VitalReach International leads the nonprofit activities. VitalReach Wellness Hub is the commercial wellness business. This page is dedicated to the mission, its activities and the people involved.</p>
+        </div>
+    </section>
+    <section class="mission-visit-gallery" aria-labelledby="visit-gallery-title">
+        <header>
+            <p class="eyebrow">Moments from the mission</p>
+            <h2 id="visit-gallery-title">Time together.<br /><em>Community in focus.</em></h2>
+            <p>A glimpse of an orphanage visit from our community work.</p>
+        </header>
+        <div class="mission-visit-photos">
+            <figure>
+                <img src="/images/mission/orphanage-visit-together-remastered.jpg" alt="An adult in a VitalReach shirt seated with children during the visit" height="518" loading="lazy" decoding="async" />
+                <figcaption>Sharing time together during the visit.</figcaption>
+            </figure>
+            <figure>
+                <img src="/images/mission/orphanage-visit-outdoors.jpg" alt="A group gathered outdoors with colourful balls" height="518" loading="lazy" decoding="async" />
+                <figcaption>A moment together outdoors.</figcaption>
+            </figure>
+        </div>
+    </section>
+    <section class="ghana-mission-activities" id="mission-activities" aria-labelledby="activities-title">
+        <header>
+            <p class="eyebrow">From the community</p>
+            <h2 id="activities-title">Activities &amp; updates</h2>
+            <p>From Eid celebrations and educational support to healthcare outreach, our work responds to community needs. Health-awareness activities also connect with the VitalReach Wellness Center.</p>
+        </header>
+        @if (Activities.Count > 0)
+        {
+            <p class="mission-timeline-note">Dated activities appear newest first, followed by community work whose dates have not yet been recorded.</p>
+            <ol class="mission-timeline" aria-label="Selected mission activities">
+                @foreach (var activity in Activities)
+                {
+                    <li @key="activity.Id">
+                        <article>
+                            @if (activity.ActivityDate is DateTime date)
+                            { <time datetime="@date.ToString("yyyy-MM-dd")">@date.ToString("dd MMM yyyy")</time> }
+                            else
+                            { <span class="mission-date-label">Date not recorded</span> }
+                            <div class="mission-timeline-card">
+                                @if (activity.ImageUrl.Length > 0)
+                                {
+                                    <a href="/ghana-mission/activities/@activity.Id" tabindex="-1" aria-hidden="true"><img src="@activity.ImageUrl" alt="" loading="lazy" /></a>
+                                }
+                                <div>
+                                    @if (activity.IsPledged) { <p class="mission-pledge">Support pledged</p> }
+                                    @if (!string.IsNullOrWhiteSpace(activity.Location)) { <p class="eyebrow">@activity.Location</p> }
+                                    <h3><a href="/ghana-mission/activities/@activity.Id">@activity.Title</a></h3>
+                                    <p>@activity.Summary</p>
+                                    <a class="underlink" href="/ghana-mission/activities/@activity.Id">Read the story @(activity.VideoUrl.Length > 0 ? "& watch video" : "") →</a>
+                                </div>
+                            </div>
+                        </article>
+                    </li>
+                }
+            </ol>
+        }
+        else
+        {
+            <div class="ghana-mission-empty">
+                <span class="eyebrow">More to share</span>
+                <h3>Our activity stories are coming soon.</h3>
+                <p>Dated stories and updates from individual activities will be shared here. For information about current activities, please contact the team.</p>
+                <a class="underlink" href="/contact">Ask about our activities ↗</a>
+            </div>
+        }
+    </section>
+    <section class="ghana-mission-connect" aria-labelledby="mission-connect-title">
+        <div>
+            <p class="eyebrow">Start a conversation</p>
+            <h2 id="mission-connect-title">Connect with<br /><em>the Ghana Mission.</em></h2>
+            <p>Interested in the work or exploring a community partnership? Tell us how you would like to get involved.</p>
+        </div>
+        <a class="btn btn-gold" href="/contact">Contact the team →</a>
+    </section>
+</main>
+<StorefrontFooter />
+

@@ -1,0 +1,32 @@
+[Unit]
+Description=VitalReach test preview Blazor application
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=vitalreach-test
+Group=vitalreach-test
+WorkingDirectory=/opt/vitalreach/test/current
+ExecStart=/usr/bin/dotnet /opt/vitalreach/test/current/VitalReach.Web.dll
+Restart=always
+RestartSec=5
+KillSignal=SIGINT
+SyslogIdentifier=vitalreach-test
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=ASPNETCORE_URLS=http://127.0.0.1:5090
+Environment="ConnectionStrings__Catalog=Data Source=/opt/vitalreach/test/shared/vitalreach.db"
+Environment=DataProtection__Path=/opt/vitalreach/test/shared/keys
+Environment=DataProtection__ApplicationName=VitalReach.Test
+Environment=ProductImages__Path=/opt/vitalreach/test/shared/uploads/products
+EnvironmentFile=/etc/vitalreach/test.env
+Environment=DOTNET_NOLOGO=true
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/vitalreach/test/shared
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

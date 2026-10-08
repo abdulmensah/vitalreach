@@ -1,0 +1,220 @@
+@page "/admin/products"
+@rendermode InteractiveServer
+@attribute [Authorize(Policy = "Admin")]
+
+<PageTitle>Product administration | VitalReach</PageTitle>
+<AdminPortalLayout ActiveSection="products">
+    <header class="admin-title">
+        <div>
+            <p class="eyebrow">Secure administration</p>
+            <h1>Product catalog</h1>
+            <p>Manage the products shown on the VitalReach storefront.</p>
+        </div>
+        <button class="admin-icon-button btn btn-gold" @onclick="NewProduct" type="button" title="Add product" aria-label="Add product"><AdminActionIcon Name="add" /></button>
+    </header>
+    @if (!string.IsNullOrEmpty(Message))
+    {
+        <div class="admin-message @(IsError ? "error" : "")" role="status">@Message</div>
+    }
+    <div class="admin-grid">
+        <section class="admin-list">
+            <div class="admin-list-heading">
+                <h2>Products</h2>
+                <small>@VisibleProducts.Count of @Products.Count products</small>
+            </div>
+            <div class="catalog-filters">
+                <label>Search<input @bind="Search" @bind:event="oninput" placeholder="Name, SKU, or variant" /></label>
+                <label>Category<select @bind="CategoryFilter"><option value="">All categories</option>@foreach (var category in Categories) { <option value="@category">@category</option> }</select></label>
+                <label>Status<select @bind="StatusFilter"><option value="">All statuses</option><option value="published">Published</option><option value="hidden">Hidden</option></select></label>
+                <label>Availability<select @bind="AvailabilityFilter"><option value="">All availability</option><option value="available">Available variants</option><option value="unavailable">No available variants</option></select></label>
+                <label>Sort by<select @bind="Sort"><option value="rank">Storefront rank</option><option value="name">Name A–Z</option><option value="name-desc">Name Z–A</option><option value="price">Price low–high</option><option value="price-desc">Price high–low</option><option value="updated">Recently updated</option></select></label>
+                <button type="button" class="admin-icon-button btn btn-outline" @onclick="ResetFilters" title="Reset filters" aria-label="Reset filters"><AdminActionIcon Name="refresh" /></button>
+                @if (!CanRank) { <small>Reset filters and sort by storefront rank to reorder products.</small> }
+            </div>
+            @if (VisibleProducts.Count == 0) { <p class="admin-gallery-empty">No products match these filters.</p> }
+            @foreach (var product in VisibleProducts)
+            {
+                <div class="admin-product-row @(Editing?.Id == product.Id ? "selected" : "")">
+                    <span class="admin-product-rank" aria-label="Rank @(Products.IndexOf(product) + 1)">@(Products.IndexOf(product) + 1)</span>
+                    <button class="admin-product" type="button" @onclick="() => Edit(product)">
+                        <span>
+                            <b>@product.Name</b>
+                            <small>@product.Category · From @product.DisplayPrice.ToString("C") · @product.Variants.Count variant(s)</small>
+                        </span>
+                        <i class="@(product.IsPublished ? "published" : "draft")">@(product.IsPublished ? "Published" : "Hidden")</i>
+                    </button>
+                    <div class="admin-rank-actions" aria-label="Change rank for @product.Name">
+                        <button type="button" disabled="@(!CanRank || Ranking || Products.IndexOf(product) == 0)" @onclick="() => MoveProduct(product, -1)" class="admin-icon-button" title="Move up" aria-label="Move up"><AdminActionIcon Name="up" /></button>
+                        <button type="button" disabled="@(!CanRank || Ranking || Products.IndexOf(product) == Products.Count - 1)" @onclick="() => MoveProduct(product, 1)" class="admin-icon-button" title="Move down" aria-label="Move down"><AdminActionIcon Name="down" /></button>
+                    </div>
+                </div>
+            }
+        </section>
+        <section class="admin-editor">
+            @if (Editing is null)
+            {
+                <div class="admin-placeholder">
+                    <h2>Select a product</h2>
+                    <p>Choose an item from the catalog or add a new product.</p>
+                </div>
+            }
+            else
+            {
+
+                <EditForm Model="Editing" OnValidSubmit="Save">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+                    <div class="form-grid">
+                        <label class="wide">
+                            Product name<InputText @bind-Value="Editing.Name" />
+                        </label>
+                        <label>
+                            Slug<InputText @bind-Value="Editing.Slug" />
+                        </label>
+                        <label>
+                            Category<InputText @bind-Value="Editing.Category" />
+                        </label>
+                        <label>Stripe product tax code<InputText @bind-Value="Editing.TaxCode" /><small>Required for automated US tax. Select the correct code for this product.</small></label>
+                        <label>
+                            Product summary<InputText @bind-Value="Editing.Detail" />
+                        </label>
+                        <label class="wide">
+                            Benefit statement<InputTextArea @bind-Value="Editing.Benefit" />
+                        </label>
+                        <label class="wide">
+                            Full product description<InputTextArea @bind-Value="Editing.Description" />
+                        </label>
+                        <section class="variant-editor wide">
+                            <h2>Sellable variants</h2>
+                            <p>Add only combinations you sell. Leave stock blank when availability must be confirmed; zero means out of stock.</p>
+                            @foreach (var variant in Editing.Variants)
+                            {
+                                <fieldset @key="variant">
+                                    <legend>@variant.Name</legend>
+                                    <div class="form-grid">
+                                        <label>Variant name<InputText @bind-Value="variant.Name" /></label>
+                                        <label>SKU<InputText @bind-Value="variant.Sku" /></label>
+                                        <label>Price (USD)<InputNumber @bind-Value="variant.Price" /></label>
+                                        <label>Stock quantity<InputNumber @bind-Value="variant.StockQuantity" /></label>
+                                        <label>Format (capsules, tablets, powder…)<InputText @bind-Value="variant.Format" /></label>
+                                        <label>Item count<InputNumber @bind-Value="variant.Count" /></label>
+                                        <label>Strength (for example 200 mg)<InputText @bind-Value="variant.Strength" /></label>
+                                        <label>Color<InputText @bind-Value="variant.Color" /></label>
+                                        <label>Size<InputText @bind-Value="variant.Size" /></label>
+                                        <label>Flavor or scent<InputText @bind-Value="variant.Flavor" /></label>
+                                        <label>Material<InputText @bind-Value="variant.Material" /></label>
+                                        <label>Net contents<InputNumber @bind-Value="variant.NetContent" /></label>
+                                        <label>Net contents unit<InputSelect @bind-Value="variant.NetContentUnit"><option value="">None</option>@foreach (var unit in VariantValidation.ContentUnits) { <option value="@unit">@unit</option> }</InputSelect></label>
+                                        <label>Shipping weight (g)<InputNumber @bind-Value="variant.ShippingWeightGrams" /></label>
+                                        <label class="wide">Variant image URL (optional)<InputText @bind-Value="variant.ImageUrl" /><small>Leave empty to use the product image.</small></label>
+                                        <label class="check"><InputCheckbox @bind-Value="variant.IsAvailable" /> Available for enquiries</label>
+                                    </div>
+                                    <button type="button" class="admin-icon-button danger-button" disabled="@(Editing.Variants.Count == 1 || Saving)" @onclick="() => RemoveVariant(variant)" title="Remove variant" aria-label="Remove variant"><AdminActionIcon Name="delete" /></button>
+                                </fieldset>
+                            }
+                            <button type="button" class="admin-icon-button btn btn-outline" disabled="@Saving" @onclick="AddVariant" title="Add variant" aria-label="Add variant"><AdminActionIcon Name="add" /></button>
+                        </section>
+                        <label class="wide">
+                            Product image<InputFile OnChange="SelectImage" accept="image/jpeg,image/png,image/webp" />
+                            <small>JPG, PNG, or WebP · maximum 5 MB. The image is uploaded when you save.</small>
+                        </label>
+                        @if (SelectedImage is not null)
+                        {
+                            <div class="admin-selected-image wide">
+                                <b>Selected:</b> @SelectedImage.Name
+                            </div>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(Editing.ImageUrl))
+                        {
+                            <div class="admin-image-preview wide">
+                                <img src="@Editing.ImageUrl" alt="Product image preview for @Editing.Name" />
+                                <button class="admin-icon-button danger-button" type="button" @onclick="RemoveImage" title="Remove image" aria-label="Remove image"><AdminActionIcon Name="delete" /></button>
+                            </div>
+                        }
+                        @if (Editing.Id != 0)
+                        {
+                            <section class="admin-gallery-manager wide">
+                                <header>
+                                    <div>
+                                        <b>PDP gallery images</b>
+                                        <small>Additional images appear as thumbnails on the product detail page.</small>
+                                    </div>
+                                </header>
+                                <div class="admin-gallery-upload">
+                                    <label>
+                                        Image description
+                                        <InputText @bind-Value="GalleryAltText" placeholder="Describe this product image" />
+                                    </label>
+                                    <label>
+                                        Gallery image
+                                        <InputFile OnChange="SelectGalleryImage" accept="image/jpeg,image/png,image/webp" />
+                                    </label>
+                                    <button class="admin-icon-button btn btn-outline" type="button" disabled="@(SelectedGalleryImage is null || SavingGalleryImage)" @onclick="AddGalleryImage" title="@(SavingGalleryImage ? "Uploading…" : "Add to gallery")" aria-label="@(SavingGalleryImage ? "Uploading…" : "Add to gallery")"><AdminActionIcon Name="upload" /></button>
+                                </div>
+                                @if (SelectedGalleryImage is not null)
+                                {
+                                    <div class="admin-selected-image"><b>Selected:</b> @SelectedGalleryImage.Name</div>
+                                }
+                                @if (GalleryImages.Count == 0)
+                                {
+                                    <p class="admin-gallery-empty">No additional gallery images have been added.</p>
+                                }
+                                else
+                                {
+                                    <div class="admin-gallery-list">
+                                        @foreach (var image in GalleryImages)
+                                        {
+                                            <article>
+                                                <img src="@image.ImageUrl" alt="@image.AltText" />
+                                                <div>
+                                                    <b>@image.AltText</b>
+                                                    <small>Gallery rank @(GalleryImages.IndexOf(image) + 1)</small>
+                                                </div>
+                                                <div class="admin-gallery-actions">
+                                                    <button type="button" disabled="@(SavingGalleryImage || GalleryImages.IndexOf(image) == 0)" @onclick="() => MoveGalleryImage(image, -1)" class="admin-icon-button" title="Move image left" aria-label="Move image left"><AdminActionIcon Name="left" /></button>
+                                                    <button type="button" disabled="@(SavingGalleryImage || GalleryImages.IndexOf(image) == GalleryImages.Count - 1)" @onclick="() => MoveGalleryImage(image, 1)" class="admin-icon-button" title="Move image right" aria-label="Move image right"><AdminActionIcon Name="right" /></button>
+                                                    <button class="admin-icon-button remove" type="button" disabled="@SavingGalleryImage" @onclick="() => RemoveGalleryImage(image)" title="Remove" aria-label="Remove"><AdminActionIcon Name="delete" /></button>
+                                                </div>
+                                            </article>
+                                        }
+                                    </div>
+                                }
+                            </section>
+                        }
+                        <label>
+                            Badge text<InputText @bind-Value="Editing.Orb" />
+                        </label>
+                        <label>
+                            Color theme<InputSelect @bind-Value="Editing.Theme">
+                            <option value="gold-product">Gold</option>
+                            <option value="teal-product">Teal</option>
+                            <option value="pearl-product">Pearl</option>
+                            <option value="berry-product">Berry</option>
+                        </InputSelect>
+                    </label>
+                    <label>
+                        Label line one<InputText @bind-Value="Editing.LabelOne" />
+                    </label>
+                    <label>
+                        Label line two<InputText @bind-Value="Editing.LabelTwo" />
+                    </label>
+                    <label>
+                        Ranking value<InputNumber @bind-Value="Editing.SortOrder" />
+                        <small>Lower values appear first. Use the arrows in the product list for quick ranking.</small>
+                    </label>
+                    <label class="check">
+                        <InputCheckbox @bind-Value="Editing.IsPublished" /> Published
+                    </label>
+                </div>
+                <div class="form-actions">
+                    <button class="admin-icon-button btn btn-gold" type="submit" disabled="@Saving" title="@(Saving ? "Saving…" : "Save product")" aria-label="@(Saving ? "Saving…" : "Save product")"><AdminActionIcon Name="save" /></button>
+                    @if (Editing.Id != 0)
+                    {
+                        <button class="admin-icon-button danger-button" type="button" @onclick="Delete" title="Delete product" aria-label="Delete product"><AdminActionIcon Name="delete" /></button>
+                    }
+                </div>
+            </EditForm>
+        }
+    </section>
+</div>
+</AdminPortalLayout>

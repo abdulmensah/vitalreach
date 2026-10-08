@@ -1,0 +1,66 @@
+@page "/admin"
+@rendermode InteractiveServer
+@attribute [Authorize(Policy = "Admin")]
+
+<PageTitle>Admin dashboard | VitalReach</PageTitle>
+<AdminPortalLayout ActiveSection="dashboard">
+    <header class="admin-title">
+        <div>
+            <p class="eyebrow">Secure administration</p>
+            <h1>Welcome back</h1>
+            <p>Manage the VitalReach storefront and wellness center from one place.</p>
+        </div>
+        <a class="btn btn-gold" href="/">View website</a>
+    </header>
+    <section class="admin-stat-grid" aria-label="Store overview">
+        <a href="/admin/products">
+            <span>Products</span>
+            <strong>@ProductCount</strong>
+            <small>@PublishedProductCount published</small>
+        </a>
+        <a href="/admin/contacts">
+            <span>Unread messages</span>
+            <strong>@UnreadMessageCount</strong>
+            <small>@MessageCount total messages</small>
+        </a>
+        <AuthorizeView Policy="SuperAdmin"><a href="/admin/users">
+            <span>Administrators</span>
+            <strong>@ActiveAdminCount</strong>
+            <small>Active accounts</small>
+        </a></AuthorizeView>
+        <a href="/admin/locations">
+            <span>Locations</span>
+            <strong class="status-word">@HeadquartersStatus</strong>
+            <small>Published locations</small>
+        </a>
+    </section>
+    <section class="admin-quick-actions">
+        <header>
+            <p class="eyebrow">Quick actions</p>
+            <h2>What would you like to manage?</h2>
+        </header>
+        <div>
+            <a href="/admin/products">
+                <b>Product catalog</b>
+                <span>Add products, upload images, set prices, and control publishing.</span>
+                <em>Manage products →</em>
+            </a>
+            <AuthorizeView Policy="ClinicalReviewer"><a href="/admin/consultations"><b>Clinical intake</b><span>Review consultation forms and screening flags; download the reception QR code.</span><em>Open clinical inbox →</em></a></AuthorizeView>
+            <a href="/admin/contacts">
+                <b>Customer messages</b>
+                <span>Read and respond to enquiries from the public contact form.</span>
+                <em>Open inbox →</em>
+            </a>
+            <a href="/admin/locations">
+                <b>Wellness center</b>
+                <span>Manage branches, publication status and display order.</span>
+                <em>Edit location →</em>
+            </a>
+            <AuthorizeView Policy="SuperAdmin"><a href="/admin/users">
+                <b>Portal access</b>
+                <span>Choose which Google-authenticated users can administer the site.</span>
+                <em>Manage access →</em>
+            </a></AuthorizeView>
+        </div>
+    </section>
+</AdminPortalLayout>

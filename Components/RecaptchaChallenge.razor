@@ -1,0 +1,17 @@
+@if (Captcha.DevelopmentBypass)
+{
+    <p role="status">Spam verification is bypassed for local development.</p>
+}
+else if (!Captcha.IsConfigured)
+{
+    <p role="status">Message submission is temporarily unavailable. Please contact us by phone.</p>
+}
+else
+{
+    @if (Failed)
+    {
+        <p role="alert">Spam verification is unavailable. Check your connection or content blocker, then submit again to retry.</p>
+        @if (IsDevelopment && DevelopmentError is not null) { <p role="status">Local diagnostic: @DevelopmentError</p> }
+    }
+    <p class="recaptcha-notice">Protected by reCAPTCHA. Read how we use <a href="/privacy#spam-prevention" target="_blank" rel="noopener noreferrer">security information</a>.</p>
+}

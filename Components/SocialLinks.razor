@@ -1,0 +1,9 @@
+@if (Links.Count > 0)
+{
+    <nav class="social-links" aria-label="Follow VitalReach">
+        @foreach (var link in Links)
+        {
+            <a href="@link.Url" target="_blank" rel="noopener noreferrer" aria-label="VitalReach on @link.Label (opens in new tab)" title="@link.Label" @key="link.Id"><SocialIcon Platform="link.Platform" /></a>
+        }
+    </nav>
+}

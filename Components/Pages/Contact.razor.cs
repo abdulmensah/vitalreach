@@ -1,0 +1,101 @@
+#nullable enable
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Components;
+using Microsoft.EntityFrameworkCore;
+using VitalReach.Web.Data;
+
+namespace VitalReach.Web.Components.Pages;
+
+public partial class Contact
+{
+    [Inject] private IDbContextFactory<CatalogDbContext> DbFactory { get; set; } = default!;
+    [Inject] private RecaptchaService Captcha { get; set; } = default!;
+    private RecaptchaChallenge? Challenge;
+    [Parameter, SupplyParameterFromQuery(Name = "message")] public string? PresetMessage { get; set; }
+
+    private ContactInput Input = new();
+    private Location? Headquarters;
+    private string? StatusMessage;
+    private string? AppliedPresetMessage;
+    private bool IsError;
+    private bool Submitting;
+    private string MapEmbedUrl => Headquarters is null
+        ? "about:blank"
+        : $"https://www.google.com/maps?q={Uri.EscapeDataString(string.Join(", ", new[] { Headquarters.AddressLine1, Headquarters.AddressLine2, Headquarters.City, Headquarters.Region, Headquarters.PostalCode, Headquarters.Country }.Where(value => !string.IsNullOrWhiteSpace(value))))}&output=embed";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+        Headquarters = await LocationSchema.Published(db).FirstOrDefaultAsync();
+    }
+
+    protected override void OnParametersSet()
+    {
+        var message = PresetMessage?.Trim();
+        if (string.IsNullOrWhiteSpace(message) || string.Equals(message, AppliedPresetMessage, StringComparison.Ordinal))
+            return;
+
+        Input.Message = message;
+        AppliedPresetMessage = message;
+        StatusMessage = null;
+        IsError = false;
+    }
+
+    private async Task SubmitAsync()
+    {
+        if (Submitting) return;
+        Submitting = true;
+        try
+        {
+            if (!string.IsNullOrWhiteSpace(Input.Website))
+            {
+                ShowSuccess();
+                return;
+            }
+
+            var token = Challenge is null ? null : await Challenge.GetTokenAsync("contact");
+            if (!await Captcha.VerifyAsync(token, "contact"))
+            {
+                IsError = true;
+                StatusMessage = "We could not verify your request. Please try again or contact us by phone. Your message has not been sent.";
+                if (Captcha.DevelopmentFailure is { } detail) StatusMessage += " Local diagnostic: " + detail;
+                return;
+            }
+            await using var db = await DbFactory.CreateDbContextAsync();
+            db.ContactSubmissions.Add(new ContactSubmission
+            {
+                Name = Input.Name.Trim(),
+                Email = Input.Email.Trim(),
+                Phone = Input.Phone.Trim(),
+                Message = Input.Message.Trim()
+            });
+            await db.SaveChangesAsync();
+            ShowSuccess();
+        }
+        catch (DbUpdateException)
+        {
+            IsError = true;
+            StatusMessage = "Your message could not be sent. Please try again or contact us by phone.";
+        }
+        finally
+        {
+            Submitting = false;
+        }
+    }
+
+    private void ShowSuccess()
+    {
+        Input = new ContactInput();
+        IsError = false;
+        StatusMessage = "Thank you. Your message has been sent successfully, and the VitalReach team will follow up.";
+    }
+
+    private sealed class ContactInput
+    {
+        [Required, MaxLength(120)] public string Name { get; set; } = "";
+        [Required, EmailAddress, MaxLength(180)] public string Email { get; set; } = "";
+        [Required, Phone, MaxLength(40)] public string Phone { get; set; } = "";
+        [Required, MinLength(10), MaxLength(4000)] public string Message { get; set; } = "";
+        public string Website { get; set; } = "";
+    }
+}

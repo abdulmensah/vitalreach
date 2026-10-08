@@ -1,0 +1,179 @@
+@page "/"
+@rendermode InteractiveServer
+<PageTitle>Wellness with purpose | VitalReach Wellness Hub</PageTitle>
+
+<div class="home-refresh">
+<StorefrontHeader />
+<main>
+    @if (CartMessage is not null) { <p class="admin-message error" role="alert">@CartMessage</p> }
+    <section class="hero">
+        <div class="hero-copy">
+            <p class="eyebrow">Wellness, rooted in purpose</p>
+            <h1>
+                Reach further.<br>
+                <em>Live fully.</em>
+            </h1>
+            <p class="lead">Premium wellness essentials and trusted health education—created to support families everywhere, with a special commitment to kidney-health awareness in Ghana.</p>
+            <div class="actions">
+                <a class="btn btn-gold" href="/#shop">
+                    Shop the collection <span>→</span>
+                </a>
+                <a class="underlink" href="/#about">Meet VitalReach ↗</a>
+            </div>
+            <div class="trust">
+                <span>Plant-based options</span>
+                <span>Quality focused</span>
+                <span>Education led</span>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <img class="hero-photo" src="/images/wellness-center/vitalreach-store-hero.jpeg" alt="VitalReach store interior with illuminated product shelves and a gold-accented reception desk" width="1536" height="1024" fetchpriority="high" />
+        </div>
+    </section>
+    <nav class="wellness-paths" aria-label="Discover VitalReach">
+        <a href="/shop"><span class="path-number">01 / The collection</span><h2>Everyday essentials</h2><p>Thoughtful choices for your daily wellness routine.</p><span class="path-link">Explore our products ↗</span></a>
+        <a href="/health-guide"><span class="path-number">02 / Health education</span><h2>Know your health</h2><p>Clear information. Better questions. Informed choices.</p><span class="path-link">Read the health guide ↗</span></a>
+        <a href="/wellness-center"><span class="path-number">03 / The wellness center</span><h2>A personal connection</h2><p>Discover our center and prepare for your visit.</p><span class="path-link">Meet us at the hub ↗</span></a>
+    </nav>
+    <section class="mission mission-home-summary" id="ghana">
+        <div class="mission-copy">
+            <p class="eyebrow">Our Ghana Mission</p>
+            <span>Led by VitalReach International.</span>
+
+            <h2>
+                Improving kidney-health awareness <em>in Ghana.</em>
+            </h2>
+            <p>The Ghana Mission is led by VitalReach International, a registered nonprofit organization in Ghana. It continues the charitable and community work previously carried out by Rashias Foundation, also a registered nonprofit in Ghana.</p>
+            <p>VitalReach International leads this nonprofit work; VitalReach Wellness Hub is the commercial wellness business. Our shared commitment to health education includes kidney-health awareness and helping people ask informed questions about their health.</p>
+            <strong>Educating Ghana. Reaching the world.</strong>
+            <a class="btn btn-outline" href="/ghana-mission">Explore the Ghana Mission →</a>
+        </div>
+    </section>
+    <nav class="ticker" aria-label="VitalReach values">
+        <a href="/#shop">Premium quality</a>
+        <i aria-hidden="true">✦</i>
+        <a href="/terms">Responsible wellness</a>
+        <i aria-hidden="true">✦</i>
+        <a href="/health-guide">Health education</a>
+        <i aria-hidden="true">✦</i>
+        <a href="/ghana-mission">Global vision</a>
+    </nav>
+    <section class="section shop" id="shop">
+        <header class="section-heading">
+            <div>
+                <p class="eyebrow">Shop VitalReach</p>
+                <h2>
+                    Daily wellness,<br>
+                    <em>elevated.</em>
+                </h2>
+            </div>
+            <p>Thoughtfully selected formulas designed to fit your everyday routine. Build your bundle and begin your wellness journey.</p>
+        </header>
+        <div class="featured-carousel" data-product-carousel>
+            <div class="products" data-carousel-track aria-label="Featured products">
+                @foreach (var product in Products)
+                {
+                    <ProductCard Product="product" OnAdd="AddToCart" />
+                }
+            </div>
+            <div class="featured-carousel-controls" aria-label="Featured product carousel controls">
+                <button type="button" data-carousel-prev aria-label="View previous featured product">←</button>
+                <div class="featured-carousel-progress">
+                    <span data-carousel-status aria-live="polite">1 / @Products.Count</span>
+                    <div class="featured-carousel-dots" aria-label="Choose a featured product">
+                        @for (var index = 0; index < Products.Count; index++)
+                        {
+                            <button type="button" class="@(index == 0 ? "active" : "")" data-carousel-index="@index" aria-label="View featured product @(index + 1)" aria-current="@(index == 0 ? "true" : null)"></button>
+                        }
+                    </div>
+                </div>
+                <button type="button" data-carousel-next aria-label="View next featured product">→</button>
+            </div>
+        </div>
+        <p class="disclaimer">Product descriptions are for general information. Final labels and claims remain subject to formulation, testing, and regulatory review.</p>
+        <a class="shop-all-link" href="/shop">Shop all products →</a>
+    </section>
+    <section class="home-wellness-center" id="wellness-center" aria-labelledby="home-center-title">
+        <img class="home-center-photo" src="/images/wellness-center/storefront.jpeg" alt="VitalReach Wellness Hub storefront with teal and gold signage and an illuminated entrance" width="1672" height="941" loading="lazy" decoding="async" />
+        <div class="home-center-copy">
+            <p class="eyebrow">Shopping &amp; Wellness Center</p>
+            <h2 id="home-center-title">Come in. Ask questions.<br /><em>Explore your wellness.</em></h2>
+            <p>Discover the VitalReach collection in person, compare product options and find practical health education in a welcoming setting.</p>
+            <ul>
+                <li>Explore products and read their labels.</li>
+                <li>Talk through your wellness questions.</li>
+                <li>Prepare for your visit with our location and contact details.</li>
+            </ul>
+            <div class="actions">
+                <a class="btn btn-gold" href="/wellness-center">Explore the center →</a>
+                <a class="underlink" href="/contact">Plan your visit ↗</a>
+            </div>
+        </div>
+    </section>
+    <section class="story" id="about">
+        <div class="story-art">
+            <img class="story-founder-photo" src="/images/vitalreach-hero-black-jacket.jpeg" alt="Masaouda N. Nartey, VitalReach founder, with the wellness collection" width="1500" height="1049" loading="lazy" />
+        </div>
+        <div class="story-copy">
+            <p class="eyebrow light">Our story</p>
+            <h2>
+                Wellness that<br>
+                <em>reaches home.</em>
+            </h2>
+            <p>VitalReach Wellness Hub was founded by Masaouda N. Nartey, BSN, RN, with a vision to make health education clearer, wellness choices more thoughtful, and quality products more accessible.</p>
+            <p>Rooted in nursing experience and proudly Ghanaian-American, VitalReach brings together practical education, culturally connected care, and a global standard of excellence.</p>
+            <ul class="story-values-inline"><li>Nurse-founded</li><li>Ghanaian-American</li><li>Whole-person wellness</li></ul>
+            <div class="founder">
+                <span>MN</span>
+                <div>
+                    <b>Masaouda N. Nartey, BSN, RN</b>
+                    <small>Founder &amp; CEO</small>
+                </div>
+            </div>
+        </div>
+    </section>
+    <span id="kidney-reading" class="anchor-target" aria-hidden="true"></span>
+    <section class="health-preview" id="journal">
+        <div class="health-preview-visual" role="img" aria-label="VitalReach kidney-health education and community wellness"></div>
+        <div class="health-preview-copy">
+            <p class="eyebrow">VitalReach Health Guide</p>
+            <h2>Knowledge is part<br />of your <em>wellness.</em></h2>
+            <p>Kidney disease can develop quietly. Learn the risk factors, understand the two tests that matter, and prepare better questions for your healthcare professional.</p>
+            <div class="health-preview-topics">
+                <span>Risk factors</span>
+                <span>eGFR &amp; uACR</span>
+                <span>Daily protection</span>
+                <span>Medicine safety</span>
+            </div>
+            <a class="btn btn-gold" href="/health-guide">Explore the complete guide →</a>
+            <small>Educational information—not medical advice, diagnosis, or treatment.</small>
+        </div>
+    </section>
+
+    <section class="contact" id="contact">
+        <div>
+            <p class="eyebrow light">Begin your VitalReach journey</p>
+            <h2>
+                Wellness feels better<br>when it feels <em>personal.</em>
+            </h2>
+        </div>
+        <div>
+            <p>Questions about our collection, partnerships or upcoming availability? We would love to hear from you.</p>
+            @*             @if (Headquarters is not null)
+            {
+                <address>
+                    <small>Headquarters</small>@Headquarters.AddressLine1, @(Headquarters.AddressLine2 ?? "")<br />@Headquarters.CityRegion, @Headquarters.Country
+                </address>
+                <a class="phone" href="@Headquarters.PhoneHref">
+                    <small>Call us</small>@Headquarters.Phone
+                </a>
+            <a class="btn btn-gold" href="/wellness-center">Learn more &amp; plan your visit →</a>
+
+            }
+ *@
+            <a class="btn btn-gold" href="/contact?message=Hello%20VitalReach%2C%0A%0AI%20would%20like%20to%20get%20in%20touch%20with%20your%20team.%0A%0AThank%20you.#contact-content">Start a conversation ↗</a>
+        </div>
+    </section>
+</main>
+</div>
+<StorefrontFooter />

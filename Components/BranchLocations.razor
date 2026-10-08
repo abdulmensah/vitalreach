@@ -1,0 +1,17 @@
+@foreach (var location in Locations)
+{
+    <section class="us-branch" aria-label="@location.CenterName" @key="location.Id">
+        <div>
+            <p class="eyebrow">Visit our location</p>
+            <h2>@location.CenterName</h2>
+            <address>@location.AddressLine1<br />
+                @if (!string.IsNullOrWhiteSpace(location.AddressLine2)) { @location.AddressLine2<br /> }
+                @location.CityRegion @location.PostalCode<br />@location.Country</address>
+            @if (!string.IsNullOrWhiteSpace(location.Phone)) { <p><a href="@location.PhoneHref">@location.Phone</a></p> }
+            @if (!string.IsNullOrWhiteSpace(location.Email)) { <p><a href="mailto:@location.Email">@location.Email</a></p> }
+            @if (!string.IsNullOrWhiteSpace(location.Hours)) { <p>@location.Hours</p> }
+            <a class="underlink" href="@location.MapUrl" target="_blank" rel="noopener noreferrer">Open in Google Maps ↗</a>
+        </div>
+        <iframe src="@location.MapEmbedUrl" title="Map showing @location.CenterName" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+    </section>
+}
