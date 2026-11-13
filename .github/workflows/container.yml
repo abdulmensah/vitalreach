@@ -1,0 +1,53 @@
+name: Build and publish container
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main, develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vitalreach-image-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  image:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v5
+      - name: Name image
+        id: image
+        env:
+          REPOSITORY: ${{ github.repository }}
+        run: echo "name=ghcr.io/${REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+      - name: Build Linux image
+        env:
+          IMAGE: ${{ steps.image.outputs.name }}
+        run: docker build --pull --label "org.opencontainers.image.source=https://github.com/$GITHUB_REPOSITORY" --label "org.opencontainers.image.revision=$GITHUB_SHA" -t "$IMAGE:$GITHUB_SHA" .
+      - name: Verify container startup and persistent storage
+        env:
+          IMAGE: ${{ steps.image.outputs.name }}
+        run: bash tests/container-smoke.sh "$IMAGE:$GITHUB_SHA"
+      - name: Publish tested image
+        if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+        env:
+          IMAGE: ${{ steps.image.outputs.name }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          printf '%s' "$GHCR_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+          trap 'docker logout ghcr.io' EXIT
+          docker push "$IMAGE:$GITHUB_SHA"
+          digest="$(docker image inspect "$IMAGE:$GITHUB_SHA" --format '{{index .RepoDigests 0}}')"
+          {
+            echo '### Published and smoke-tested container'
+            printf '\nAPP_IMAGE=%s\n' "$digest"
+            echo
+            echo 'Publishing does not deploy production or establish QA acceptance.'
+          } >> "$GITHUB_STEP_SUMMARY"

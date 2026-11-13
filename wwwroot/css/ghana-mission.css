@@ -1,5 +1,19 @@
-.mission-date-label { display: block; margin-bottom: 12px; font-size: 14px; font-weight: 700; }
-.mission-pledge { display: inline-block; padding: 4px 10px; background: #f3e3be; color: #604510; font-size: 13px; font-weight: 700; }
+.mission-date-label {
+    display: block;
+    margin-bottom: 12px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.mission-pledge {
+    display: inline-block;
+    padding: 4px 10px;
+    background: #f3e3be;
+    color: #604510;
+    font-size: 13px;
+    font-weight: 700;
+}
+
 .ghana-mission-page {
     color: #063f3b;
 }
@@ -34,34 +48,200 @@
     align-items: center;
 }
 
-.mission-visit-photos img {
-    display: block;
-    width: 100%;
-    height: auto;
-}
-
-.mission-visit-photos figcaption {
-    padding: 16px 20px;
-    font-size: 13px;
-    line-height: 1.6;
-}
-
 .mission-visit-gallery {
+    background: #f1eee3;
+    display: grid;
+    grid-template-columns: minmax(0, .85fr) minmax(0, 1.4fr);
+    column-gap: clamp(16px, 2vw, 32px);
+    align-items: start;
+}
+
+    .mission-visit-gallery > header {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        box-sizing: border-box;
+        min-height: 500px;
+        padding: 24px 0;
+        color: #063f3b;
+    }
+
+        .mission-visit-gallery > header a {
+            align-self: flex-start;
+            color: #063f3b;
+        }
+
+        .mission-visit-gallery > header .eyebrow {
+            color: #806021;
+            margin: 0;
+        }
+
+        .mission-visit-gallery > header h2 {
+            color: #063f3b;
+        }
+
+        .mission-visit-gallery > header p:not(.eyebrow) {
+            font-size: 16px;
+            line-height: 1.65;
+            margin: 0 0 20px;
+        }
+
+.mission-slideshow {
+    min-width: 0;
     background: #f1eee3;
 }
 
-.mission-visit-photos {
-    display: grid;
-    grid-template-columns: minmax(0,1fr) minmax(0,1fr);
-    gap: 24px;
-    align-items: start;
-    margin-top: 28px;
+    .mission-slideshow figure {
+        position: relative;
+        margin: 0;
+    }
+
+.mission-slide-image {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    height: 500px;
+    background: #f1eee3;
 }
 
-    .mission-visit-photos figure {
-        margin: 0;
-        background: #fffdf5;
+    .mission-slide-image img {
+        display: block;
+        width: auto;
+        max-width: 100%;
+        height: auto;
+        max-height: 100%;
+        object-fit: contain;
+        mask-image: linear-gradient(90deg, transparent, #000 12%);
     }
+
+.mission-slideshow figcaption {
+    position: absolute;
+    inset: auto 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px 16px;
+    padding: 10px 16px;
+    background: rgb(241 238 227 / 72%);
+    color: #063f3b;
+    font-size: 13px;
+    line-height: 1.4;
+    backdrop-filter: blur(8px);
+}
+
+.mission-slide-caption {
+    flex: 1 1 200px;
+    display: grid;
+    gap: 3px;
+    text-align: right;
+}
+
+.mission-slideshow figcaption .eyebrow {
+    margin: 0;
+    font-size: 10px;
+    color: #806021;
+}
+
+.mission-slide-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+    margin-left: auto;
+}
+
+    .mission-slide-controls button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 44px;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: #063f3b;
+        font-size: 22px;
+        cursor: pointer;
+        border-radius: 4px;
+    }
+
+        .mission-slide-controls button:hover {
+            background: #063f3b;
+            color: #fffdf5;
+        }
+
+        .mission-slide-controls button:focus-visible {
+            outline: 3px solid #b99750;
+            outline-offset: 3px;
+        }
+
+.mission-slide-dots {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+    .mission-slide-dots button {
+        width: 24px;
+        height: 44px;
+        border: 0;
+    }
+
+    .mission-slide-dots span {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: currentColor;
+        opacity: .4;
+    }
+
+    .mission-slide-dots .is-active span {
+        opacity: 1;
+        width: 18px;
+        border-radius: 6px;
+    }
+
+@media (max-width: 1050px) {
+    .mission-visit-gallery {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+        .mission-visit-gallery > header {
+            min-height: 0;
+            padding: 0;
+        }
+
+    .mission-slide-image {
+        justify-content: center;
+    }
+
+        .mission-slide-image img {
+            mask-image: linear-gradient(180deg, transparent, #000 10%);
+        }
+}
+
+@media (max-width: 600px) {
+    .mission-visit-gallery > header h2 {
+        font-size: 30px;
+        margin-block: 12px;
+    }
+}
+
+@media (max-width: 400px) {
+    .mission-slideshow figcaption {
+        padding: 8px 12px;
+    }
+
+    .mission-slide-controls {
+        margin-inline: auto;
+        gap: 2px;
+    }
+
+    .mission-slide-image {
+        height: 300px;
+    }
+}
 
 .ghana-mission-identity {
     padding: 36px;
@@ -222,10 +402,6 @@
 }
 
 @media (max-width: 800px) {
-    .mission-visit-photos {
-        grid-template-columns: minmax(0,1fr);
-    }
-
     .mission-timeline-card {
         flex-direction: column;
     }
@@ -270,7 +446,11 @@
 .public-refresh .center-hero.mission-center-hero {
     background-image: linear-gradient(90deg,rgba(2,35,33,.94) 0%,rgba(2,46,43,.78) 36%,rgba(2,46,43,.12) 75%), url('/images/mission/orphanage-visit-presentation-remastered.jpg');
 }
-.ghana-mission-page .mission-center-hero h1 { margin: 0; }
+
+.ghana-mission-page .mission-center-hero h1 {
+    margin: 0;
+}
+
 @media (max-width: 700px) {
     .public-refresh .center-hero.mission-center-hero {
         background-image: linear-gradient(180deg,transparent 100px,#022e2b 260px), url('/images/mission/orphanage-visit-presentation-remastered.jpg');

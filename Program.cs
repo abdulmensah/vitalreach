@@ -16,7 +16,15 @@ builder.Services.AddDataProtection()
     .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionPath))
     .SetApplicationName(builder.Configuration["DataProtection:ApplicationName"] ?? "VitalReach.Local");
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
-    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto);
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    foreach (var proxy in builder.Configuration.GetSection("ForwardedHeaders:KnownProxies").GetChildren())
+    {
+        if (!System.Net.IPAddress.TryParse(proxy.Value, out var address))
+            throw new InvalidOperationException("ForwardedHeaders:KnownProxies entries must be valid IP addresses.");
+        options.KnownProxies.Add(address);
+    }
+});
 builder.Services.AddRazorComponents().AddInteractiveServerComponents(options =>
 {
     options.DisconnectedCircuitRetentionPeriod = TimeSpan.FromMinutes(10);

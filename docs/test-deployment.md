@@ -54,6 +54,12 @@ CI uses the Git commit SHA instead. Do not include `.env`, `App_Data`, local dat
 
 ## Recovery and eventual adoption
 
+### October 8, 2026 working-copy release
+
+Activated artifact `c2fe900b360338fe3c707f21ecbc190a8aa0f2ec` (archive SHA-1, not a Git commit) with the mission slideshow, compact overlay footer, updated imagery and mission content. SHA-256: `b68b9cc67a019454ee0c892ff3af529c2030582ac111e655b4d1c065948e95a9`. The mission activity anchor was corrected during browser verification.
+
+Backup: `/opt/vitalreach/test/backups/20261008T031856Z-c2fe900b360338fe3c707f21ecbc190a8aa0f2ec`. Existing test database, uploads and environment were preserved; application startup applied its normal schema/seed updates. No local database or environment file was uploaded. Release publish and the .NET/browser regression checks passed. Public HTTPS health, mission rendering, interactive photo selection and image loading passed. Test was active with zero automatic restarts, and QA health remained successful. Deployment was manual from the working copy; GitHub was not changed.
+
 Activation briefly stops test, backs up shared data and its environment, then swaps the current release link and verifies local health. Failure attempts to restore the preceding code. Database changes are never automatically reverted. Backups remain in `/opt/vitalreach/test/backups`; establish retention and monitor disk usage. A repeat release ID is rejected; investigate before retrying or use a new commit. Public HTTPS failure after a successful local check requires investigation.
 
 After design approval, merge develop into main through the normal QA process. Keep production promotion separate. Retire the test service, DNS and secrets deliberately when no longer needed; merging does not remove them automatically.

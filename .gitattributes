@@ -1,1 +1,6 @@
 deploy/server/* text eol=lf
+tests/*.sh text eol=lf
+Dockerfile text eol=lf
+.dockerignore text eol=lf
+deploy/containers/* text eol=lf
+.github/workflows/container.yml text eol=lf

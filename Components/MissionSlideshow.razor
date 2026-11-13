@@ -1,0 +1,21 @@
+<div class="mission-slideshow" role="region" aria-roledescription="carousel" aria-label="Community work in Ghana">
+    <figure id="mission-current-slide">
+        <div class="mission-slide-image">
+            <img src="@Current.Image" alt="@Current.Alt" width="823" height="550" loading="lazy" decoding="async" />
+        </div>
+        <figcaption>
+            <span class="mission-slide-caption" aria-live="polite" aria-atomic="true"><span class="eyebrow">@(ActiveIndex + 1) / @Slides.Length</span><span>@Current.Caption</span></span>
+            <div class="mission-slide-controls">
+        <button type="button" @onclick="Previous" aria-label="Previous photo" aria-controls="mission-current-slide">←</button>
+        <div class="mission-slide-dots" aria-label="Choose a photo">
+            @for (var i = 0; i < Slides.Length; i++)
+            {
+                var index = i;
+                <button type="button" class="@(ActiveIndex == index ? "is-active" : null)" aria-label="@($"Photo {index + 1}: {Slides[index].Caption}")" aria-current="@(ActiveIndex == index ? "true" : null)" aria-controls="mission-current-slide" @onclick="() => Select(index)"><span></span></button>
+            }
+        </div>
+        <button type="button" @onclick="Next" aria-label="Next photo" aria-controls="mission-current-slide">→</button>
+            </div>
+        </figcaption>
+    </figure>
+</div>

@@ -1,0 +1,35 @@
+name: vitalreach-prod
+services:
+  app:
+    image: ${APP_IMAGE:?Set APP_IMAGE to the published GHCR digest}
+    restart: unless-stopped
+    user: "1654:1654"
+    env_file: .env
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_HTTP_PORTS: "8080"
+      AllowedHosts: vitalreachhub.com;www.vitalreachhub.com
+      ConnectionStrings__Catalog: Data Source=/data/vitalreach.db
+      DataProtection__Path: /data/keys
+      DataProtection__ApplicationName: VitalReach.Production
+      ProductImages__Path: /data/uploads/products
+      ForwardedHeaders__KnownProxies__0: ${CADDY_PROXY_IP:?Set the Caddy container IP on hosting-edge}
+    volumes:
+      - ./data:/data
+    networks:
+      edge:
+        aliases: [vitalreach-prod]
+    read_only: true
+    tmpfs: ["/tmp:rw,nosuid,size=64m"]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: ${APP_MEMORY:-512m}
+    cpus: ${APP_CPUS:-0.75}
+    pids_limit: 256
+    logging:
+      driver: local
+      options: {max-size: "10m", max-file: "3"}
+networks:
+  edge:
+    external: true
+    name: hosting-edge

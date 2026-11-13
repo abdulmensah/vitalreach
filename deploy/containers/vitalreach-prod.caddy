@@ -1,0 +1,4 @@
+vitalreachhub.com, www.vitalreachhub.com {
+    encode zstd gzip
+    reverse_proxy vitalreach-prod:8080
+}
