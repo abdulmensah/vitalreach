@@ -1,0 +1,45 @@
+#!/bin/bash
+set -Eeuo pipefail
+umask 077
+[[ $EUID == 0 && $# == 1 && -f "$1" ]] || { echo 'Usage: sudo bash install-container-ci /path/to/ci.pub' >&2; exit 64; }
+source_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+for name in vitalreach-ci-ssh vitalreach-deploy-container deploy-container-engine; do
+    [[ -f "$source_dir/$name" ]] || { echo "Missing $name" >&2; exit 66; }
+done
+key="$(tr -d '\r' < "$1")"
+[[ "$key" =~ ^ssh-ed25519\ [A-Za-z0-9+/=]+(\ [^$'\n']*)?$ ]] || { echo 'Expected one plain Ed25519 public key' >&2; exit 65; }
+ssh-keygen -lf "$1" >/dev/null
+# Refuse to repurpose an existing account that wasn't created by this installer.
+if id vitalreach-ci >/dev/null 2>&1; then
+    [[ -f /var/lib/vitalreach-ci/.managed-account ]] || { echo 'Existing account needs manual review' >&2; exit 65; }
+    [[ "$(id -Gn vitalreach-ci)" == vitalreach-ci ]] || { echo 'CI account has extra groups; review first' >&2; exit 65; }
+else
+    useradd --system --user-group --home-dir /var/lib/vitalreach-ci --shell /bin/sh vitalreach-ci
+fi
+install -d -o root -g root -m 0755 /var/lib/vitalreach-ci /var/lib/vitalreach-ci/.ssh /usr/local/lib/vitalreach
+touch /var/lib/vitalreach-ci/.managed-account
+install -d -o root -g root -m 0700 /etc/vitalreach-container /var/lib/vitalreach-container /var/lib/vitalreach-container/backups
+# Parent permits traversal by UID 1654; data remains readable only by the app.
+chmod 0711 /var/lib/vitalreach-container
+if [[ ! -e /var/lib/vitalreach-container/data ]]; then
+    install -d -o 1654 -g 1654 -m 0700 /var/lib/vitalreach-container/data
+fi
+install -o root -g root -m 0755 "$source_dir/vitalreach-ci-ssh" /usr/local/sbin/vitalreach-ci-ssh
+install -o root -g root -m 0755 "$source_dir/vitalreach-deploy-container" /usr/local/sbin/vitalreach-deploy-container
+install -o root -g root -m 0700 "$source_dir/deploy-container-engine" /usr/local/lib/vitalreach/deploy-container-engine
+key_file=/var/lib/vitalreach-ci/.ssh/authorized_keys
+[[ ! -L "$key_file" ]] || { echo 'Refusing symlink authorized_keys' >&2; exit 65; }
+touch "$key_file"
+line="restrict,command=\"/usr/local/sbin/vitalreach-ci-ssh\" $key"
+grep -qxF "$line" "$key_file" || printf '%s\n' "$line" >> "$key_file"
+# Root ownership prevents the account from adding unrestricted keys.
+chown root:root "$key_file"
+chmod 0644 "$key_file"
+sudo_tmp="$(mktemp)"
+trap 'rm -f "$sudo_tmp"' EXIT
+printf '%s\n' 'vitalreach-ci ALL=(root) NOPASSWD: /usr/local/sbin/vitalreach-deploy-container *' > "$sudo_tmp"
+visudo -cf "$sudo_tmp"
+install -o root -g root -m 0440 "$sudo_tmp" /etc/sudoers.d/vitalreach-container-ci
+echo 'CI account installed. No application or Caddy configuration was changed.'
+echo 'Install root-owned Compose and .env under /etc/vitalreach-container before deploying.'
+echo 'Remove this CI public key from unrestricted administrator accounts if previously installed there.'

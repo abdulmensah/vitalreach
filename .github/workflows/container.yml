@@ -1,9 +1,9 @@
 name: Build and publish container
 on:
   pull_request:
-    branches: [main, develop]
+    branches: [main, main-release, develop]
   push:
-    branches: [main, develop]
+    branches: [main, main-release, develop]
   workflow_dispatch:
 
 permissions:
@@ -22,6 +22,10 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v5
+      - name: Verify deployment command boundaries and recovery
+        run: |
+          for script in deploy/server/vitalreach-ci-ssh deploy/server/vitalreach-deploy-container deploy/server/deploy-container-engine deploy/server/install-container-ci; do bash -n "$script"; done
+          python3 tests/container_deploy_checks.py
       - name: Name image
         id: image
         env:
@@ -36,7 +40,7 @@ jobs:
           IMAGE: ${{ steps.image.outputs.name }}
         run: bash tests/container-smoke.sh "$IMAGE:$GITHUB_SHA"
       - name: Publish tested image
-        if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+        if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/main-release' || github.ref == 'refs/heads/develop')
         env:
           IMAGE: ${{ steps.image.outputs.name }}
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -45,9 +49,19 @@ jobs:
           trap 'docker logout ghcr.io' EXIT
           docker push "$IMAGE:$GITHUB_SHA"
           digest="$(docker image inspect "$IMAGE:$GITHUB_SHA" --format '{{index .RepoDigests 0}}')"
+          [[ "$digest" == "$IMAGE@sha256:"* ]]
+          export IMAGE_DIGEST="${digest#*@}"
+          python3 -c 'import json,os; from pathlib import Path; Path("image.json").write_text(json.dumps({"repository":os.environ["GITHUB_REPOSITORY"].lower(),"commit":os.environ["GITHUB_SHA"],"digest":os.environ["IMAGE_DIGEST"]}))'
           {
             echo '### Published and smoke-tested container'
             printf '\nAPP_IMAGE=%s\n' "$digest"
             echo
             echo 'Publishing does not deploy production or establish QA acceptance.'
           } >> "$GITHUB_STEP_SUMMARY"
+      - name: Save published digest for production promotion
+        if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/main-release' || github.ref == 'refs/heads/develop')
+        uses: actions/upload-artifact@v5
+        with:
+          name: container-image
+          path: image.json
+          retention-days: 30

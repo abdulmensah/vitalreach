@@ -1,5 +1,9 @@
 # Production deployment preparation
 
+> Historical systemd/archive deployment reference. The current production workflow
+> now targets Docker on the new VPS; follow [container-deployment.md](container-deployment.md).
+> The old workflow instructions below no longer describe `.github/workflows/production.yml`.
+
 These files prepare production; they do not install anything on the VPS or change DNS. The proposed canonical host is `vitalreachhub.com`. Confirm it before provisioning. QA continues at `qa.vitalreachhub.com`.
 
 | Setting | QA | Production |

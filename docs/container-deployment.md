@@ -1,105 +1,172 @@
-# Container production deployment
+# Docker production deployment
 
-This path targets the new production VPS (162.246.17.53), using the shared
-Caddy instance already running on hosting-edge. Existing QA/test archive
-deployments and the legacy systemd production workflow remain unchanged.
-Do not run the legacy production workflow against this Docker host.
+Production runs on 162.246.17.53 behind the existing hosting-edge Caddy.
+Release branch: main-release. The production workflow now deploys containers;
+the old archive/systemd production workflow has been replaced. QA and test
+archive workflows are unchanged. No server is changed by adding these files.
 
-## Publish an image
+## GitHub setup
 
-Commit the Dockerfile, .dockerignore, container workflow, proxy change and
-deployment files to the intended GitHub repository. The checkout currently has
-no configured remote; an authenticated repository owner must establish it.
-Build and publish container runs on main/develop pushes and manually. Pull
-requests build and smoke-test but do not publish.
+The production environment needs:
+- Variable PROD_HOST: 162.246.17.53.
+- Secret PROD_SSH_PRIVATE_KEY: the dedicated production CI private key.
+- Secret PROD_SSH_KNOWN_HOSTS: the verified host-key entry for this VPS.
 
-The image name is ghcr.io/<lowercase-owner>/<lowercase-repository>. Its tag is
-the full commit SHA. The workflow summary gives the exact APP_IMAGE digest.
-Always deploy the digest, not a moving tag. The job exercises non-root,
-read-only startup, health, homepage and volume persistence before pushing.
-It does not substitute for QA functional acceptance or deploy production.
+Allow only main-release to deploy to production and configure required reviewers
+where supported. Protect that branch and workflow files. The deployment SSH
+username is fixed to vitalreach-ci, not the administrative deployer account.
+The existing GitHub secret can hold the same dedicated key; install its public
+half on the restricted account below.
 
-Allow GitHub Actions to write packages. If the package is private, authenticate
-the server using a registry credential with read:packages only and appropriate
-organization authorization. Use docker login ghcr.io --username YOUR_USER
-interactively; do not put tokens in .env or commands committed to Git.
+The build workflow publishes ghcr.io/abdulmensah/vitalreach:<full-commit-sha>
+after its container checks pass. It also uploads a container-image artifact
+containing the immutable digest and source commit. No custom GHCR publishing
+key is needed; GitHub's job token has packages:write. main-release is now an
+automatic build trigger, alongside main/develop.
 
-## Prepare production storage
+Run Deploy production container from main-release, supplying the numeric ID
+of a successful main-release Build and publish container run. Attest that the
+release passed QA including login, uploads and idle/reconnection. The workflow
+checks the source repository, workflow, branch, event, result, commit and image
+record before using production SSH. It does not automatically prove functional
+QA acceptance or deploy the image to QA. Production never rebuilds the image.
+Expired image artifacts require a new successful build.
 
-Keep each client's/environment's data independent. A fresh production database
-uses application seed content; do not copy QA/test records into production.
-Review the seed/admin configuration and production readiness requirements.
+## One-time server setup (administrator)
 
-As deployer on the VPS:
+These commands are for the existing deployer administrator session. Keep that
+administrator key separate. Transfer the following repository files together
+to a temporary directory on the VPS, plus the CI PUBLIC key:
 
-```bash
-sudo install -d -o deployer -g deployer -m 0750 /opt/hosting/apps/vitalreach-prod
-sudo install -d -o 1654 -g 1654 -m 0700 /opt/hosting/apps/vitalreach-prod/data
-```
+- deploy/server/install-container-ci
+- deploy/server/vitalreach-ci-ssh
+- deploy/server/vitalreach-deploy-container
+- deploy/server/deploy-container-engine
+- deploy/containers/compose.production.yaml
+- deploy/containers/.env.example
 
-Copy compose.production.yaml and .env.example from deploy/containers to this
-directory. Rename .env.example to .env, chmod 600, then edit production values.
-No working-copy .env or local database should be uploaded.
-
-Find Caddy's current Docker address on the existing network:
-
-```bash
-cd /opt/hosting/edge
-docker inspect "$(docker compose -f compose.edge.yaml ps -q caddy)" --format '{{(index .NetworkSettings.Networks "hosting-edge").IPAddress}}'
-```
-
-Set CADDY_PROXY_IP in the application .env to that address. It is not the public
-VPS IP. If Caddy is recreated its address may change: recheck and recreate the
-app with the new setting. Prefer assigning a reviewed static Caddy address on
-the existing Docker network before automating deployments. Do not recreate an
-in-use network to assign one. Only that configured address plus framework
-loopback defaults are trusted for forwarded headers. Do not enable unrestricted
-ASPNETCORE_FORWARDEDHEADERS_ENABLED as a workaround.
-
-Set APP_IMAGE to the workflow's published digest and configure Google,
-reCAPTCHA and payment credentials as appropriate. Register the production
-Google callback https://vitalreachhub.com/signin-google. Intake and chatbot
-default disabled. Follow docs/production-deployment.md readiness requirements.
-
-## First activation
-
-The existing Caddy route is also versioned in deploy/containers/vitalreach-prod.caddy.
-It points at the app's vitalreach-prod alias on hosting-edge:8080. There is no
-published application port. Do not launch a second Caddy on ports 80/443.
+Run from that directory, using the actual public-key filename:
 
 ```bash
-cd /opt/hosting/apps/vitalreach-prod
-docker network inspect hosting-edge
-docker compose -f compose.production.yaml config --quiet
-docker compose -f compose.production.yaml pull
-docker compose -f compose.production.yaml up -d --wait --wait-timeout 180
-docker compose -f compose.production.yaml ps
-curl --fail --show-error https://vitalreachhub.com/health
-curl --fail --show-error https://www.vitalreachhub.com/health
+sudo bash install-container-ci ./vitalreach_prod_ci_ed25519.pub
+sudo install -o root -g root -m 0600 compose.production.yaml /etc/vitalreach-container/compose.production.yaml
+# FIRST INSTALL ONLY. Do not overwrite an existing configured .env.
+sudo test -e /etc/vitalreach-container/.env || sudo install -o root -g root -m 0600 .env.example /etc/vitalreach-container/.env
+sudoedit /etc/vitalreach-container/.env
 ```
 
-Verify login, secure cookies, uploads, product images and Blazor WebSockets.
-Health alone is not acceptance. Review resource limits against actual VPS
-capacity. Retain Caddy's persistent certificate volumes.
+The installer creates a dedicated vitalreach-ci account, with a root-owned home
+and authorized_keys. It has no Docker/sudo group membership. The key has
+restrict plus a forced command; only "deploy sha256:<64 lowercase hex digits>"
+is accepted. The narrow sudo rule runs a root-owned wrapper that validates its
+argument and starts the engine with an empty environment. Shell sessions, SCP,
+forwarding and arbitrary commands are denied. There is no upload endpoint.
 
-## Subsequent deployments and recovery
+If this CI public key was previously added to deployer/root authorized_keys,
+remove THAT key's unrestricted entry after checking the restricted connection.
+Do not remove the separate administrator key. Additional SSH AllowUsers/Match
+policies must permit key login for vitalreach-ci. Root console access remains
+available for recovery. The installer does not rewrite global SSH policy.
 
-Before an update, save the previous APP_IMAGE digest and take a consistent
-backup of data and .env with the app stopped. Startup can update database
-schema/seed content. Keep encrypted off-server backups; handle .env as secret.
-Restart the old image if backup fails and investigate before activation.
+Configuration is root-owned under /etc/vitalreach-container, state under
+/var/lib/vitalreach-container, app data under its data directory owned by UID
+1654. These paths intentionally avoid administrator-owned /opt/hosting parents
+for privileged Compose inputs. The Caddy stack stays in /opt/hosting/edge.
 
-After installing the new digest, use up --wait and verify public health.
-A failed health check does not automatically restore the previous release.
-Code rollback uses the recorded previous digest, but may require deliberate
-database restoration after reviewing schema compatibility and any newer data.
-Never blindly overwrite a running database. Do not use down -v or delete data.
+The .env contains application secrets and memory/CPU budgets. APP_IMAGE and
+CADDY_PROXY_IP placeholders are overridden by the deployment command; do not
+hardcode a tag for promotion. The command looks up the running hosting-edge
+Caddy IP and trusts that exact address. If Caddy is recreated between app
+deployments, redeploy the current digest to refresh trust. Consider a reviewed
+static Caddy address later. App containers have no published host ports.
 
-Automated SSH deployment, backup/rollback and QA-approved image promotion
-are not wired into this publishing workflow yet. They should use the same
-tested image digest, separate CI credentials and protected production
-environment approvals, rather than rebuilding during promotion.
+Register https://vitalreachhub.com/signin-google with Google OAuth. Review
+production secrets, seed content, administrator roles and payment setup.
+Intake/chatbot remain disabled until explicitly configured. No QA data is copied.
+
+If GHCR is private, configure ROOT's registry login once (the engine runs as
+root). Use a credential with read:packages only:
+
+```bash
+sudo docker login ghcr.io --username YOUR_GITHUB_USERNAME
+```
+
+Enter the credential at the prompt, not in a command line or Git-tracked file.
+The admin deployer's Docker login alone will not authenticate root.
+
+No application should already run under the vitalreach-prod Compose project on
+first installation. If a manually deployed container/data exists at
+/opt/hosting/apps/vitalreach-prod, stop and migrate it deliberately: back it up,
+copy database/keys/uploads together into the new data directory, preserve UID
+1654 ownership, and record its exact running digest as current-image before
+adoption. The engine refuses an existing app with no matching image record.
+
+## Verify the restriction before deployment
+
+From your local computer, with the dedicated CI key:
+
+```bash
+ssh -T -o BatchMode=yes -o IdentitiesOnly=yes -i /path/to/vitalreach_prod_ci_ed25519 vitalreach-ci@162.246.17.53 id
+```
+
+Expected result: "Only deploy sha256:..." and exit status 64. A shell or id output
+means the key is not restricted correctly. Verify the SSH host fingerprint via
+the hosting console before adding it to the GitHub known-hosts secret.
+
+Then run the protected production workflow. It locks deployments, downloads
+the candidate before downtime, stops the existing app, backs up data plus .env
+and Compose, starts the new digest and waits for Docker health. It checks
+HTTPS for BOTH domains through this server's Caddy using loopback resolution.
+The workflow then verifies public DNS/HTTPS separately.
+
+After deployment, verify login, uploads, product images and Blazor WebSockets.
+Health is availability, not full functional acceptance.
+
+## Recovery and maintenance
+
+The current successful digest is in /var/lib/vitalreach-container/current-image.
+Backups are in /var/lib/vitalreach-container/backups/<timestamp>-<digest>-<pid>.
+They contain secrets and sensitive data; arrange encrypted off-server copies
+and retention separately. The local backup is not disaster recovery.
+
+Pull failure leaves the existing app running. Backup failure restarts previous
+code. Candidate-startup or local HTTPS failure stops the candidate and attempts
+to restart the previous digest, leaving the successful-image record unchanged.
+On a first-deployment failure, the candidate stays stopped for investigation.
+Remove that failed container deliberately before a first-deployment retry;
+do not remove its data. Database/schema changes are NOT automatically reversed.
+Review compatibility and backup contents before any data restoration. Automatic
+code recovery can fail; an operator must handle that case.
+
+A public HTTPS failure AFTER successful server activation does not automatically
+undo the deployment: inspect DNS/proxy connectivity. Loss of SSH, host power or
+SIGKILL can interrupt recovery; inspect container state, current-image and
+backups before retrying. No trap can guarantee recovery from host failure.
+
+To redeploy a previously accepted digest, an administrator may run:
+```bash
+sudo /usr/local/sbin/vitalreach-deploy-container sha256:THE_64_CHARACTER_DIGEST
+```
+
+Only this repository's images can be selected, but deployment still grants code
+access to production application secrets/data. The forced command is not an
+image-signing policy or protection against a malicious publisher. Keep package
+publishing and production-environment access tightly controlled.
+
+Compose, the server scripts and Caddy routes remain reviewed administrative
+configuration; CI cannot upload/replace privileged files or proxy routes.
+Install reviewed updates with the administrator account. The installer never
+starts/reloads Caddy. Keep its persistent certificate volumes. Do not run
+compose down -v or delete the data directory during normal updates.
+
+## Validation
+
+tests/container_deploy_checks.py tests forced-command rejection and pull,
+backup, activation, HTTPS, first-deployment and successful-recording paths using
+mock host tools. It never touches Docker or SSH. Privilege/permission enforcement,
+flock and actual container/TLS behavior still need Ubuntu acceptance testing.
+The publishing workflow separately runs the real container smoke checks.
 
 References:
-- [GitHub image publishing](https://docs.github.com/en/actions/tutorials/publish-packages/publish-docker-images)
-- [ASP.NET proxy trust](https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/proxy-load-balancer?view=aspnetcore-10.0)
+- [GitHub artifact download](https://github.com/actions/download-artifact)
+- [OpenSSH authorized key restrictions](https://man.openbsd.org/sshd.8)

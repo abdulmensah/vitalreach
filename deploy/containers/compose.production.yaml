@@ -15,7 +15,7 @@ services:
       ProductImages__Path: /data/uploads/products
       ForwardedHeaders__KnownProxies__0: ${CADDY_PROXY_IP:?Set the Caddy container IP on hosting-edge}
     volumes:
-      - ./data:/data
+      - ${VITALREACH_DATA_PATH:-./data}:/data
     networks:
       edge:
         aliases: [vitalreach-prod]

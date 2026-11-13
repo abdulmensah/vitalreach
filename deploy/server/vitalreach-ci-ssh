@@ -1,0 +1,8 @@
+#!/bin/bash
+set -euo pipefail
+# Forced command for a dedicated, non-administrative SSH account.
+if [[ "${SSH_ORIGINAL_COMMAND:-}" =~ ^deploy\ (sha256:[0-9a-f]{64})$ ]]; then
+    exec /usr/bin/sudo -n /usr/local/sbin/vitalreach-deploy-container "${BASH_REMATCH[1]}"
+fi
+echo 'Only deploy sha256:<64 lowercase hex characters> is permitted.' >&2
+exit 64

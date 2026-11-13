@@ -1,0 +1,90 @@
+#!/bin/bash
+set -Eeuo pipefail
+umask 077
+[[ $# == 1 && "$1" =~ ^sha256:[0-9a-f]{64}$ && $EUID == 0 ]] || exit 64
+readonly config=/etc/vitalreach-container
+readonly state=/var/lib/vitalreach-container
+readonly repo=ghcr.io/abdulmensah/vitalreach
+readonly candidate="$repo@$1"
+readonly docker=/usr/bin/docker
+readonly curl=/usr/bin/curl
+die() { echo "$*" >&2; exit 1; }
+# Config/state parents and scripts are installed root-owned, not under the
+# administrator-owned /opt/hosting tree. CI cannot replace privileged inputs.
+[[ -f "$config/.env" && -f "$config/compose.production.yaml" ]] || die 'Install production configuration first.'
+[[ -d "$state/data" ]] || die 'Prepare production data first.'
+exec 9>/run/lock/vitalreach-container-deploy.lock
+flock -n 9 || die 'Another deployment is running.'
+export VITALREACH_DATA_PATH="$state/data"
+export APP_IMAGE="$candidate"
+# Resolve the actual trusted edge IP each time, including rollback.
+mapfile -t edges < <("$docker" ps -q --filter label=com.docker.compose.project=hosting-edge --filter label=com.docker.compose.service=caddy)
+[[ "${#edges[@]}" == 1 ]] || die 'Expected exactly one running hosting-edge Caddy container.'
+CADDY_PROXY_IP="$("$docker" inspect "${edges[0]}" --format '{{(index .NetworkSettings.Networks "hosting-edge").IPAddress}}')"
+export CADDY_PROXY_IP
+/usr/bin/python3 -c 'import ipaddress,sys; ipaddress.ip_address(sys.argv[1])' "$CADDY_PROXY_IP"
+compose() {
+    "$docker" compose --project-name vitalreach-prod --project-directory "$config" \
+      --env-file "$config/.env" -f "$config/compose.production.yaml" "$@"
+}
+compose config --quiet
+previous=
+if [[ -f "$state/current-image" ]]; then
+    previous="$(cat "$state/current-image")"
+    [[ "$previous" =~ ^ghcr\.io/abdulmensah/vitalreach@sha256:[0-9a-f]{64}$ ]] || die 'Invalid previous image record.'
+fi
+existing="$(compose ps -aq app)"
+if [[ -n "$existing" ]]; then
+    [[ -n "$previous" ]] || die 'Existing app has no managed image record; administrator must adopt it first.'
+    [[ "$("$docker" inspect "$existing" --format '{{.Config.Image}}')" == "$previous" ]] ||
+      die 'Running app differs from recorded image; review manual changes.'
+fi
+# Download before downtime, preserving the existing service on pull failure.
+compose pull app
+[[ "$("$docker" image inspect "$candidate" --format '{{json .Config.Healthcheck.Test}}')" != null ]] || die 'Candidate has no health check.'
+backup="$state/backups/$(date -u +%Y%m%dT%H%M%SZ)-${1#sha256:}-$$"
+install -d -m 0700 "$backup"
+printf '%s\n' "$previous" > "$backup/previous-image"
+printf '%s\n' "$candidate" > "$backup/candidate-image"
+stopped=0
+activated=0
+recover() {
+    trap - ERR INT TERM
+    set +e
+    echo "Deployment failed; backup: $backup" >&2
+    if (( stopped )); then
+        compose stop -t 30 app
+        if [[ -n "$previous" ]]; then
+            export APP_IMAGE="$previous"
+            if compose up -d --wait --wait-timeout 180 app; then
+                echo 'Previous code is healthy again.' >&2
+            else
+                echo 'RECOVERY FAILED: administrator intervention required.' >&2
+            fi
+        else
+            echo 'First deployment failed; candidate stopped for investigation.' >&2
+        fi
+    fi
+    if (( activated )); then
+        echo 'Database was NOT rolled back. Review schema compatibility and the backup before restoring data.' >&2
+    fi
+    exit 1
+}
+trap recover ERR INT TERM
+stopped=1
+compose stop -t 30 app
+# Back up all mutable files together, plus secrets and Compose settings.
+tar -czf "$backup/data.tar.gz" -C "$state" data
+cp "$config/.env" "$config/compose.production.yaml" "$backup/"
+activated=1
+compose up -d --wait --wait-timeout 180 app
+# Verify THIS server's HTTPS edge rather than a different server still in DNS.
+for host in vitalreachhub.com www.vitalreachhub.com; do
+    "$curl" --fail --silent --show-error --retry 3 --retry-delay 2 --max-time 15 \
+      --resolve "$host:443:127.0.0.1" "https://$host/health" >/dev/null
+done
+printf '%s\n' "$candidate" > "$state/current-image.next"
+mv -f "$state/current-image.next" "$state/current-image"
+trap - ERR INT TERM
+echo "Healthy production image: $candidate"
+echo "Consistent pre-deployment backup: $backup"

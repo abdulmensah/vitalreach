@@ -1,0 +1,8 @@
+#!/bin/bash
+set -Eeuo pipefail
+[[ $# == 1 && "$1" =~ ^sha256:[0-9a-f]{64}$ ]] || { echo 'Expected one sha256 digest' >&2; exit 64; }
+[[ $EUID == 0 ]] || { echo 'Run via the restricted sudo command' >&2; exit 77; }
+# Start the root-owned engine with an empty environment. No caller-controlled
+# Docker host/config, Compose options, PATH, Python settings or shell init.
+exec /usr/bin/env -i HOME=/root PATH=/usr/sbin:/usr/bin:/sbin:/bin \
+  /bin/bash /usr/local/lib/vitalreach/deploy-container-engine "$1"
