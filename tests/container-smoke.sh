@@ -32,6 +32,11 @@ docker exec "$name" test -s /data/vitalreach.db
 docker exec "$name" sh -c 'test -n "$(ls -A /data/keys)"'
 docker exec "$name" sh -c 'echo persistence-check > /data/uploads/products/smoke.txt'
 docker exec "$name" curl --fail --silent --show-error -H 'Host: vitalreachhub.com' http://127.0.0.1:8080/ >/dev/null
+# Prerendered HTML can work even when the Blazor runtime is missing.
+docker exec "$name" curl --fail --silent --show-error -H 'Host: vitalreachhub.com' \
+  http://127.0.0.1:8080/_framework/blazor.web.js > /tmp/"$name"-blazor.js
+grep -q 'Blazor' /tmp/"$name"-blazor.js
+rm -f /tmp/"$name"-blazor.js
 # A recreation, not just a restart, must preserve mutable storage.
 docker rm -f "$name" >/dev/null
 docker run -d --name "$name" --read-only --tmpfs /tmp:rw,nosuid,size=64m \
@@ -41,4 +46,4 @@ docker run -d --name "$name" --read-only --tmpfs /tmp:rw,nosuid,size=64m \
   -v "$volume:/data" "$image" >/dev/null
 wait_healthy
 docker exec "$name" grep -qx persistence-check /data/uploads/products/smoke.txt
-echo 'Non-root/read-only startup, homepage and persistent volume checks passed.'
+echo 'Non-root/read-only startup, homepage, Blazor runtime and persistent volume checks passed.'

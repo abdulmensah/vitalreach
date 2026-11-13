@@ -180,6 +180,7 @@ app.MapPost("/payments/{provider}/webhook", async (string provider, HttpRequest 
     catch (System.Text.Json.JsonException) { return Results.BadRequest(); }
     catch (KeyNotFoundException) { return Results.BadRequest(); }
 });
+app.MapStaticAssets();
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
 app.Run();
