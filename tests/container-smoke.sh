@@ -31,10 +31,15 @@ wait_healthy
 docker exec "$name" test -s /data/vitalreach.db
 docker exec "$name" sh -c 'test -n "$(ls -A /data/keys)"'
 docker exec "$name" sh -c 'echo persistence-check > /data/uploads/products/smoke.txt'
-docker exec "$name" curl --fail --silent --show-error -H 'Host: vitalreachhub.com' http://127.0.0.1:8080/ >/dev/null
+echo 'Checking homepage and its Blazor runtime script...'
+homepage="$(docker exec "$name" curl --fail --silent --show-error -H 'Host: vitalreachhub.com' http://127.0.0.1:8080/)"
 # Prerendered HTML can work even when the Blazor runtime is missing.
+# Follow the rendered URL, including the fingerprint chosen by the asset manifest.
+blazor_path="$(printf '%s' "$homepage" | grep -oE 'src="[^"]*_framework/blazor\.web[^"]*\.js"' | sed -E 's/^src="//; s/"$//')"
+[[ -n "$blazor_path" && "$blazor_path" != *$'\n'* ]]
+echo "Checking Blazor runtime: $blazor_path"
 docker exec "$name" curl --fail --silent --show-error -H 'Host: vitalreachhub.com' \
-  http://127.0.0.1:8080/_framework/blazor.web.js > /tmp/"$name"-blazor.js
+  "http://127.0.0.1:8080/${blazor_path#/}" > /tmp/"$name"-blazor.js
 grep -q 'Blazor' /tmp/"$name"-blazor.js
 rm -f /tmp/"$name"-blazor.js
 # A recreation, not just a restart, must preserve mutable storage.

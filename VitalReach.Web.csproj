@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
+    <!-- Docker restores before Razor files are copied; require Blazor assets explicitly. -->
+    <RequiresAspNetWebAssets>true</RequiresAspNetWebAssets>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>d142e4e8-7716-40f8-9fa4-102f83787187</UserSecretsId>
