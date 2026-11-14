@@ -40,7 +40,7 @@
 .mission-welcome-photo { position: relative; margin: 0 0 18px; padding: 22px 0 48px 22px; isolation: isolate; }
 .mission-welcome-photo::before { content: ''; position: absolute; inset: 0 28px 22px 0; z-index: -1; background: #e7b195; border-radius: 110px 16px 16px 16px; }
 .mission-welcome-photo img { display: block; width: 100%; height: auto; min-height: 300px; object-fit: cover; border-radius: 90px 12px 12px 12px; }
-.mission-welcome-photo figcaption { position: absolute; right: 20px; bottom: 0; background: #f4cd65; color: #173e35; padding: 22px 26px; border-radius: 4px 4px 30px 4px; font: 600 19px/1.35 'DM Sans', sans-serif; box-shadow: 0 8px 20px #66422212; }
+.mission-welcome-photo figcaption { width: max-content; max-width: calc(100% - 24px); box-sizing: border-box; white-space: nowrap; position: absolute; right: 20px; bottom: 0; background: #f4cd65; color: #173e35; padding: 22px 26px; border-radius: 4px 4px 30px 4px; font: 600 19px/1.35 'DM Sans', sans-serif; box-shadow: 0 8px 20px #66422212; }
 .mission-photo-mark { float: left; font-size: 44px; line-height: 1; margin: 3px 16px 0 0; }
 
 .ghana-mission-page .mission-causes { padding-top: 58px; background: #f3ecdc; }
