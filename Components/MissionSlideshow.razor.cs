@@ -1,7 +1,9 @@
 #nullable enable
+using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 namespace VitalReach.Web.Components;
 
-public partial class MissionSlideshow
+public partial class MissionSlideshow : IAsyncDisposable
 {
     private sealed record Slide(string File, string Alt, string Caption)
     {
@@ -19,9 +21,68 @@ public partial class MissionSlideshow
         new("health-screen-01", "A community health outreach event with consultation tables beneath outdoor canopies", "Bringing healthcare outreach into the community.")
     ];
 
+    [Inject] private IJSRuntime Javascript { get; set; } = default!;
+    private ElementReference Hero;
+    private IJSObjectReference? Module;
+    private DotNetObjectReference<MissionSlideshow>? Reference;
+    private bool Disposed;
+    private bool IsPaused = true;
     private int ActiveIndex;
     private Slide Current => Slides[ActiveIndex];
-    private void Select(int index) => ActiveIndex = index;
-    private void Previous() => ActiveIndex = (ActiveIndex + Slides.Length - 1) % Slides.Length;
-    private void Next() => ActiveIndex = (ActiveIndex + 1) % Slides.Length;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        Module = await Javascript.InvokeAsync<IJSObjectReference>("import", "/js/mission-slideshow.js?v=1");
+        if (Disposed) { await Module.DisposeAsync(); return; }
+        Reference = DotNetObjectReference.Create(this);
+        IsPaused = await Module.InvokeAsync<bool>("start", Hero, Reference);
+        if (!Disposed) StateHasChanged();
+    }
+
+    private async Task Select(int index)
+    {
+        ActiveIndex = index;
+        IsPaused = true;
+        if (Module is not null) await Module.InvokeVoidAsync("setPaused", Hero, true);
+    }
+    private Task Previous() => Select((ActiveIndex + Slides.Length - 1) % Slides.Length);
+    private Task Next() => Select((ActiveIndex + 1) % Slides.Length);
+    private async Task ToggleRotation()
+    {
+        IsPaused = !IsPaused;
+        if (Module is not null) await Module.InvokeVoidAsync("setPaused", Hero, IsPaused);
+    }
+
+    [JSInvokable]
+    public Task AdvanceAutomatically() => InvokeAsync(() =>
+    {
+        if (Disposed || IsPaused) return;
+        ActiveIndex = (ActiveIndex + 1) % Slides.Length;
+        StateHasChanged();
+    });
+
+    [JSInvokable]
+    public Task PauseFromBrowser() => InvokeAsync(() =>
+    {
+        if (Disposed) return;
+        IsPaused = true;
+        StateHasChanged();
+    });
+
+    public async ValueTask DisposeAsync()
+    {
+        Disposed = true;
+        if (Module is not null)
+        {
+            try
+            {
+                await Module.InvokeVoidAsync("dispose", Hero);
+                await Module.DisposeAsync();
+            }
+            catch (JSDisconnectedException) { }
+            catch (TaskCanceledException) { }
+        }
+        Reference?.Dispose();
+    }
 }

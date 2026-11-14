@@ -4,17 +4,35 @@
 <HeadContent>
     <meta name="description" content="Discover the Ghana Mission of VitalReach International, continuing the charitable work of Rashias Foundation. Both are registered nonprofit organizations in Ghana." />
 </HeadContent>
-<StorefrontHeader />
-<main class="public-refresh ghana-mission-page">
-    <section class="center-hero mission-center-hero" aria-labelledby="mission-title">
-        <div class="center-hero-content">
-            <p class="eyebrow light">VitalReach International</p>
-            <h1 id="mission-title">Our Ghana Mission.<br /><em>Purpose in action.</em></h1>
-            <p>Supporting dignity, health and education through community work in Ghana.</p>
-            <div class="actions">
-                <a class="btn btn-gold" href="/ghana-mission#mission-activities">Explore our activities ↓</a>
-                <a class="underlink light-link" href="/contact">Connect with us ↗</a>
-            </div>
+<StorefrontHeader MissionTheme="true" />
+<main class="public-refresh ghana-mission-page mission-landing">
+    <MissionSlideshow @rendermode="InteractiveServer" />
+    <section class="mission-causes" aria-labelledby="mission-causes-title">
+        <header>
+            <p class="eyebrow">Where care takes shape</p>
+            <h2 id="mission-causes-title">Many ways to make<br /><em>a difference.</em></h2>
+        </header>
+        <div class="mission-cause-grid">
+            <article class="mission-cause mission-cause-health">
+                <span class="mission-cause-number" aria-hidden="true">01 /</span>
+                <h3>Health &amp; care</h3>
+                <p>Community screenings, first aid and practical training alongside local healthcare professionals.</p>
+            </article>
+            <article class="mission-cause mission-cause-education">
+                <span class="mission-cause-number" aria-hidden="true">02 /</span>
+                <h3>Education</h3>
+                <p>Books, uniforms and school-fee support to help students continue their learning.</p>
+            </article>
+            <article class="mission-cause mission-cause-essentials">
+                <span class="mission-cause-number" aria-hidden="true">03 /</span>
+                <h3>Everyday essentials</h3>
+                <p>Meals, Eid gift packages and donations that bring practical support to families and children’s homes.</p>
+            </article>
+            <article class="mission-cause mission-cause-water">
+                <span class="mission-cause-number" aria-hidden="true">04 /</span>
+                <h3>Water access</h3>
+                <p>Community water-access support, including borehole and water-tank donations.</p>
+            </article>
         </div>
     </section>
     <section class="ghana-mission-story" aria-labelledby="mission-story-title">
@@ -36,12 +54,15 @@
             <p>Our healthcare outreach has included screenings and first aid with local nurses and doctors, alongside hands-on training in safe patient transfer and lifting for healthcare workers. Educational support and visits to children’s homes extend that care beyond the consultation table.</p>
             <a class="underlink" href="/ghana-mission#mission-activities">Explore the stories behind the work ↓</a>
         </header>
-        <MissionSlideshow @rendermode="InteractiveServer" />
+        <figure class="mission-welcome-photo">
+            <img src="/images/mission/orphanage-visit-together-hero.jpg" alt="A VitalReach team member spending time with children during a community visit in Ghana" width="1401" height="648" loading="lazy" />
+            <figcaption><span class="mission-photo-mark" aria-hidden="true">✳</span> Small acts of care.<br />Lasting connections.</figcaption>
+        </figure>
     </section>
     <section class="ghana-mission-activities" id="mission-activities" aria-labelledby="activities-title">
         <header>
             <p class="eyebrow">From the community</p>
-            <h2 id="activities-title">Activities &amp; updates</h2>
+            <h2 id="activities-title">Stories of care.<br /><em>From our communities.</em></h2>
             <p>From Eid celebrations and educational support to healthcare outreach, our work responds to community needs. Health-awareness activities also connect with the VitalReach Wellness Center.</p>
         </header>
         @if (Activities.Count > 0)
@@ -87,10 +108,10 @@
     <section class="ghana-mission-connect" aria-labelledby="mission-connect-title">
         <div>
             <p class="eyebrow">Start a conversation</p>
-            <h2 id="mission-connect-title">Connect with<br /><em>the Ghana Mission.</em></h2>
+            <h2 id="mission-connect-title">There’s a place for you<br /><em>in this story.</em></h2>
             <p>Interested in the work or exploring a community partnership? Tell us how you would like to get involved.</p>
         </div>
-        <a class="btn btn-gold" href="/contact">Contact the team →</a>
+        <a class="btn mission-primary" href="/contact">Let’s connect →</a>
     </section>
 </main>
 <StorefrontFooter />

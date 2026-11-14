@@ -1,458 +1,184 @@
-.mission-date-label {
-    display: block;
-    margin-bottom: 12px;
-    font-size: 14px;
-    font-weight: 700;
-}
-
-.mission-pledge {
-    display: inline-block;
-    padding: 4px 10px;
-    background: #f3e3be;
-    color: #604510;
-    font-size: 13px;
-    font-weight: 700;
-}
-
+/* Ghana Mission: warm community colors, shared with activity stories. */
 .ghana-mission-page {
-    color: #063f3b;
+    --mission-ink: #173e35;
+    --mission-clay: #a83e28;
+    --mission-cream: #fff8ed;
+    color: var(--mission-ink);
+    background: var(--mission-cream);
 }
+.ghana-mission-page section { padding: 76px var(--page-space); }
+.ghana-mission-page h1 { font: 500 clamp(42px, 5.3vw, 78px)/1.06 'Playfair Display', serif; letter-spacing: -.04em; margin: 20px 0 28px; }
+.ghana-mission-page h2 { font: 500 clamp(32px, 3.5vw, 50px)/1.15 'Playfair Display', serif; letter-spacing: -.025em; margin: 12px 0 24px; }
+.ghana-mission-page h3 { font: 500 27px/1.25 'Playfair Display', serif; }
+.ghana-mission-page p { max-width: 65ch; line-height: 1.75; }
+.ghana-mission-page .eyebrow { color: #8d442f; font-weight: 700; }
+.ghana-mission-page .underlink { color: var(--mission-ink); text-underline-offset: 6px; }
+.ghana-mission-page .btn.mission-primary { background: var(--mission-clay); color: #fff8ed; border: 1px solid var(--mission-clay); border-radius: 6px; text-transform: none; letter-spacing: .01em; font-size: 14px; font-weight: 700; display: inline-flex; align-items: center; gap: 26px; }
+.ghana-mission-page .btn.mission-primary:hover { background: #84301f; border-color: #84301f; }
+.ghana-mission-page a:focus-visible, .ghana-mission-page button:focus-visible { outline: 3px solid #a83e28; outline-offset: 5px; }
+.ghana-mission-page em { color: var(--mission-clay); }
 
-    .ghana-mission-page section {
-        padding: 56px var(--page-space);
-    }
+/* Rotating photography stays behind stable, readable hero copy. */
+.ghana-mission-page .mission-hero { position: relative; isolation: isolate; overflow: hidden; min-height: 690px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; gap: 54px; padding-block: 74px 28px; background: #173e35; color: #fff8ed; }
+.mission-hero-images, .mission-hero-images::after { position: absolute; inset: 0; }
+.mission-hero-images { z-index: -1; }
+.mission-hero-images img { position: absolute; width: 100%; height: 100%; object-fit: cover; object-position: center 42%; opacity: 0; transition: opacity 1.6s ease-in-out; }
+.mission-hero-images img.is-active { opacity: 1; }
+.mission-hero-images::after { content: ''; background: linear-gradient(90deg, #092d27ed 0%, #092d27cf 35%, #092d2730 80%), linear-gradient(0deg, #092d27ed, transparent 40%); }
+.mission-hero-copy { max-width: 650px; }
+.ghana-mission-page .mission-hero h1 { color: #fff8ed; }
+.ghana-mission-page .mission-hero em, .ghana-mission-page .mission-hero .eyebrow { color: #f4cd65; }
+.mission-welcome-intro { font-size: 17px; max-width: 52ch !important; }
+.mission-welcome-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 24px; margin-top: 30px; }
+.ghana-mission-page .mission-hero .underlink { color: #fff8ed; }
+.ghana-mission-page .mission-hero .mission-primary { background: #f4cd65; color: #173e35; border-color: #f4cd65; }
+.ghana-mission-page .mission-hero .mission-primary:hover { background: #ffdf8d; }
+.ghana-mission-page .mission-welcome-note { font-size: 12px; letter-spacing: .04em; margin: 28px 0 0; color: #eeeade; }
+.mission-hero-footer { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 20px; padding-top: 20px; border-top: 1px solid #ffffff45; }
+.mission-hero a:focus-visible, .mission-hero button:focus-visible { outline-color: #f4cd65; }
+/* The original framed portrait now accompanies the community story. */
+.mission-welcome-photo { position: relative; margin: 0 0 18px; padding: 22px 0 48px 22px; isolation: isolate; }
+.mission-welcome-photo::before { content: ''; position: absolute; inset: 0 28px 22px 0; z-index: -1; background: #e7b195; border-radius: 110px 16px 16px 16px; }
+.mission-welcome-photo img { display: block; width: 100%; height: auto; min-height: 300px; object-fit: cover; border-radius: 90px 12px 12px 12px; }
+.mission-welcome-photo figcaption { position: absolute; right: 20px; bottom: 0; background: #f4cd65; color: #173e35; padding: 22px 26px; border-radius: 4px 4px 30px 4px; font: 600 19px/1.35 'DM Sans', sans-serif; box-shadow: 0 8px 20px #66422212; }
+.mission-photo-mark { float: left; font-size: 44px; line-height: 1; margin: 3px 16px 0 0; }
 
-    .ghana-mission-page h1 {
-        font: 500 clamp(38px, 4.6vw, 68px)/1.1 'Playfair Display', serif;
-        margin: 18px 0 24px;
-    }
+.ghana-mission-page .mission-causes { padding-top: 58px; background: #f3ecdc; }
+.mission-causes > header { margin-bottom: 32px; }
+.mission-cause-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.mission-cause { padding: 30px 24px 24px; border-radius: 8px; }
+.mission-cause-number { font: 700 12px/1 'DM Sans', sans-serif; letter-spacing: .08em; }
+.mission-cause h3 { margin: 36px 0 14px; }
+.mission-cause p { font-size: 14px; margin-bottom: 0; }
+.mission-cause-health { background: #d9e4cd; }
+.mission-cause-education { background: #f6d57c; }
+.mission-cause-essentials { background: #efc1a9; }
+.mission-cause-water { background: #cfdfdf; }
 
-    .ghana-mission-page h2 {
-        font: 500 clamp(28px, 3vw, 42px)/1.2 'Playfair Display', serif;
-        margin: 12px 0 20px;
-    }
+.ghana-mission-story { background: #173e35; color: #fff8ed; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 60px; align-items: start; }
+.ghana-mission-story .eyebrow, .ghana-mission-story em { color: #f3c17e; }
+.ghana-mission-story > div:last-child { border-left: 3px solid #e2aa7e; padding-left: 32px; }
+.ghana-mission-story > div:last-child p:first-child { margin-top: 0; }
+.ghana-mission-story > div:last-child p:last-child { margin-bottom: 0; }
 
-    .ghana-mission-page h3 {
-        font: 500 26px/1.3 'Playfair Display', serif;
-    }
+.mission-visit-gallery { background: #e1e8d8; display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 40px; align-items: center; }
+.mission-visit-gallery > header p:not(.eyebrow) { font-size: 15px; }
+.mission-slide-caption { flex: 1 1 240px; display: grid; gap: 6px; font-size: 13px; line-height: 1.5; }
+.mission-slide-caption .eyebrow { font-size: 11px; }
+.mission-slide-controls { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.mission-slide-controls button { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 44px; padding: 0; border: 0; background: transparent; color: #fff8ed; font-size: 22px; cursor: pointer; border-radius: 4px; }
+.mission-slide-controls button:hover { background: #ffffff22; }
+.mission-slide-controls .mission-rotation-toggle { width: 84px; gap: 8px; font-size: 13px; border: 1px solid #ffffff70; margin-right: 10px; }
+.mission-slide-dots { display: flex; justify-content: center; }
+.mission-slide-dots button { width: 24px; }
+.mission-slide-dots span { width: 7px; height: 7px; border-radius: 50%; background: currentColor; opacity: .5; }
+.mission-slide-dots .is-active span { opacity: 1; width: 16px; border-radius: 6px; background: #f4cd65; }
 
-    .ghana-mission-page p {
-        max-width: 65ch;
-        line-height: 1.8;
-    }
+.ghana-mission-activities { scroll-margin-top: 110px; }
+.ghana-mission-activities > header { max-width: 720px; }
+.mission-timeline-note { font-size: 13px; color: #596c5d; }
+.mission-timeline { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px 24px; list-style: none; padding: 0; margin: 36px 0 0; }
+.mission-timeline > li { min-width: 0; }
+.mission-timeline > li > article { height: 100%; display: flex; flex-direction: column; }
+.mission-timeline time, .mission-date-label { display: block; margin-bottom: 12px; color: #76513d; font-size: 12px; font-weight: 700; }
+.mission-timeline-card { display: flex; flex-direction: column; flex: 1; background: #fffdf7; border: 1px solid #e8ddc8; border-radius: 10px; overflow: hidden; }
+.mission-timeline-card > a { display: block; background: #f0e9db; }
+.mission-timeline-card img { display: block; width: 100%; height: 230px; object-fit: contain; }
+.mission-timeline-card > div { padding: 26px; min-width: 0; display: flex; flex: 1; flex-direction: column; align-items: flex-start; }
+.mission-timeline-card h3 { margin: 8px 0 14px; overflow-wrap: anywhere; font-size: 25px; }
+.mission-timeline-card h3 a { color: inherit; text-decoration: none; }
+.mission-timeline-card h3 a:hover { color: #a83e28; }
+.mission-timeline-card p { font-size: 14px; }
+.mission-timeline-card .eyebrow { font-size: 10px; margin: 0; }
+.mission-timeline-card .underlink { margin-top: auto; padding-top: 14px; font-size: 13px; }
+.mission-pledge { display: inline-block; padding: 5px 10px; background: #f6d57c; color: #62461c; font-size: 12px; font-weight: 700; border-radius: 4px; }
+.ghana-mission-empty { margin-top: 28px; padding: 32px; background: #f3ecdc; border-left: 4px solid #a83e28; }
 
-.ghana-mission-story {
-    display: grid;
-    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
-    gap: 48px;
-    align-items: center;
+.ghana-mission-connect { display: flex; justify-content: space-between; align-items: center; gap: 40px; background: #f2cd77; color: #173e35; border-top: 1px solid #e3b956; }
+.ghana-mission-connect > a { flex-shrink: 0; }
+.ghana-mission-connect p:last-child { margin-bottom: 0; }
+.mission-article { max-width: 1100px; margin: auto; overflow-wrap: anywhere; }
+.mission-article-image { display: block; width: 100%; max-height: 650px; object-fit: contain; margin: 28px 0; border-radius: 8px; }
+.mission-article-body { white-space: pre-wrap; line-height: 1.9; max-width: 75ch; margin-block: 28px; }
+
+@media (min-width: 1600px) {
+    .ghana-mission-page { --page-space: max(72px, calc((100vw - 1440px) / 2)); }
 }
-
-.mission-visit-gallery {
-    background: #f1eee3;
-    display: grid;
-    grid-template-columns: minmax(0, .85fr) minmax(0, 1.4fr);
-    column-gap: clamp(16px, 2vw, 32px);
-    align-items: start;
+@media (max-width: 1100px) {
+    .mission-cause-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .mission-timeline { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .mission-visit-gallery { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+    .mission-visit-gallery > header { max-width: 720px; }
+    .mission-welcome-photo figcaption { right: 8px; padding: 18px; font-size: 16px; }
 }
-
-    .mission-visit-gallery > header {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        box-sizing: border-box;
-        min-height: 500px;
-        padding: 24px 0;
-        color: #063f3b;
-    }
-
-        .mission-visit-gallery > header a {
-            align-self: flex-start;
-            color: #063f3b;
-        }
-
-        .mission-visit-gallery > header .eyebrow {
-            color: #806021;
-            margin: 0;
-        }
-
-        .mission-visit-gallery > header h2 {
-            color: #063f3b;
-        }
-
-        .mission-visit-gallery > header p:not(.eyebrow) {
-            font-size: 16px;
-            line-height: 1.65;
-            margin: 0 0 20px;
-        }
-
-.mission-slideshow {
-    min-width: 0;
-    background: #f1eee3;
+@media (max-width: 800px) {
+    .ghana-mission-page section { padding-block: 48px; }
+    .ghana-mission-page h1 { font-size: clamp(42px, 8vw, 64px); }
+    .mission-welcome-photo { max-width: 650px; width: 100%; box-sizing: border-box; justify-self: center; margin: 0; }
+    .mission-welcome-photo img { min-height: 0; }
+    .ghana-mission-story { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+    .ghana-mission-story > div:last-child { padding-left: 24px; }
+    .ghana-mission-connect { flex-direction: column; align-items: flex-start; gap: 28px; }
 }
-
-    .mission-slideshow figure {
-        position: relative;
-        margin: 0;
-    }
-
-.mission-slide-image {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    height: 500px;
-    background: #f1eee3;
-}
-
-    .mission-slide-image img {
-        display: block;
-        width: auto;
-        max-width: 100%;
-        height: auto;
-        max-height: 100%;
-        object-fit: contain;
-        mask-image: linear-gradient(90deg, transparent, #000 12%);
-    }
-
-.mission-slideshow figcaption {
-    position: absolute;
-    inset: auto 0 0;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 4px 16px;
-    padding: 10px 16px;
-    background: rgb(241 238 227 / 72%);
-    color: #063f3b;
-    font-size: 13px;
-    line-height: 1.4;
-    backdrop-filter: blur(8px);
-}
-
-.mission-slide-caption {
-    flex: 1 1 200px;
-    display: grid;
-    gap: 3px;
-    text-align: right;
-}
-
-.mission-slideshow figcaption .eyebrow {
-    margin: 0;
-    font-size: 10px;
-    color: #806021;
-}
-
-.mission-slide-controls {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 4px;
-    margin-left: auto;
-}
-
-    .mission-slide-controls button {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 36px;
-        height: 44px;
-        padding: 0;
-        border: 0;
-        background: transparent;
-        color: #063f3b;
-        font-size: 22px;
-        cursor: pointer;
-        border-radius: 4px;
-    }
-
-        .mission-slide-controls button:hover {
-            background: #063f3b;
-            color: #fffdf5;
-        }
-
-        .mission-slide-controls button:focus-visible {
-            outline: 3px solid #b99750;
-            outline-offset: 3px;
-        }
-
-.mission-slide-dots {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-    .mission-slide-dots button {
-        width: 24px;
-        height: 44px;
-        border: 0;
-    }
-
-    .mission-slide-dots span {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: currentColor;
-        opacity: .4;
-    }
-
-    .mission-slide-dots .is-active span {
-        opacity: 1;
-        width: 18px;
-        border-radius: 6px;
-    }
-
-@media (max-width: 1050px) {
-    .mission-visit-gallery {
-        grid-template-columns: minmax(0, 1fr);
-    }
-
-        .mission-visit-gallery > header {
-            min-height: 0;
-            padding: 0;
-        }
-
-    .mission-slide-image {
-        justify-content: center;
-    }
-
-        .mission-slide-image img {
-            mask-image: linear-gradient(180deg, transparent, #000 10%);
-        }
-}
-
-@media (max-width: 600px) {
-    .mission-visit-gallery > header h2 {
-        font-size: 30px;
-        margin-block: 12px;
-    }
-}
-
-@media (max-width: 400px) {
-    .mission-slideshow figcaption {
-        padding: 8px 12px;
-    }
-
-    .mission-slide-controls {
-        margin-inline: auto;
-        gap: 2px;
-    }
-
-    .mission-slide-image {
-        height: 300px;
-    }
-}
-
-.ghana-mission-identity {
-    padding: 36px;
-    background: #063f3b;
-    color: #fffdf5;
-    border-top: 4px solid #d8b66c;
-}
-
-    .ghana-mission-identity > span {
-        color: #ead1a0;
-        font-size: 12px;
-        letter-spacing: .14em;
-        text-transform: uppercase;
-    }
-
-    .ghana-mission-identity hr {
-        border: 0;
-        border-top: 1px solid #63847b;
-        margin: 24px 0;
-    }
-
-.ghana-mission-story {
-    border-bottom: 1px solid #d8dfd3;
-}
-
-.ghana-mission-activities {
-    scroll-margin-top: 110px;
-}
-
-.ghana-mission-activity-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 24px;
-    margin-top: 28px;
-}
-
-    .ghana-mission-activity-grid article {
-        padding: 30px;
-        background: #e9ede3;
-        border-top: 3px solid #b99750;
-    }
-
-    .ghana-mission-activity-grid h3 {
-        margin: 12px 0 18px;
-    }
-
-.ghana-mission-empty {
-    margin-top: 28px;
-    padding: 30px;
-    border: 1px solid #d8dfd3;
-    border-left: 4px solid #b99750;
-    background: #fffdf5;
-}
-
-.ghana-mission-connect {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 32px;
-    background: #063f3b;
-    color: #fffdf5;
-}
-
-    .ghana-mission-connect .eyebrow {
-        color: #ead1a0;
-    }
-
-    .ghana-mission-connect > a {
-        flex-shrink: 0;
-    }
-
-.ghana-mission-page a:focus-visible {
-    outline: 3px solid #b99750;
-    outline-offset: 5px;
-}
-
-.mission-timeline {
-    list-style: none;
-    padding: 0 0 0 24px;
-    margin: 40px 0 0;
-    border-left: 2px solid #b99750;
-}
-
-    .mission-timeline > li {
-        position: relative;
-        margin-bottom: 32px;
-    }
-
-        .mission-timeline > li::before {
-            content: '';
-            position: absolute;
-            top: 7px;
-            left: -31px;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #063f3b;
-        }
-
-    .mission-timeline time {
-        display: block;
-        margin-bottom: 12px;
-        font-size: 14px;
-        font-weight: 700;
-    }
-
-.mission-timeline-card {
-    display: flex;
-    background: #fffdf5;
-    border: 1px solid #d8dfd3;
-}
-
-    .mission-timeline-card > a {
-        flex: 0 0 34%;
-    }
-
-    .mission-timeline-card img {
-        width: 100%;
-        height: 100%;
-        max-height: 330px;
-        object-fit: contain;
-    }
-
-    .mission-timeline-card > div {
-        min-width: 0;
-        padding: 28px;
-    }
-
-    .mission-timeline-card h3 {
-        margin: 10px 0;
-        overflow-wrap: anywhere;
-    }
-
-        .mission-timeline-card h3 a {
-            color: inherit;
-            text-decoration: none;
-        }
-
-.mission-article {
-    max-width: 1100px;
-    margin: auto;
-    overflow-wrap: anywhere;
-}
-
-.mission-article-image {
-    display: block;
-    width: 100%;
-    max-height: 650px;
-    object-fit: contain;
-    margin: 28px 0;
-}
-
-.mission-article-body {
-    white-space: pre-wrap;
-    line-height: 1.9;
-    max-width: 75ch;
-    margin-block: 28px;
+@media (max-width: 560px) {
+    .mission-cause-grid, .mission-timeline { grid-template-columns: minmax(0, 1fr); }
+    .mission-cause { padding: 24px; }
+    .mission-cause h3 { margin-top: 20px; }
+    .mission-welcome-photo { padding: 14px 0 54px 14px; }
+    .mission-welcome-photo::before { border-radius: 64px 10px 10px 10px; }
+    .mission-welcome-photo img { border-radius: 54px 8px 8px 8px; }
+    .mission-welcome-photo figcaption { right: 12px; font-size: 14px; padding: 14px 18px; }
+    .mission-photo-mark { font-size: 32px; margin-right: 12px; }
+    .mission-welcome-actions { gap: 20px; }
+    .mission-slide-controls { margin-inline: auto; gap: 0; }
+    .mission-slide-dots button { width: 22px; }
+    .mission-timeline-card img { height: 250px; }
 }
 
 @media (max-width: 800px) {
-    .mission-timeline-card {
-        flex-direction: column;
-    }
-
-        .mission-timeline-card img {
-            height: auto;
-            max-height: 350px;
-        }
-
-        .mission-timeline-card > div {
-            padding: 22px;
-        }
-
-    .ghana-mission-page section {
-        padding-block: 34px;
-    }
-
-    .ghana-mission-story {
-        grid-template-columns: minmax(0, 1fr);
-        gap: 24px;
-    }
-
-    .ghana-mission-activity-grid {
-        grid-template-columns: minmax(0, 1fr);
-    }
-
-        .ghana-mission-activity-grid article {
-            padding: 24px;
-        }
-
-    .ghana-mission-identity, .ghana-mission-empty {
-        padding: 24px;
-    }
-
-    .ghana-mission-connect {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 16px;
-    }
+    .ghana-mission-page .mission-hero { min-height: 720px; padding-block: 64px 24px; gap: 40px; }
+    .mission-hero-images::after { background: linear-gradient(90deg, #092d27cf, #092d2766), linear-gradient(0deg, #092d27f5, #092d2733 80%); }
+    .mission-hero-copy { max-width: 580px; }
+}
+@media (max-width: 560px) {
+    .ghana-mission-page .mission-hero { padding-inline: 24px; }
+    .mission-hero-images img { object-position: 60% center; }
+    .mission-hero-footer { gap: 16px; }
+    .mission-slide-controls { margin-inline: 0; width: 100%; justify-content: space-between; }
+    .mission-slide-controls .mission-rotation-toggle { width: 68px; margin-right: 0; }
+    .mission-slide-controls > button:not(.mission-rotation-toggle) { width: 28px; }
+    .mission-slide-dots button { width: 22px; }
+}
+@media (max-width: 360px) {
+    .mission-slide-dots button { width: 19px; }
+    .mission-slide-controls .mission-rotation-toggle { width: 60px; gap: 4px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .mission-hero-images img { transition: none; }
 }
 
-.public-refresh .center-hero.mission-center-hero {
-    background-image: linear-gradient(90deg,rgba(2,35,33,.94) 0%,rgba(2,46,43,.78) 36%,rgba(2,46,43,.12) 75%), url('/images/mission/orphanage-visit-presentation-remastered.jpg');
-}
-
-.ghana-mission-page .mission-center-hero h1 {
-    margin: 0;
-}
-
-@media (max-width: 700px) {
-    .public-refresh .center-hero.mission-center-hero {
-        background-image: linear-gradient(180deg,transparent 100px,#022e2b 260px), url('/images/mission/orphanage-visit-presentation-remastered.jpg');
-    }
+/* Mission-only navigation overlays the opening photo; shared pages retain their header. */
+.mission-announcement { position: relative; z-index: 81; background: #f4cd65; color: #173e35; }
+.mission-announcement span { color: #85432c; }
+.site-header.storefront-header.mission-header { background: #123c344a; border-bottom-color: #ffffff30; color: #fff8ed; }
+.mission-header .logo { background: transparent; padding-inline: 8px; }
+.mission-header .logo img { height: 64px; width: 160px; display: block; }
+.mission-header .desktop-nav a { color: #fff8ed; }
+.mission-header .desktop-nav a:hover { color: #f4cd65; }
+.site-header.storefront-header.mission-header .cart-icon { color: #fff8ed; border-color: #ffffff70; }
+.mission-header .menu-trigger { background: transparent; border-color: #ffffff70; }
+.mission-header .menu-trigger span { background: #fff8ed; }
+.mission-header .cart-icon:hover, .mission-header .menu-trigger:hover { background: #ffffff20; }
+.mission-header :is(a,button):focus-visible { outline-color: #f4cd65; }
+.mission-landing { margin-top: -90px; }
+.mission-landing .mission-hero { min-height: 90vh; min-height: 90svh; padding-top: 138px; padding-bottom: 24px; gap: 32px; }
+.mission-landing .mission-hero h1 { margin-block: 14px 22px; }
+.mission-landing .mission-hero-images::after { background: linear-gradient(90deg, #092d27ed 0%, #092d27cf 35%, #092d2730 80%), linear-gradient(0deg, #092d27ed, transparent 40%); }
+@media (max-width: 600px) {
+    .mission-landing { margin-top: -80px; }
+    .mission-header .logo img { width: 140px; height: 58px; }
+    .mission-landing .mission-hero { padding-top: 116px; gap: 28px; }
+    .mission-landing .mission-welcome-intro { font-size: 15px; line-height: 1.65; }
+    .mission-landing .mission-welcome-actions { margin-top: 22px; gap: 14px; }
+    .mission-landing .mission-welcome-note { margin-top: 22px; }
 }

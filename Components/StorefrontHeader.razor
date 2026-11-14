@@ -1,8 +1,8 @@
 @rendermode InteractiveServer
-<div class="announcement storefront-announcement">Proudly Ghanaian-American <span>✦</span> Wellness with purpose</div>
-<header class="site-header storefront-header" id="top">
+<div class="announcement storefront-announcement @(MissionTheme ? "mission-announcement" : null)">Proudly Ghanaian-American <span>✦</span> Wellness with purpose</div>
+<header class="site-header storefront-header @(MissionTheme ? "mission-header" : null)" id="top">
     <a class="logo" href="/#top">
-        <img src="images/vitalreach-logo_header.png" alt="VitalReach Wellness Hub" />
+        <img src="@(MissionTheme ? "images/vitalreach-logo_footer.png" : "images/vitalreach-logo_header.png")" alt="VitalReach Wellness Hub" />
     </a>
     <nav class="desktop-nav" aria-label="Main navigation">
         <a href="/shop">Shop</a>

@@ -1,21 +1,44 @@
-<div class="mission-slideshow" role="region" aria-roledescription="carousel" aria-label="Community work in Ghana">
-    <figure id="mission-current-slide">
-        <div class="mission-slide-image">
-            <img src="@Current.Image" alt="@Current.Alt" width="823" height="550" loading="lazy" decoding="async" />
+<section class="mission-hero" @ref="Hero" aria-roledescription="carousel" aria-labelledby="mission-title">
+    <div class="mission-hero-images" id="mission-hero-images">
+        @for (var i = 0; i < Slides.Length; i++)
+        {
+            var slide = Slides[i];
+            <img class="@(i == ActiveIndex ? "is-active" : null)" src="@slide.Image"
+                 alt="@(i == ActiveIndex ? slide.Alt : "")" aria-hidden="@(i != ActiveIndex ? "true" : null)"
+                 fetchpriority="@(i == 0 ? "high" : "low")" decoding="async" />
+        }
+    </div>
+    <div class="mission-hero-copy">
+        <p class="eyebrow">VitalReach International · Ghana</p>
+        <h1 id="mission-title">Care that brings<br /><em>us together.</em></h1>
+        <p class="mission-welcome-intro">Our Ghana Mission supports dignity, health and education through everyday acts of care. Together with our communities, we turn compassion into action.</p>
+        <div class="mission-welcome-actions">
+            <a class="btn mission-primary" href="/ghana-mission#mission-activities">Explore our work <span aria-hidden="true">↗</span></a>
+            <a class="underlink" href="/contact">Get involved →</a>
         </div>
-        <figcaption>
-            <span class="mission-slide-caption" aria-live="polite" aria-atomic="true"><span class="eyebrow">@(ActiveIndex + 1) / @Slides.Length</span><span>@Current.Caption</span></span>
-            <div class="mission-slide-controls">
-        <button type="button" @onclick="Previous" aria-label="Previous photo" aria-controls="mission-current-slide">←</button>
-        <div class="mission-slide-dots" aria-label="Choose a photo">
-            @for (var i = 0; i < Slides.Length; i++)
-            {
-                var index = i;
-                <button type="button" class="@(ActiveIndex == index ? "is-active" : null)" aria-label="@($"Photo {index + 1}: {Slides[index].Caption}")" aria-current="@(ActiveIndex == index ? "true" : null)" aria-controls="mission-current-slide" @onclick="() => Select(index)"><span></span></button>
-            }
+        <p class="mission-welcome-note">Rooted in Ghana. Built on community.</p>
+    </div>
+    <div class="mission-hero-footer">
+        <div class="mission-slide-caption" aria-live="@(IsPaused ? "polite" : "off")" aria-atomic="true">
+            <span class="eyebrow">@(ActiveIndex + 1) / @Slides.Length</span>
+            <span>@Current.Caption</span>
         </div>
-        <button type="button" @onclick="Next" aria-label="Next photo" aria-controls="mission-current-slide">→</button>
+        <div class="mission-slide-controls" aria-label="Hero photo controls">
+            <button class="mission-rotation-toggle" type="button" @onclick="ToggleRotation" aria-label="@(IsPaused ? "Play slideshow" : "Pause slideshow")">
+                <span aria-hidden="true">@(IsPaused ? "▶" : "Ⅱ")</span> @(IsPaused ? "Play" : "Pause")
+            </button>
+            <button type="button" @onclick="Previous" aria-label="Previous photo" aria-controls="mission-hero-images">←</button>
+            <div class="mission-slide-dots" aria-label="Choose a photo">
+                @for (var i = 0; i < Slides.Length; i++)
+                {
+                    var index = i;
+                    <button type="button" class="@(ActiveIndex == index ? "is-active" : null)"
+                            aria-label="@($"Photo {index + 1}: {Slides[index].Caption}")"
+                            aria-current="@(ActiveIndex == index ? "true" : null)" aria-controls="mission-hero-images"
+                            @onclick="() => Select(index)"><span></span></button>
+                }
             </div>
-        </figcaption>
-    </figure>
-</div>
+            <button type="button" @onclick="Next" aria-label="Next photo" aria-controls="mission-hero-images">→</button>
+        </div>
+    </div>
+</section>
